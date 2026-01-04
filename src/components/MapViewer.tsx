@@ -29,6 +29,21 @@ function FitBounds({ bounds }: { bounds: LatLngBounds }) {
   return null
 }
 
+// Component to handle map resize on fullscreen toggle
+function MapResizer({ isFullscreen }: { isFullscreen: boolean }) {
+  const map = useMap()
+
+  useEffect(() => {
+    // Delay to allow CSS transition to complete
+    const timer = setTimeout(() => {
+      map.invalidateSize()
+    }, 100)
+    return () => clearTimeout(timer)
+  }, [isFullscreen, map])
+
+  return null
+}
+
 export function MapViewer({ allPoints, selectedPoints, startKm = 0, endKm }: MapViewerProps) {
   const [isFullscreen, setIsFullscreen] = useState(false)
 
@@ -96,6 +111,7 @@ export function MapViewer({ allPoints, selectedPoints, startKm = 0, endKm }: Map
           />
 
           <FitBounds bounds={bounds} />
+          <MapResizer isFullscreen={isFullscreen} />
 
           {/* Full route - more visible */}
           <Polyline

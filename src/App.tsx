@@ -1,10 +1,10 @@
-import { useState, useRef, useEffect } from 'react'
-import { UploadCloud, FileUp, CheckCircle, Settings, Scissors, Download, HelpCircle, Eye, Map } from 'lucide-react'
+import { useState, useRef, useEffect, useMemo } from 'react'
+import { UploadCloud, FileUp, CheckCircle, Settings, Download, HelpCircle, Eye, Map } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Toast } from '@/components/ui/toast'
+import { Slider } from '@/components/ui/slider'
 import { processGPX, analyzeGPX, type GPXPreview, type GPXProcessResult } from '@/lib/gpx-utils'
 import { MapViewer } from '@/components/MapViewer'
 
@@ -14,7 +14,8 @@ function App() {
   const [startFromKM, setStartFromKM] = useState<number>(0)
   const [distanceKM, setDistanceKM] = useState<number>(40)
   const [preview, setPreview] = useState<GPXPreview | null>(null)
-  const [result, setResult] = useState<GPXProcessResult | null>(null)
+  const [allSegments, setAllSegments] = useState<GPXProcessResult[]>([])
+  const [selectedSegmentIndex, setSelectedSegmentIndex] = useState<number | null>(null)
   const [toast, setToast] = useState({ show: false, message: '' })
   const [helpOpen, setHelpOpen] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -26,12 +27,27 @@ function App() {
     }, 3000)
   }
 
+  // Live preview of selected segment
+  const liveSegment = useMemo(() => {
+    if (!currentXML || !preview) return null
+
+    try {
+      return processGPX(currentXML, {
+        startFromKM,
+        distanceKM,
+      })
+    } catch (error) {
+      return null
+    }
+  }, [currentXML, startFromKM, distanceKM, preview])
+
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = event.target.files?.[0]
     if (selectedFile) {
       setFile(selectedFile)
       setPreview(null)
-      setResult(null)
+      setAllSegments([])
+      setSelectedSegmentIndex(null)
       const reader = new FileReader()
       reader.onload = (e) => {
         const parser = new DOMParser()
@@ -48,22 +64,37 @@ function App() {
     try {
       const previewData = analyzeGPX(currentXML)
       setPreview(previewData)
+      setStartFromKM(0)
+      setDistanceKM(Math.min(40, Math.floor(previewData.totalDistance)))
       showToast('Preview geladen!')
     } catch (error) {
       showToast(error instanceof Error ? error.message : 'Er is een fout opgetreden')
     }
   }
 
-  const handleProcess = () => {
-    if (!currentXML) return
+  const generateAllSegments = () => {
+    if (!currentXML || !preview) return
 
     try {
-      const processedResult = processGPX(currentXML, {
-        startFromKM,
-        distanceKM,
-      })
-      setResult(processedResult)
-      showToast(`Route gegenereerd: ${Math.round(processedResult.distance * 10) / 10} km!`)
+      const segments: GPXProcessResult[] = []
+      const segmentLength = 40 // 40km segments
+      let start = 0
+
+      while (start < preview.totalDistance) {
+        const distance = Math.min(segmentLength, preview.totalDistance - start)
+        if (distance < 5) break // Skip very short segments at the end
+
+        const segment = processGPX(currentXML, {
+          startFromKM: start,
+          distanceKM: distance,
+        })
+        segments.push(segment)
+        start += segmentLength
+      }
+
+      setAllSegments(segments)
+      setSelectedSegmentIndex(null)
+      showToast(`${segments.length} segmenten gegenereerd!`)
     } catch (error) {
       showToast(error instanceof Error ? error.message : 'Er is een fout opgetreden')
     }
@@ -76,17 +107,20 @@ function App() {
     }
   }, [currentXML])
 
-  const handleDownload = () => {
-    if (!result) return
-    const url = URL.createObjectURL(result.blob)
+  const handleDownload = (segment: GPXProcessResult) => {
+    const url = URL.createObjectURL(segment.blob)
     const a = document.createElement('a')
     a.href = url
-    a.download = result.fileName
+    a.download = segment.fileName
     document.body.appendChild(a)
     a.click()
     document.body.removeChild(a)
     URL.revokeObjectURL(url)
+    showToast(`${segment.fileName} gedownload!`)
   }
+
+  const maxDistance = preview?.totalDistance || 1000
+  const roundedMaxDistance = Math.floor(maxDistance / 10) * 10
 
   return (
     <div className="min-h-screen bg-background p-4 pb-20">
@@ -164,7 +198,70 @@ function App() {
           </Card>
         )}
 
-        {/* Map Viewer */}
+        {/* Step 2: Settings - MOVED BEFORE MAP */}
+        {preview && (
+          <Card className="border-orange-200 bg-orange-50/50 dark:bg-orange-950/20">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-orange-900 dark:text-orange-100">
+                <Settings className="w-5 h-5" />
+                Stap 2: Selecteer Segment
+              </CardTitle>
+              <CardDescription>
+                Gebruik de sliders om je segment te kiezen - de kaart toont het direct
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="space-y-3">
+                <div className="flex justify-between items-center">
+                  <Label htmlFor="startFromKM">Start vanaf (KM)</Label>
+                  <span className="text-lg font-semibold text-primary">{startFromKM} km</span>
+                </div>
+                <Slider
+                  id="startFromKM"
+                  min={0}
+                  max={roundedMaxDistance}
+                  step={10}
+                  value={startFromKM}
+                  onValueChange={setStartFromKM}
+                />
+                <p className="text-xs text-muted-foreground">
+                  Stappen van 10 km
+                </p>
+              </div>
+
+              <div className="space-y-3">
+                <div className="flex justify-between items-center">
+                  <Label htmlFor="distanceKM">Afstand (KM)</Label>
+                  <span className="text-lg font-semibold text-primary">{distanceKM} km</span>
+                </div>
+                <Slider
+                  id="distanceKM"
+                  min={10}
+                  max={Math.min(200, roundedMaxDistance)}
+                  step={10}
+                  value={distanceKM}
+                  onValueChange={setDistanceKM}
+                />
+                <p className="text-xs text-muted-foreground">
+                  Stappen van 10 km
+                </p>
+              </div>
+
+              <div className="p-4 bg-gradient-to-r from-green-50 to-blue-50 dark:from-green-950/20 dark:to-blue-950/20 rounded-lg border-2 border-primary/20">
+                <p className="text-sm font-medium text-center">
+                  📍 Geselecteerd Segment: <span className="text-primary font-bold">{startFromKM} km</span> → <span className="text-primary font-bold">{startFromKM + distanceKM} km</span>
+                </p>
+                {liveSegment && (
+                  <p className="text-xs text-center mt-1 text-muted-foreground">
+                    {liveSegment.pointCount} GPS punten · {liveSegment.distance.toFixed(2)} km
+                  </p>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Map Viewer - NOW AFTER SETTINGS */}
         {preview && (
           <Card className="border-purple-200 bg-purple-50/50 dark:bg-purple-950/20">
             <CardHeader>
@@ -179,107 +276,68 @@ function App() {
             <CardContent>
               <MapViewer
                 allPoints={preview.allPoints}
-                selectedPoints={result?.selectedPoints}
-                startKm={result?.startKm || startFromKM}
-                endKm={result?.endKm || startFromKM + distanceKM}
+                selectedPoints={liveSegment?.selectedPoints}
+                startKm={startFromKM}
+                endKm={startFromKM + distanceKM}
               />
             </CardContent>
           </Card>
         )}
 
-        {/* Step 2: Settings */}
-        <Card className={!file ? 'opacity-50 pointer-events-none' : ''}>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Settings className="w-5 h-5 text-primary" />
-              Stap 2: Instellingen
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="startFromKM">Start vanaf (KM)</Label>
-              <div className="flex items-center gap-4">
-                <Input
-                  id="startFromKM"
-                  type="number"
-                  min="0"
-                  max={preview?.totalDistance || 1000}
-                  value={startFromKM}
-                  onChange={(e) => setStartFromKM(Number(e.target.value))}
-                  className="flex-1 text-lg"
-                />
-                <span className="text-xs text-muted-foreground w-1/2">
-                  Begin het knipselectie op dit kilometerpunt.
-                </span>
-              </div>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="distanceKM">Afstand (KM)</Label>
-              <div className="flex items-center gap-4">
-                <Input
-                  id="distanceKM"
-                  type="number"
-                  min="1"
-                  value={distanceKM}
-                  onChange={(e) => setDistanceKM(Number(e.target.value))}
-                  className="flex-1 text-lg"
-                />
-                <span className="text-xs text-muted-foreground w-1/2">
-                  Hoeveel kilometer vanaf het startpunt.
-                </span>
-              </div>
-            </div>
-            {preview && (
-              <div className="p-3 bg-accent/50 rounded-lg">
-                <p className="text-sm font-medium">
-                  Selectie: {startFromKM} km → {startFromKM + distanceKM} km
-                </p>
-              </div>
-            )}
-          </CardContent>
-        </Card>
-
-        {/* Action Button */}
-        {file && (
-          <Button onClick={handleProcess} className="w-full h-12 text-base" size="lg">
-            <Scissors className="w-5 h-5" />
-            Route Genereren
+        {/* Generate All Segments Button */}
+        {preview && (
+          <Button
+            onClick={generateAllSegments}
+            className="w-full h-12 text-base bg-purple-600 hover:bg-purple-700"
+            size="lg"
+          >
+            <Settings className="w-5 h-5" />
+            Genereer Alle Segmenten (40km)
           </Button>
         )}
 
-        {/* Results */}
-        {result && (
+        {/* All Segments Grid */}
+        {allSegments.length > 0 && (
           <Card className="border-green-200 bg-green-50/50 dark:bg-green-950/20">
             <CardHeader>
-              <CardTitle className="text-green-900 dark:text-green-100">Resultaat</CardTitle>
+              <CardTitle className="text-green-900 dark:text-green-100">
+                Alle Segmenten ({allSegments.length})
+              </CardTitle>
+              <CardDescription>
+                Klik op een segment om te downloaden
+              </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-2 gap-4 text-sm mb-4">
-                <div>
-                  <p className="text-muted-foreground">Route segment:</p>
-                  <p className="font-semibold">{result.startKm.toFixed(1)} - {result.endKm.toFixed(1)} km</p>
-                </div>
-                <div>
-                  <p className="text-muted-foreground">Afstand:</p>
-                  <p className="font-semibold">{result.distance.toFixed(2)} km</p>
-                </div>
-                <div>
-                  <p className="text-muted-foreground">GPS punten:</p>
-                  <p className="font-semibold">{result.pointCount.toLocaleString()}</p>
-                </div>
-                <div>
-                  <p className="text-muted-foreground">Bestandsnaam:</p>
-                  <p className="font-semibold text-xs truncate">{result.fileName}</p>
-                </div>
+            <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                {allSegments.map((segment, index) => (
+                  <button
+                    key={index}
+                    onClick={() => handleDownload(segment)}
+                    onMouseEnter={() => setSelectedSegmentIndex(index)}
+                    onMouseLeave={() => setSelectedSegmentIndex(null)}
+                    className={`p-4 rounded-lg border-2 transition-all text-left ${
+                      selectedSegmentIndex === index
+                        ? 'border-green-500 bg-green-100 dark:bg-green-900/50 shadow-lg scale-105'
+                        : 'border-green-200 bg-white dark:bg-green-950/20 hover:border-green-400'
+                    }`}
+                  >
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="font-semibold text-green-900 dark:text-green-100">
+                        Segment {index + 1}
+                      </span>
+                      <Download className="w-4 h-4 text-green-600" />
+                    </div>
+                    <div className="text-sm space-y-1">
+                      <p className="text-muted-foreground">
+                        {segment.startKm.toFixed(1)} - {segment.endKm.toFixed(1)} km
+                      </p>
+                      <p className="font-medium">
+                        {segment.distance.toFixed(2)} km · {segment.pointCount} punten
+                      </p>
+                    </div>
+                  </button>
+                ))}
               </div>
-              <Button
-                onClick={handleDownload}
-                className="w-full h-12 text-base bg-green-600 hover:bg-green-700"
-                size="lg"
-              >
-                <Download className="w-5 h-5" />
-                Download GPX Bestand
-              </Button>
             </CardContent>
           </Card>
         )}
@@ -301,10 +359,9 @@ function App() {
                 <ol className="list-decimal pl-5 space-y-2">
                   <li>Exporteer je GPX bestand vanuit Komoot.</li>
                   <li>Upload het bestand - een preview wordt automatisch getoond.</li>
-                  <li>Kies waar je wilt beginnen (Start vanaf KM).</li>
-                  <li>Kies hoeveel kilometer je wilt hebben vanaf dat punt.</li>
-                  <li>Klik op 'Route Genereren'.</li>
-                  <li>Download je aangepaste GPX bestand!</li>
+                  <li>Gebruik de sliders om een segment te kiezen - zie het direct op de kaart!</li>
+                  <li>Of klik op "Genereer Alle Segmenten" voor 40km segmenten van de hele route.</li>
+                  <li>Klik op een segment om het te downloaden.</li>
                 </ol>
               </CardDescription>
             </CardContent>
