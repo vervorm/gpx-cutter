@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useState } from 'react'
-import { MapContainer, TileLayer, Polyline, CircleMarker, Popup, useMap } from 'react-leaflet'
-import { LatLngBounds, LatLngExpression } from 'leaflet'
-import { Maximize2, Minimize2 } from 'lucide-react'
+import { MapContainer, TileLayer, Polyline, Marker, Popup, useMap } from 'react-leaflet'
+import { LatLngBounds, LatLngExpression, DivIcon } from 'leaflet'
+import { Maximize2, Minimize2, MapPin } from 'lucide-react'
+import { renderToStaticMarkup } from 'react-dom/server'
 import 'leaflet/dist/leaflet.css'
 
 interface RoutePoint {
@@ -46,6 +47,43 @@ function MapResizer({ isFullscreen }: { isFullscreen: boolean }) {
 
 export function MapViewer({ allPoints, selectedPoints, startKm = 0, endKm }: MapViewerProps) {
   const [isFullscreen, setIsFullscreen] = useState(false)
+
+  // Create custom icons using MapPin from lucide
+  const startIcon = useMemo(() => {
+    const iconMarkup = renderToStaticMarkup(
+      <div style={{
+        color: '#22C55E',
+        filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.3))',
+        transform: 'translate(-12px, -24px)'
+      }}>
+        <MapPin size={32} fill="#22C55E" strokeWidth={2} />
+      </div>
+    )
+    return new DivIcon({
+      html: iconMarkup,
+      className: 'custom-marker-icon',
+      iconSize: [32, 32],
+      iconAnchor: [16, 32],
+    })
+  }, [])
+
+  const endIcon = useMemo(() => {
+    const iconMarkup = renderToStaticMarkup(
+      <div style={{
+        color: '#EF4444',
+        filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.3))',
+        transform: 'translate(-12px, -24px)'
+      }}>
+        <MapPin size={32} fill="#EF4444" strokeWidth={2} />
+      </div>
+    )
+    return new DivIcon({
+      html: iconMarkup,
+      className: 'custom-marker-icon',
+      iconSize: [32, 32],
+      iconAnchor: [16, 32],
+    })
+  }, [])
 
   // Convert points to Leaflet format
   const fullRoute: LatLngExpression[] = useMemo(
@@ -135,46 +173,28 @@ export function MapViewer({ allPoints, selectedPoints, startKm = 0, endKm }: Map
             />
           )}
 
-          {/* Start marker - using CircleMarker to avoid icon 404 */}
+          {/* Start marker - using MapPin icon */}
           {startPoint && (
-            <CircleMarker
-              center={[startPoint.lat, startPoint.lon]}
-              radius={8}
-              pathOptions={{
-                color: '#22C55E',
-                fillColor: '#22C55E',
-                fillOpacity: 1,
-                weight: 3,
-              }}
-            >
+            <Marker position={[startPoint.lat, startPoint.lon]} icon={startIcon}>
               <Popup>
                 <div className="text-sm">
                   <p className="font-semibold">Start</p>
                   <p>{startKm.toFixed(1)} km</p>
                 </div>
               </Popup>
-            </CircleMarker>
+            </Marker>
           )}
 
-          {/* End marker */}
+          {/* End marker - using MapPin icon */}
           {endPoint && selectedPoints && selectedPoints.length > 0 && (
-            <CircleMarker
-              center={[endPoint.lat, endPoint.lon]}
-              radius={8}
-              pathOptions={{
-                color: '#EF4444',
-                fillColor: '#EF4444',
-                fillOpacity: 1,
-                weight: 3,
-              }}
-            >
+            <Marker position={[endPoint.lat, endPoint.lon]} icon={endIcon}>
               <Popup>
                 <div className="text-sm">
                   <p className="font-semibold">Einde</p>
                   <p>{endKm?.toFixed(1)} km</p>
                 </div>
               </Popup>
-            </CircleMarker>
+            </Marker>
           )}
         </MapContainer>
       </div>

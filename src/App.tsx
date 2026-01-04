@@ -12,7 +12,7 @@ function App() {
   const [file, setFile] = useState<File | null>(null)
   const [currentXML, setCurrentXML] = useState<Document | null>(null)
   const [startFromKM, setStartFromKM] = useState<number>(0)
-  const [distanceKM, setDistanceKM] = useState<number>(40)
+  const [distanceKM, setDistanceKM] = useState<number>(100)
   const [preview, setPreview] = useState<GPXPreview | null>(null)
   const [allSegments, setAllSegments] = useState<GPXProcessResult[]>([])
   const [selectedSegmentIndex, setSelectedSegmentIndex] = useState<number | null>(null)
@@ -65,7 +65,7 @@ function App() {
       const previewData = analyzeGPX(currentXML)
       setPreview(previewData)
       setStartFromKM(0)
-      setDistanceKM(Math.min(40, Math.floor(previewData.totalDistance)))
+      setDistanceKM(Math.min(100, Math.floor(previewData.totalDistance)))
       showToast('Preview geladen!')
     } catch (error) {
       showToast(error instanceof Error ? error.message : 'Er is een fout opgetreden')
@@ -77,19 +77,47 @@ function App() {
 
     try {
       const segments: GPXProcessResult[] = []
-      const segmentLength = 40 // 40km segments
-      let start = 0
 
-      while (start < preview.totalDistance) {
-        const distance = Math.min(segmentLength, preview.totalDistance - start)
-        if (distance < 5) break // Skip very short segments at the end
+      if (startFromKM === 0) {
+        // 2 segmenten: splits de route in 2 gelijke delen
+        const halfDistance = preview.totalDistance / 2
 
-        const segment = processGPX(currentXML, {
-          startFromKM: start,
-          distanceKM: distance,
-        })
-        segments.push(segment)
-        start += segmentLength
+        // Segment 1: 0 tot halverwege
+        segments.push(processGPX(currentXML, {
+          startFromKM: 0,
+          distanceKM: halfDistance,
+        }))
+
+        // Segment 2: halverwege tot einde
+        segments.push(processGPX(currentXML, {
+          startFromKM: halfDistance,
+          distanceKM: preview.totalDistance - halfDistance,
+        }))
+      } else {
+        // 3 segmenten: voor, geselecteerd, na
+
+        // Segment 1: 0 tot start (als er ruimte is)
+        if (startFromKM > 5) {
+          segments.push(processGPX(currentXML, {
+            startFromKM: 0,
+            distanceKM: startFromKM,
+          }))
+        }
+
+        // Segment 2: geselecteerd segment
+        segments.push(processGPX(currentXML, {
+          startFromKM,
+          distanceKM,
+        }))
+
+        // Segment 3: na het geselecteerde segment tot einde (als er ruimte is)
+        const remaining = preview.totalDistance - (startFromKM + distanceKM)
+        if (remaining > 5) {
+          segments.push(processGPX(currentXML, {
+            startFromKM: startFromKM + distanceKM,
+            distanceKM: remaining,
+          }))
+        }
       }
 
       setAllSegments(segments)
@@ -292,7 +320,7 @@ function App() {
             size="lg"
           >
             <Settings className="w-5 h-5" />
-            Genereer Alle Segmenten (40km)
+            {startFromKM === 0 ? 'Genereer 2 Segmenten' : 'Genereer 3 Segmenten'}
           </Button>
         )}
 
