@@ -1,11 +1,12 @@
 import { useState, useRef, useEffect } from 'react'
-import { UploadCloud, FileUp, CheckCircle, Settings, Scissors, Download, HelpCircle, Eye } from 'lucide-react'
+import { UploadCloud, FileUp, CheckCircle, Settings, Scissors, Download, HelpCircle, Eye, Map } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Toast } from '@/components/ui/toast'
-import { processGPX, analyzeGPX, type GPXPreview } from '@/lib/gpx-utils'
+import { processGPX, analyzeGPX, type GPXPreview, type GPXProcessResult } from '@/lib/gpx-utils'
+import { MapViewer } from '@/components/MapViewer'
 
 function App() {
   const [file, setFile] = useState<File | null>(null)
@@ -13,14 +14,7 @@ function App() {
   const [startFromKM, setStartFromKM] = useState<number>(0)
   const [distanceKM, setDistanceKM] = useState<number>(40)
   const [preview, setPreview] = useState<GPXPreview | null>(null)
-  const [result, setResult] = useState<{
-    blob: Blob
-    fileName: string
-    distance: number
-    pointCount: number
-    startKm: number
-    endKm: number
-  } | null>(null)
+  const [result, setResult] = useState<GPXProcessResult | null>(null)
   const [toast, setToast] = useState({ show: false, message: '' })
   const [helpOpen, setHelpOpen] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -166,6 +160,29 @@ function App() {
                   <p className="font-semibold">0 - {preview.totalDistance.toFixed(0)} km</p>
                 </div>
               </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Map Viewer */}
+        {preview && (
+          <Card className="border-purple-200 bg-purple-50/50 dark:bg-purple-950/20">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-purple-900 dark:text-purple-100">
+                <Map className="w-5 h-5" />
+                Route Kaart
+              </CardTitle>
+              <CardDescription>
+                Volledige route in grijs, geselecteerd segment in blauw
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <MapViewer
+                allPoints={preview.allPoints}
+                selectedPoints={result?.selectedPoints}
+                startKm={result?.startKm || startFromKM}
+                endKm={result?.endKm || startFromKM + distanceKM}
+              />
             </CardContent>
           </Card>
         )}

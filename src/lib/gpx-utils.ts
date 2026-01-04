@@ -33,6 +33,11 @@ export function getDistanceFromLatLonInKm(
   return d;
 }
 
+export interface RoutePoint {
+  lat: number;
+  lon: number;
+}
+
 export interface GPXPreview {
   originalName: string;
   totalDistance: number;
@@ -41,11 +46,22 @@ export interface GPXPreview {
   startLon: number;
   endLat: number;
   endLon: number;
+  allPoints: RoutePoint[];
 }
 
 export interface GPXProcessOptions {
   startFromKM?: number;
   distanceKM: number;
+}
+
+export interface GPXProcessResult {
+  blob: Blob;
+  fileName: string;
+  distance: number;
+  pointCount: number;
+  startKm: number;
+  endKm: number;
+  selectedPoints: RoutePoint[];
 }
 
 /**
@@ -82,6 +98,12 @@ export function analyzeGPX(xmlDoc: Document): GPXPreview {
   const firstPoint = points[0];
   const lastPoint = points[points.length - 1];
 
+  // Extract all points for map display
+  const allPoints: RoutePoint[] = points.map(pt => ({
+    lat: parseFloat(pt.getAttribute('lat') || '0'),
+    lon: parseFloat(pt.getAttribute('lon') || '0'),
+  }));
+
   return {
     originalName,
     totalDistance,
@@ -90,6 +112,7 @@ export function analyzeGPX(xmlDoc: Document): GPXPreview {
     startLon: parseFloat(firstPoint.getAttribute('lon') || '0'),
     endLat: parseFloat(lastPoint.getAttribute('lat') || '0'),
     endLon: parseFloat(lastPoint.getAttribute('lon') || '0'),
+    allPoints,
   };
 }
 
@@ -198,6 +221,12 @@ export function processGPX(
     ? `${safeName}_${Math.round(startFromKM)}-${Math.round(startFromKM + rangeDistance)}km.gpx`
     : `${safeName}_${Math.round(rangeDistance)}km.gpx`;
 
+  // Extract selected points for map display
+  const selectedPoints: RoutePoint[] = newPoints.map(pt => ({
+    lat: parseFloat(pt.getAttribute('lat') || '0'),
+    lon: parseFloat(pt.getAttribute('lon') || '0'),
+  }));
+
   return {
     blob,
     fileName,
@@ -205,5 +234,6 @@ export function processGPX(
     pointCount: newPoints.length,
     startKm: startFromKM,
     endKm: startFromKM + rangeDistance,
+    selectedPoints,
   };
 }
