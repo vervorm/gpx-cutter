@@ -79,25 +79,26 @@ function App() {
       const segments: GPXProcessResult[] = []
 
       if (startFromKM === 0) {
-        // 2 segmenten: splits de route in 2 gelijke delen
-        const halfDistance = preview.totalDistance / 2
-
-        // Segment 1: 0 tot halverwege
-        segments.push(processGPX(currentXML, {
+        // 2 segmenten: splits de route op basis van selectie
+        // Segment 1: 0 tot gekozen afstand
+        const segment1 = processGPX(currentXML, {
           startFromKM: 0,
-          distanceKM: halfDistance,
-        }))
+          distanceKM: distanceKM,
+        })
+        segments.push(segment1)
 
-        // Segment 2: halverwege tot einde
-        segments.push(processGPX(currentXML, {
-          startFromKM: halfDistance,
-          distanceKM: preview.totalDistance - halfDistance,
-        }))
+        // Segment 2: start waar segment 1 eindigt
+        const remainingDistance = preview.totalDistance - segment1.endKm
+        if (remainingDistance > 0.1) { // Voeg alleen toe als er nog iets over is (0.1km marge)
+          segments.push(processGPX(currentXML, {
+            startFromKM: segment1.endKm,
+            distanceKM: remainingDistance,
+          }))
+        }
       } else {
         // 3 segmenten: voor, geselecteerd, na
-
         // Segment 1: 0 tot start (als er ruimte is)
-        if (startFromKM > 5) {
+        if (startFromKM > 0) {
           segments.push(processGPX(currentXML, {
             startFromKM: 0,
             distanceKM: startFromKM,
@@ -105,16 +106,17 @@ function App() {
         }
 
         // Segment 2: geselecteerd segment
-        segments.push(processGPX(currentXML, {
+        const segment2 = processGPX(currentXML, {
           startFromKM,
           distanceKM,
-        }))
+        })
+        segments.push(segment2)
 
         // Segment 3: na het geselecteerde segment tot einde (als er ruimte is)
-        const remaining = preview.totalDistance - (startFromKM + distanceKM)
-        if (remaining > 5) {
+        const remaining = preview.totalDistance - segment2.endKm
+        if (remaining > 1) {
           segments.push(processGPX(currentXML, {
-            startFromKM: startFromKM + distanceKM,
+            startFromKM: segment2.endKm,
             distanceKM: remaining,
           }))
         }
@@ -147,8 +149,8 @@ function App() {
     showToast(`${segment.fileName} gedownload!`)
   }
 
-  const maxDistance = preview?.totalDistance || 1000
-  const roundedMaxDistance = Math.floor(maxDistance / 10) * 10
+  const maxDistance = preview?.totalDistance || 0
+  const roundedMaxDistance = Math.ceil(maxDistance)
 
   return (
     <div className="min-h-screen bg-background p-4 pb-20">
@@ -248,12 +250,12 @@ function App() {
                   id="startFromKM"
                   min={0}
                   max={roundedMaxDistance}
-                  step={10}
+                  step={1}
                   value={startFromKM}
                   onValueChange={setStartFromKM}
                 />
                 <p className="text-xs text-muted-foreground">
-                  Stappen van 10 km
+                  Stappen van 1 km
                 </p>
               </div>
 
@@ -271,7 +273,7 @@ function App() {
                   onValueChange={setDistanceKM}
                 />
                 <p className="text-xs text-muted-foreground">
-                  Stappen van 10 km
+                  Stappen van 10 km (max 200 km)
                 </p>
               </div>
 
@@ -343,11 +345,10 @@ function App() {
                     onClick={() => handleDownload(segment)}
                     onMouseEnter={() => setSelectedSegmentIndex(index)}
                     onMouseLeave={() => setSelectedSegmentIndex(null)}
-                    className={`p-4 rounded-lg border-2 transition-all text-left ${
-                      selectedSegmentIndex === index
+                    className={`p-4 rounded-lg border-2 transition-all text-left ${selectedSegmentIndex === index
                         ? 'border-green-500 bg-green-100 dark:bg-green-900/50 shadow-lg scale-105'
                         : 'border-green-200 bg-white dark:bg-green-950/20 hover:border-green-400'
-                    }`}
+                      }`}
                   >
                     <div className="flex items-center justify-between mb-2">
                       <span className="font-semibold text-green-900 dark:text-green-100">

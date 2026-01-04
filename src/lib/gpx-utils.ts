@@ -148,6 +148,12 @@ export function processGPX(
   for (let i = 0; i < points.length; i++) {
     const pt = points[i];
 
+    // Add the first point if starting from 0
+    if (startFromKM === 0 && i === 0) {
+        newPoints.push(pt);
+        inRange = true;
+    }
+
     // Calculate distance from previous point
     if (i > 0) {
       const prevPt = points[i - 1];
@@ -162,21 +168,14 @@ export function processGPX(
       // Check if we've reached the start point
       if (!inRange && currentDist >= startFromKM) {
         inRange = true;
-        newPoints.push(pt); // Add the point where we start
-      }
-
-      // If in range, track the range distance
-      if (inRange) {
+        // Add the point just before and the point after the start distance
+        newPoints.push(prevPt, pt);
         rangeDistance += dist;
+      } else if (inRange) {
+        // If in range, track the range distance and add the point
+        rangeDistance += dist;
+        newPoints.push(pt);
       }
-    } else if (startFromKM === 0) {
-      // If starting from beginning, add first point
-      newPoints.push(pt);
-    }
-
-    // If in range and not the first point, add it
-    if (inRange && i > 0 && newPoints[newPoints.length - 1] !== pt) {
-      newPoints.push(pt);
     }
 
     // Stop once we've covered the desired distance in the range

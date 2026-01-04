@@ -18,11 +18,11 @@ interface MapViewerProps {
 }
 
 // Component to fit map bounds
-function FitBounds({ bounds }: { bounds: LatLngBounds }) {
+function FitBounds({ bounds }: { bounds: LatLngBounds | null }) {
   const map = useMap()
 
   useEffect(() => {
-    if (bounds.isValid()) {
+    if (bounds && bounds.isValid()) {
       map.fitBounds(bounds, { padding: [50, 50] })
     }
   }, [bounds, map])
@@ -38,7 +38,7 @@ function MapResizer({ isFullscreen }: { isFullscreen: boolean }) {
     // Delay to allow CSS transition to complete
     const timer = setTimeout(() => {
       map.invalidateSize()
-    }, 100)
+    }, 400)
     return () => clearTimeout(timer)
   }, [isFullscreen, map])
 
@@ -54,7 +54,6 @@ export function MapViewer({ allPoints, selectedPoints, startKm = 0, endKm }: Map
       <div style={{
         color: '#22C55E',
         filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.3))',
-        transform: 'translate(-12px, -24px)'
       }}>
         <MapPin size={32} fill="#22C55E" strokeWidth={2} />
       </div>
@@ -72,7 +71,6 @@ export function MapViewer({ allPoints, selectedPoints, startKm = 0, endKm }: Map
       <div style={{
         color: '#EF4444',
         filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.3))',
-        transform: 'translate(-12px, -24px)'
       }}>
         <MapPin size={32} fill="#EF4444" strokeWidth={2} />
       </div>
@@ -103,6 +101,15 @@ export function MapViewer({ allPoints, selectedPoints, startKm = 0, endKm }: Map
     return boundsObj
   }, [allPoints])
 
+  const selectedBounds = useMemo(() => {
+    if (!selectedPoints || selectedPoints.length === 0) {
+      return null
+    }
+    const boundsObj = new LatLngBounds([])
+    selectedPoints.forEach(p => boundsObj.extend([p.lat, p.lon]))
+    return boundsObj
+  }, [selectedPoints])
+
   // Get start and end markers
   const startPoint = selectedPoints?.[0] || allPoints[0]
   const endPoint = selectedPoints?.[selectedPoints.length - 1] || allPoints[allPoints.length - 1]
@@ -121,15 +128,6 @@ export function MapViewer({ allPoints, selectedPoints, startKm = 0, endKm }: Map
 
   return (
     <div className="relative">
-      {/* Fullscreen toggle button */}
-      <button
-        onClick={toggleFullscreen}
-        className="absolute top-2 right-2 z-[1000] bg-white hover:bg-gray-100 text-gray-700 p-2 rounded-lg shadow-lg transition-colors border border-gray-300"
-        title={isFullscreen ? 'Sluit fullscreen' : 'Open fullscreen'}
-      >
-        {isFullscreen ? <Minimize2 className="w-5 h-5" /> : <Maximize2 className="w-5 h-5" />}
-      </button>
-
       <div
         className={`rounded-lg overflow-hidden border-2 border-border shadow-lg transition-all ${
           isFullscreen
@@ -137,6 +135,14 @@ export function MapViewer({ allPoints, selectedPoints, startKm = 0, endKm }: Map
             : 'w-full h-96'
         }`}
       >
+        {/* Fullscreen toggle button */}
+        <button
+          onClick={toggleFullscreen}
+          className="absolute top-2 right-2 z-[1000] bg-white hover:bg-gray-100 text-gray-700 p-2 rounded-lg shadow-lg transition-colors border border-gray-300"
+          title={isFullscreen ? 'Sluit fullscreen' : 'Open fullscreen'}
+        >
+          {isFullscreen ? <Minimize2 className="w-5 h-5" /> : <Maximize2 className="w-5 h-5" />}
+        </button>
         <MapContainer
           center={[allPoints[0].lat, allPoints[0].lon]}
           zoom={13}
@@ -148,7 +154,7 @@ export function MapViewer({ allPoints, selectedPoints, startKm = 0, endKm }: Map
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           />
 
-          <FitBounds bounds={bounds} />
+          <FitBounds bounds={selectedBounds || bounds} />
           <MapResizer isFullscreen={isFullscreen} />
 
           {/* Full route - more visible */}
