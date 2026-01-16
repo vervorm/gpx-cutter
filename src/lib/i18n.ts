@@ -58,6 +58,19 @@ export interface Translations {
   howItWorksStep4: string
   howItWorksStep5: string
 
+  // About section
+  aboutTitle: string
+  aboutWhyTitle: string
+  aboutWhyText1: string
+  aboutWhyText2: string
+  aboutWhyText3: string
+  aboutStoryTitle: string
+  aboutStoryText1: string
+  aboutStoryText2: string
+  aboutStoryText3: string
+  aboutStoryText4: string
+  aboutDedication: string
+
   // Language names
   languageName: string
 }
@@ -112,6 +125,18 @@ export const translations: Record<Language, Translations> = {
     howItWorksStep4: 'Klik op "Genereer Segmenten" om meerdere delen te maken.',
     howItWorksStep5: 'Klik op een segment om het als GPX bestand te downloaden.',
 
+    aboutTitle: 'Over dit project',
+    aboutWhyTitle: 'Waarom deze tool?',
+    aboutWhyText1: 'Je kan lange routes maken op Komoot, maar niet alle GPS trackers kunnen grote GPX bestanden aan.',
+    aboutWhyText2: 'De "day by day" functie van Komoot splitst je volledige route op, maar kan daarna niet meer gereset worden.',
+    aboutWhyText3: 'En één specifiek stuk uit een lange GPX route halen was gewoonweg niet mogelijk... tot nu.',
+    aboutStoryTitle: 'Een persoonlijke reis',
+    aboutStoryText1: 'Deze tool is gemaakt voor een bijzondere reis van meer dan 10.000 km.',
+    aboutStoryText2: 'Ter herdenking van het 10-jarig overlijden van mijn broer Koenraad (aka Koene), die uitgestrooid is op zee.',
+    aboutStoryText3: 'De route volgt de volledige Europese westkust:',
+    aboutStoryText4: 'Oostende → Faro → Noordkaap → Oostende',
+    aboutDedication: '100 dagen × 100 km/dag, in liefdevolle herinnering aan Koene',
+
     languageName: 'Nederlands',
   },
   en: {
@@ -162,6 +187,18 @@ export const translations: Record<Language, Translations> = {
     howItWorksStep3: 'Use the sliders to choose your desired segment - see it immediately on the map!',
     howItWorksStep4: 'Click "Generate Segments" to create multiple parts.',
     howItWorksStep5: 'Click on a segment to download it as a GPX file.',
+
+    aboutTitle: 'About this project',
+    aboutWhyTitle: 'Why this tool?',
+    aboutWhyText1: 'You can create long routes on Komoot, but not all GPS trackers can handle large GPX files.',
+    aboutWhyText2: 'Komoot\'s "day by day" feature splits your complete route, but cannot be reset afterwards.',
+    aboutWhyText3: 'And extracting one specific section from a long GPX route was simply not possible... until now.',
+    aboutStoryTitle: 'A personal journey',
+    aboutStoryText1: 'This tool was created for a special journey of more than 10,000 km.',
+    aboutStoryText2: 'In memory of the 10th anniversary of my brother Koenraad\'s (aka Koene) passing, whose ashes were scattered at sea.',
+    aboutStoryText3: 'The route follows the entire European west coast:',
+    aboutStoryText4: 'Ostend → Faro → North Cape → Ostend',
+    aboutDedication: '100 days × 100 km/day, in loving memory of Koene',
 
     languageName: 'English',
   },
@@ -214,6 +251,18 @@ export const translations: Record<Language, Translations> = {
     howItWorksStep4: 'Cliquez sur "Générer des Segments" pour créer plusieurs parties.',
     howItWorksStep5: 'Cliquez sur un segment pour le télécharger en tant que fichier GPX.',
 
+    aboutTitle: 'À propos de ce projet',
+    aboutWhyTitle: 'Pourquoi cet outil ?',
+    aboutWhyText1: 'Vous pouvez créer de longs itinéraires sur Komoot, mais tous les GPS ne peuvent pas gérer de gros fichiers GPX.',
+    aboutWhyText2: 'La fonction "jour par jour" de Komoot divise votre itinéraire complet, mais ne peut pas être réinitialisée ensuite.',
+    aboutWhyText3: 'Et extraire une section spécifique d\'un long itinéraire GPX était tout simplement impossible... jusqu\'à présent.',
+    aboutStoryTitle: 'Un voyage personnel',
+    aboutStoryText1: 'Cet outil a été créé pour un voyage exceptionnel de plus de 10 000 km.',
+    aboutStoryText2: 'En mémoire du 10e anniversaire du décès de mon frère Koenraad (alias Koene), dont les cendres ont été dispersées en mer.',
+    aboutStoryText3: 'L\'itinéraire suit toute la côte ouest européenne :',
+    aboutStoryText4: 'Ostende → Faro → Cap Nord → Ostende',
+    aboutDedication: '100 jours × 100 km/jour, en mémoire affectueuse de Koene',
+
     languageName: 'Français',
   },
   es: {
@@ -264,6 +313,18 @@ export const translations: Record<Language, Translations> = {
     howItWorksStep3: '¡Usa los deslizadores para elegir tu segmento - vélo inmediatamente en el mapa!',
     howItWorksStep4: 'Haz clic en "Generar Segmentos" para crear varias partes.',
     howItWorksStep5: 'Haz clic en un segmento para descargarlo como archivo GPX.',
+
+    aboutTitle: 'Sobre este proyecto',
+    aboutWhyTitle: '¿Por qué esta herramienta?',
+    aboutWhyText1: 'Puedes crear rutas largas en Komoot, pero no todos los GPS pueden manejar archivos GPX grandes.',
+    aboutWhyText2: 'La función "día a día" de Komoot divide tu ruta completa, pero no se puede restablecer después.',
+    aboutWhyText3: 'Y extraer una sección específica de una ruta GPX larga simplemente no era posible... hasta ahora.',
+    aboutStoryTitle: 'Un viaje personal',
+    aboutStoryText1: 'Esta herramienta fue creada para un viaje especial de más de 10.000 km.',
+    aboutStoryText2: 'En memoria del 10° aniversario del fallecimiento de mi hermano Koenraad (alias Koene), cuyas cenizas fueron esparcidas en el mar.',
+    aboutStoryText3: 'La ruta sigue toda la costa oeste europea:',
+    aboutStoryText4: 'Ostende → Faro → Cabo Norte → Ostende',
+    aboutDedication: '100 días × 100 km/día, en memoria amorosa de Koene',
 
     languageName: 'Español',
   },
@@ -316,6 +377,18 @@ export const translations: Record<Language, Translations> = {
     howItWorksStep4: 'Klicken Sie auf "Segmente Generieren", um mehrere Teile zu erstellen.',
     howItWorksStep5: 'Klicken Sie auf ein Segment, um es als GPX-Datei herunterzuladen.',
 
+    aboutTitle: 'Über dieses Projekt',
+    aboutWhyTitle: 'Warum dieses Tool?',
+    aboutWhyText1: 'Sie können lange Routen auf Komoot erstellen, aber nicht alle GPS-Tracker können große GPX-Dateien verarbeiten.',
+    aboutWhyText2: 'Die "Tag für Tag"-Funktion von Komoot teilt Ihre komplette Route auf, kann aber danach nicht zurückgesetzt werden.',
+    aboutWhyText3: 'Und einen bestimmten Abschnitt aus einer langen GPX-Route zu extrahieren war einfach nicht möglich... bis jetzt.',
+    aboutStoryTitle: 'Eine persönliche Reise',
+    aboutStoryText1: 'Dieses Tool wurde für eine besondere Reise von mehr als 10.000 km erstellt.',
+    aboutStoryText2: 'Zum Gedenken an den 10. Jahrestag des Todes meines Bruders Koenraad (alias Koene), dessen Asche auf See verstreut wurde.',
+    aboutStoryText3: 'Die Route folgt der gesamten europäischen Westküste:',
+    aboutStoryText4: 'Ostende → Faro → Nordkap → Ostende',
+    aboutDedication: '100 Tage × 100 km/Tag, in liebevoller Erinnerung an Koene',
+
     languageName: 'Deutsch',
   },
   no: {
@@ -367,6 +440,18 @@ export const translations: Record<Language, Translations> = {
     howItWorksStep4: 'Klikk på "Generer Segmenter" for å lage flere deler.',
     howItWorksStep5: 'Klikk på et segment for å laste det ned som en GPX-fil.',
 
+    aboutTitle: 'Om dette prosjektet',
+    aboutWhyTitle: 'Hvorfor dette verktøyet?',
+    aboutWhyText1: 'Du kan lage lange ruter på Komoot, men ikke alle GPS-trackere kan håndtere store GPX-filer.',
+    aboutWhyText2: 'Komoot sin "dag for dag"-funksjon deler opp hele ruten, men kan ikke tilbakestilles etterpå.',
+    aboutWhyText3: 'Og å hente ut en bestemt del fra en lang GPX-rute var rett og slett ikke mulig... før nå.',
+    aboutStoryTitle: 'En personlig reise',
+    aboutStoryText1: 'Dette verktøyet ble laget for en spesiell reise på mer enn 10 000 km.',
+    aboutStoryText2: 'Til minne om 10-årsdagen for min bror Koenraads (alias Koene) bortgang, hvis aske ble strødd i havet.',
+    aboutStoryText3: 'Ruten følger hele den europeiske vestkysten:',
+    aboutStoryText4: 'Oostende → Faro → Nordkapp → Oostende',
+    aboutDedication: '100 dager × 100 km/dag, i kjærlig minne om Koene',
+
     languageName: 'Norsk',
   },
   pt: {
@@ -417,6 +502,18 @@ export const translations: Record<Language, Translations> = {
     howItWorksStep3: 'Use os controles deslizantes para escolher seu segmento - veja-o imediatamente no mapa!',
     howItWorksStep4: 'Clique em "Gerar Segmentos" para criar várias partes.',
     howItWorksStep5: 'Clique em um segmento para baixá-lo como arquivo GPX.',
+
+    aboutTitle: 'Sobre este projeto',
+    aboutWhyTitle: 'Por que esta ferramenta?',
+    aboutWhyText1: 'Você pode criar rotas longas no Komoot, mas nem todos os GPS podem lidar com arquivos GPX grandes.',
+    aboutWhyText2: 'A função "dia a dia" do Komoot divide sua rota completa, mas não pode ser redefinida depois.',
+    aboutWhyText3: 'E extrair uma seção específica de uma rota GPX longa simplesmente não era possível... até agora.',
+    aboutStoryTitle: 'Uma jornada pessoal',
+    aboutStoryText1: 'Esta ferramenta foi criada para uma jornada especial de mais de 10.000 km.',
+    aboutStoryText2: 'Em memória do 10º aniversário do falecimento de meu irmão Koenraad (alias Koene), cujas cinzas foram espalhadas no mar.',
+    aboutStoryText3: 'A rota segue toda a costa oeste europeia:',
+    aboutStoryText4: 'Ostende → Faro → Cabo Norte → Ostende',
+    aboutDedication: '100 dias × 100 km/dia, em memória amorosa de Koene',
 
     languageName: 'Português',
   },

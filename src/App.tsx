@@ -27,6 +27,7 @@ function App() {
   const [selectedSegmentIndex, setSelectedSegmentIndex] = useState<number | null>(null)
   const [toast, setToast] = useState({ show: false, message: '' })
   const [helpOpen, setHelpOpen] = useState(false)
+  const [aboutOpen, setAboutOpen] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   // Save language preference to localStorage
@@ -399,8 +400,50 @@ function App() {
           </Card>
         )}
 
+        {/* About Section */}
+        <Card className="mt-12 border-2 border-blue-200 bg-gradient-to-br from-blue-50/50 to-purple-50/50 dark:from-blue-950/20 dark:to-purple-950/20">
+          <CardHeader
+            className="cursor-pointer hover:bg-accent/50 transition-colors"
+            onClick={() => setAboutOpen(!aboutOpen)}
+          >
+            <CardTitle className="flex items-center gap-2 text-blue-900 dark:text-blue-100">
+              <HelpCircle className="w-5 h-5" />
+              {t.aboutTitle}
+            </CardTitle>
+          </CardHeader>
+          {aboutOpen && (
+            <CardContent className="space-y-6">
+              {/* Why this tool */}
+              <div className="space-y-3">
+                <h3 className="font-semibold text-lg text-blue-900 dark:text-blue-100">{t.aboutWhyTitle}</h3>
+                <div className="space-y-2 text-muted-foreground">
+                  <p>• {t.aboutWhyText1}</p>
+                  <p>• {t.aboutWhyText2}</p>
+                  <p>• {t.aboutWhyText3}</p>
+                </div>
+              </div>
+
+              {/* Personal story */}
+              <div className="space-y-3 pt-4 border-t border-blue-200 dark:border-blue-800">
+                <h3 className="font-semibold text-lg text-purple-900 dark:text-purple-100">{t.aboutStoryTitle}</h3>
+                <div className="space-y-2 text-muted-foreground">
+                  <p>{t.aboutStoryText1}</p>
+                  <p>{t.aboutStoryText2}</p>
+                  <p className="pt-2">{t.aboutStoryText3}</p>
+                  <p className="font-semibold text-blue-700 dark:text-blue-300 text-center text-lg py-2">
+                    {t.aboutStoryText4}
+                  </p>
+                  <p className="text-center italic font-medium text-purple-700 dark:text-purple-300 pt-2">
+                    ⚓ {t.aboutDedication} ⚓
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          )}
+        </Card>
+
         {/* Help Section */}
-        <Card className="mt-12">
+        <Card className="mt-8">
           <CardHeader
             className="cursor-pointer hover:bg-accent/50 transition-colors"
             onClick={() => setHelpOpen(!helpOpen)}
