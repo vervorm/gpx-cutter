@@ -50,6 +50,14 @@ export interface Translations {
   noRouteData: string
   error: string
 
+  // Help section
+  howItWorksTitle: string
+  howItWorksStep1: string
+  howItWorksStep2: string
+  howItWorksStep3: string
+  howItWorksStep4: string
+  howItWorksStep5: string
+
   // Language names
   languageName: string
 }
@@ -97,6 +105,13 @@ export const translations: Record<Language, Translations> = {
     noRouteData: 'Geen route data beschikbaar',
     error: 'Er is een fout opgetreden',
 
+    howItWorksTitle: 'Hoe werkt dit?',
+    howItWorksStep1: 'Upload je GPX bestand van je GPS apparaat, Komoot, Strava of andere app.',
+    howItWorksStep2: 'De route wordt automatisch geanalyseerd en op de kaart getoond.',
+    howItWorksStep3: 'Gebruik de sliders om je gewenste segment te kiezen - zie het direct op de kaart!',
+    howItWorksStep4: 'Klik op "Genereer Segmenten" om meerdere delen te maken.',
+    howItWorksStep5: 'Klik op een segment om het als GPX bestand te downloaden.',
+
     languageName: 'Nederlands',
   },
   en: {
@@ -140,6 +155,13 @@ export const translations: Record<Language, Translations> = {
     downloaded: 'downloaded!',
     noRouteData: 'No route data available',
     error: 'An error occurred',
+
+    howItWorksTitle: 'How does it work?',
+    howItWorksStep1: 'Upload your GPX file from your GPS device, Komoot, Strava or other app.',
+    howItWorksStep2: 'The route is automatically analyzed and displayed on the map.',
+    howItWorksStep3: 'Use the sliders to choose your desired segment - see it immediately on the map!',
+    howItWorksStep4: 'Click "Generate Segments" to create multiple parts.',
+    howItWorksStep5: 'Click on a segment to download it as a GPX file.',
 
     languageName: 'English',
   },
@@ -185,6 +207,13 @@ export const translations: Record<Language, Translations> = {
     noRouteData: 'Aucune donnée d\'itinéraire disponible',
     error: 'Une erreur s\'est produite',
 
+    howItWorksTitle: 'Comment ça marche ?',
+    howItWorksStep1: 'Téléchargez votre fichier GPX depuis votre appareil GPS, Komoot, Strava ou autre application.',
+    howItWorksStep2: 'L\'itinéraire est automatiquement analysé et affiché sur la carte.',
+    howItWorksStep3: 'Utilisez les curseurs pour choisir votre segment - voyez-le immédiatement sur la carte !',
+    howItWorksStep4: 'Cliquez sur "Générer des Segments" pour créer plusieurs parties.',
+    howItWorksStep5: 'Cliquez sur un segment pour le télécharger en tant que fichier GPX.',
+
     languageName: 'Français',
   },
   es: {
@@ -228,6 +257,13 @@ export const translations: Record<Language, Translations> = {
     downloaded: 'descargado!',
     noRouteData: 'No hay datos de ruta disponibles',
     error: 'Se produjo un error',
+
+    howItWorksTitle: '¿Cómo funciona?',
+    howItWorksStep1: 'Sube tu archivo GPX desde tu dispositivo GPS, Komoot, Strava u otra aplicación.',
+    howItWorksStep2: 'La ruta se analiza automáticamente y se muestra en el mapa.',
+    howItWorksStep3: '¡Usa los deslizadores para elegir tu segmento - vélo inmediatamente en el mapa!',
+    howItWorksStep4: 'Haz clic en "Generar Segmentos" para crear varias partes.',
+    howItWorksStep5: 'Haz clic en un segmento para descargarlo como archivo GPX.',
 
     languageName: 'Español',
   },
@@ -273,6 +309,13 @@ export const translations: Record<Language, Translations> = {
     noRouteData: 'Keine Routendaten verfügbar',
     error: 'Ein Fehler ist aufgetreten',
 
+    howItWorksTitle: 'Wie funktioniert es?',
+    howItWorksStep1: 'Laden Sie Ihre GPX-Datei von Ihrem GPS-Gerät, Komoot, Strava oder einer anderen App hoch.',
+    howItWorksStep2: 'Die Route wird automatisch analysiert und auf der Karte angezeigt.',
+    howItWorksStep3: 'Verwenden Sie die Schieberegler, um Ihr Segment zu wählen - sehen Sie es sofort auf der Karte!',
+    howItWorksStep4: 'Klicken Sie auf "Segmente Generieren", um mehrere Teile zu erstellen.',
+    howItWorksStep5: 'Klicken Sie auf ein Segment, um es als GPX-Datei herunterzuladen.',
+
     languageName: 'Deutsch',
   },
   no: {
@@ -317,6 +360,13 @@ export const translations: Record<Language, Translations> = {
     noRouteData: 'Ingen rutedata tilgjengelig',
     error: 'En feil oppstod',
 
+    howItWorksTitle: 'Hvordan fungerer det?',
+    howItWorksStep1: 'Last opp din GPX-fil fra GPS-enheten, Komoot, Strava eller annen app.',
+    howItWorksStep2: 'Ruten analyseres automatisk og vises på kartet.',
+    howItWorksStep3: 'Bruk glidebrytere for å velge ditt segment - se det umiddelbart på kartet!',
+    howItWorksStep4: 'Klikk på "Generer Segmenter" for å lage flere deler.',
+    howItWorksStep5: 'Klikk på et segment for å laste det ned som en GPX-fil.',
+
     languageName: 'Norsk',
   },
   pt: {
@@ -360,6 +410,13 @@ export const translations: Record<Language, Translations> = {
     downloaded: 'baixado!',
     noRouteData: 'Nenhum dado de rota disponível',
     error: 'Ocorreu um erro',
+
+    howItWorksTitle: 'Como funciona?',
+    howItWorksStep1: 'Carregue seu arquivo GPX do seu dispositivo GPS, Komoot, Strava ou outro aplicativo.',
+    howItWorksStep2: 'A rota é automaticamente analisada e exibida no mapa.',
+    howItWorksStep3: 'Use os controles deslizantes para escolher seu segmento - veja-o imediatamente no mapa!',
+    howItWorksStep4: 'Clique em "Gerar Segmentos" para criar várias partes.',
+    howItWorksStep5: 'Clique em um segmento para baixá-lo como arquivo GPX.',
 
     languageName: 'Português',
   },

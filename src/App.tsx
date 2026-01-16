@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useMemo } from 'react'
-import { UploadCloud, FileUp, CheckCircle, Settings, Download, Eye, Map } from 'lucide-react'
+import { UploadCloud, FileUp, CheckCircle, Settings, Download, Eye, Map, HelpCircle } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Label } from '@/components/ui/label'
@@ -26,6 +26,7 @@ function App() {
   const [allSegments, setAllSegments] = useState<GPXProcessResult[]>([])
   const [selectedSegmentIndex, setSelectedSegmentIndex] = useState<number | null>(null)
   const [toast, setToast] = useState({ show: false, message: '' })
+  const [helpOpen, setHelpOpen] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   // Save language preference to localStorage
@@ -397,6 +398,32 @@ function App() {
             </CardContent>
           </Card>
         )}
+
+        {/* Help Section */}
+        <Card className="mt-12">
+          <CardHeader
+            className="cursor-pointer hover:bg-accent/50 transition-colors"
+            onClick={() => setHelpOpen(!helpOpen)}
+          >
+            <CardTitle className="flex items-center gap-2">
+              <HelpCircle className="w-5 h-5" />
+              {t.howItWorksTitle}
+            </CardTitle>
+          </CardHeader>
+          {helpOpen && (
+            <CardContent>
+              <CardDescription className="space-y-2">
+                <ol className="list-decimal pl-5 space-y-2">
+                  <li>{t.howItWorksStep1}</li>
+                  <li>{t.howItWorksStep2}</li>
+                  <li>{t.howItWorksStep3}</li>
+                  <li>{t.howItWorksStep4}</li>
+                  <li>{t.howItWorksStep5}</li>
+                </ol>
+              </CardDescription>
+            </CardContent>
+          )}
+        </Card>
       </div>
     </div>
   )
