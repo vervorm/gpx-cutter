@@ -15,6 +15,13 @@ interface MapViewerProps {
   selectedPoints?: RoutePoint[]
   startKm?: number
   endKm?: number
+  translations?: {
+    openFullscreen: string
+    closeFullscreen: string
+    startMarker: string
+    endMarker: string
+    noRouteData: string
+  }
 }
 
 // Component to fit map bounds
@@ -49,14 +56,19 @@ function MapResizer({ isFullscreen }: { isFullscreen: boolean }) {
 }
 
 // Fullscreen toggle button inside map
-function FullscreenControl({ isFullscreen, onToggle }: { isFullscreen: boolean; onToggle: () => void }) {
+function FullscreenControl({ isFullscreen, onToggle, openText, closeText }: {
+  isFullscreen: boolean
+  onToggle: () => void
+  openText: string
+  closeText: string
+}) {
   return (
     <div className="leaflet-top leaflet-right" style={{ position: 'absolute', top: '10px', right: '10px', zIndex: 1000 }}>
       <div className="leaflet-control">
         <button
           onClick={onToggle}
           className="bg-white hover:bg-gray-100 text-gray-700 p-2 rounded-lg shadow-lg transition-colors border border-gray-300"
-          title={isFullscreen ? 'Sluit fullscreen' : 'Open fullscreen'}
+          title={isFullscreen ? closeText : openText}
         >
           {isFullscreen ? <Minimize2 className="w-5 h-5" /> : <Maximize2 className="w-5 h-5" />}
         </button>
@@ -65,8 +77,17 @@ function FullscreenControl({ isFullscreen, onToggle }: { isFullscreen: boolean; 
   )
 }
 
-export function MapViewer({ allPoints, selectedPoints, startKm = 0, endKm }: MapViewerProps) {
+export function MapViewer({ allPoints, selectedPoints, startKm = 0, endKm, translations }: MapViewerProps) {
   const [isFullscreen, setIsFullscreen] = useState(false)
+
+  // Default translations
+  const t = translations || {
+    openFullscreen: 'Open fullscreen',
+    closeFullscreen: 'Close fullscreen',
+    startMarker: 'Start',
+    endMarker: 'End',
+    noRouteData: 'No route data available',
+  }
 
   // Create custom icons using MapPin from lucide
   const startIcon = useMemo(() => {
@@ -144,7 +165,7 @@ export function MapViewer({ allPoints, selectedPoints, startKm = 0, endKm }: Map
   if (allPoints.length === 0) {
     return (
       <div className="w-full h-96 bg-gray-100 rounded-lg flex items-center justify-center">
-        <p className="text-gray-500">Geen route data beschikbaar</p>
+        <p className="text-gray-500">{t.noRouteData}</p>
       </div>
     )
   }
@@ -170,7 +191,12 @@ export function MapViewer({ allPoints, selectedPoints, startKm = 0, endKm }: Map
 
         <FitBounds bounds={selectedBounds || bounds} />
         <MapResizer isFullscreen={isFullscreen} />
-        <FullscreenControl isFullscreen={isFullscreen} onToggle={toggleFullscreen} />
+        <FullscreenControl
+          isFullscreen={isFullscreen}
+          onToggle={toggleFullscreen}
+          openText={t.openFullscreen}
+          closeText={t.closeFullscreen}
+        />
 
           {/* Full route - more visible */}
           <Polyline
@@ -199,7 +225,7 @@ export function MapViewer({ allPoints, selectedPoints, startKm = 0, endKm }: Map
             <Marker position={[startPoint.lat, startPoint.lon]} icon={startIcon}>
               <Popup>
                 <div className="text-sm">
-                  <p className="font-semibold">Start</p>
+                  <p className="font-semibold">{t.startMarker}</p>
                   <p>{startKm.toFixed(1)} km</p>
                 </div>
               </Popup>
@@ -211,7 +237,7 @@ export function MapViewer({ allPoints, selectedPoints, startKm = 0, endKm }: Map
             <Marker position={[endPoint.lat, endPoint.lon]} icon={endIcon}>
               <Popup>
                 <div className="text-sm">
-                  <p className="font-semibold">Einde</p>
+                  <p className="font-semibold">{t.endMarker}</p>
                   <p>{endKm?.toFixed(1)} km</p>
                 </div>
               </Popup>
