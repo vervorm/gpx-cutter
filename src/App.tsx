@@ -153,16 +153,16 @@ function App() {
   const roundedMaxDistance = Math.ceil(maxDistance)
 
   return (
-    <div className="min-h-screen bg-background p-4 pb-20">
+    <div className="min-h-screen bg-background p-2 md:p-4 pb-20">
       <Toast show={toast.show}>{toast.message}</Toast>
 
       {/* Header */}
-      <header className="mb-8 mt-4 max-w-3xl mx-auto">
-        <h1 className="text-3xl font-bold text-foreground tracking-tight">Route Inkorten</h1>
-        <p className="text-muted-foreground mt-1">Maak een korte versie van je Komoot tour</p>
+      <header className="mb-4 md:mb-8 mt-2 md:mt-4 max-w-7xl mx-auto px-2">
+        <h1 className="text-2xl md:text-3xl font-bold text-foreground tracking-tight">Route Inkorten</h1>
+        <p className="text-sm md:text-base text-muted-foreground mt-1">Maak een korte versie van je Komoot tour</p>
       </header>
 
-      <div className="max-w-3xl mx-auto space-y-4">
+      <div className="max-w-7xl mx-auto space-y-4">
         {/* Step 1: Upload */}
         <Card>
           <CardHeader>
@@ -228,19 +228,21 @@ function App() {
           </Card>
         )}
 
-        {/* Step 2: Settings - MOVED BEFORE MAP */}
+        {/* Step 2: Settings and Map - Side by side on desktop */}
         {preview && (
-          <Card className="border-orange-200 bg-orange-50/50 dark:bg-orange-950/20">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-orange-900 dark:text-orange-100">
-                <Settings className="w-5 h-5" />
-                Stap 2: Selecteer Segment
-              </CardTitle>
-              <CardDescription>
-                Gebruik de sliders om je segment te kiezen - de kaart toont het direct
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            {/* Settings Card */}
+            <Card className="border-orange-200 bg-orange-50/50 dark:bg-orange-950/20">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-orange-900 dark:text-orange-100">
+                  <Settings className="w-5 h-5" />
+                  Stap 2: Selecteer Segment
+                </CardTitle>
+                <CardDescription>
+                  Gebruik de sliders om je segment te kiezen - de kaart toont het direct
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
               <div className="space-y-3">
                 <div className="flex justify-between items-center">
                   <Label htmlFor="startFromKM">Start vanaf (KM)</Label>
@@ -289,29 +291,28 @@ function App() {
               </div>
             </CardContent>
           </Card>
-        )}
 
-        {/* Map Viewer - NOW AFTER SETTINGS */}
-        {preview && (
-          <Card className="border-purple-200 bg-purple-50/50 dark:bg-purple-950/20">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-purple-900 dark:text-purple-100">
-                <Map className="w-5 h-5" />
-                Route Kaart
-              </CardTitle>
-              <CardDescription>
-                Volledige route in grijs, geselecteerd segment in blauw
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <MapViewer
-                allPoints={preview.allPoints}
-                selectedPoints={liveSegment?.selectedPoints}
-                startKm={startFromKM}
-                endKm={startFromKM + distanceKM}
-              />
-            </CardContent>
-          </Card>
+            {/* Map Card */}
+            <Card className="border-purple-200 bg-purple-50/50 dark:bg-purple-950/20 h-fit lg:sticky lg:top-4">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-purple-900 dark:text-purple-100">
+                  <Map className="w-5 h-5" />
+                  Route Kaart
+                </CardTitle>
+                <CardDescription>
+                  Volledige route in grijs, geselecteerd segment in blauw
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="h-[400px] md:h-[500px] lg:h-[600px]">
+                <MapViewer
+                  allPoints={preview.allPoints}
+                  selectedPoints={liveSegment?.selectedPoints}
+                  startKm={startFromKM}
+                  endKm={startFromKM + distanceKM}
+                />
+              </CardContent>
+            </Card>
+          </div>
         )}
 
         {/* Generate All Segments Button */}

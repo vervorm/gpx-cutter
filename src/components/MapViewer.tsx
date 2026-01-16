@@ -35,14 +35,34 @@ function MapResizer({ isFullscreen }: { isFullscreen: boolean }) {
   const map = useMap()
 
   useEffect(() => {
-    // Delay to allow CSS transition to complete
-    const timer = setTimeout(() => {
-      map.invalidateSize()
-    }, 400)
-    return () => clearTimeout(timer)
+    // Multiple calls to ensure map resizes correctly
+    const timers = [
+      setTimeout(() => map.invalidateSize(), 0),
+      setTimeout(() => map.invalidateSize(), 100),
+      setTimeout(() => map.invalidateSize(), 300),
+      setTimeout(() => map.invalidateSize(), 500),
+    ]
+    return () => timers.forEach(timer => clearTimeout(timer))
   }, [isFullscreen, map])
 
   return null
+}
+
+// Fullscreen toggle button inside map
+function FullscreenControl({ isFullscreen, onToggle }: { isFullscreen: boolean; onToggle: () => void }) {
+  return (
+    <div className="leaflet-top leaflet-right" style={{ position: 'absolute', top: '10px', right: '10px', zIndex: 1000 }}>
+      <div className="leaflet-control">
+        <button
+          onClick={onToggle}
+          className="bg-white hover:bg-gray-100 text-gray-700 p-2 rounded-lg shadow-lg transition-colors border border-gray-300"
+          title={isFullscreen ? 'Sluit fullscreen' : 'Open fullscreen'}
+        >
+          {isFullscreen ? <Minimize2 className="w-5 h-5" /> : <Maximize2 className="w-5 h-5" />}
+        </button>
+      </div>
+    </div>
+  )
 }
 
 export function MapViewer({ allPoints, selectedPoints, startKm = 0, endKm }: MapViewerProps) {
@@ -63,6 +83,7 @@ export function MapViewer({ allPoints, selectedPoints, startKm = 0, endKm }: Map
       className: 'custom-marker-icon',
       iconSize: [32, 32],
       iconAnchor: [16, 32],
+      popupAnchor: [0, -32],
     })
   }, [])
 
@@ -80,6 +101,7 @@ export function MapViewer({ allPoints, selectedPoints, startKm = 0, endKm }: Map
       className: 'custom-marker-icon',
       iconSize: [32, 32],
       iconAnchor: [16, 32],
+      popupAnchor: [0, -32],
     })
   }, [])
 
@@ -94,12 +116,13 @@ export function MapViewer({ allPoints, selectedPoints, startKm = 0, endKm }: Map
     [selectedPoints]
   )
 
-  // Calculate bounds
+  // Calculate bounds - zoom to selected segment if available, otherwise full route
   const bounds = useMemo(() => {
     const boundsObj = new LatLngBounds([])
-    allPoints.forEach(p => boundsObj.extend([p.lat, p.lon]))
+    const pointsToFit = selectedPoints && selectedPoints.length > 0 ? selectedPoints : allPoints
+    pointsToFit.forEach(p => boundsObj.extend([p.lat, p.lon]))
     return boundsObj
-  }, [allPoints])
+  }, [allPoints, selectedPoints])
 
   const selectedBounds = useMemo(() => {
     if (!selectedPoints || selectedPoints.length === 0) {
@@ -127,35 +150,27 @@ export function MapViewer({ allPoints, selectedPoints, startKm = 0, endKm }: Map
   }
 
   return (
-    <div className="relative">
-      <div
-        className={`rounded-lg overflow-hidden border-2 border-border shadow-lg transition-all ${
-          isFullscreen
-            ? 'fixed inset-4 z-[999] w-[calc(100vw-2rem)] h-[calc(100vh-2rem)]'
-            : 'w-full h-96'
-        }`}
+    <div
+      className={`rounded-lg overflow-hidden border-2 border-border shadow-lg transition-all ${
+        isFullscreen
+          ? 'fixed inset-4 z-[999] w-[calc(100vw-2rem)] h-[calc(100vh-2rem)]'
+          : 'w-full h-full'
+      }`}
+    >
+      <MapContainer
+        center={[allPoints[0].lat, allPoints[0].lon]}
+        zoom={13}
+        className="w-full h-full"
+        scrollWheelZoom={true}
       >
-        {/* Fullscreen toggle button */}
-        <button
-          onClick={toggleFullscreen}
-          className="absolute top-2 right-2 z-[1000] bg-white hover:bg-gray-100 text-gray-700 p-2 rounded-lg shadow-lg transition-colors border border-gray-300"
-          title={isFullscreen ? 'Sluit fullscreen' : 'Open fullscreen'}
-        >
-          {isFullscreen ? <Minimize2 className="w-5 h-5" /> : <Maximize2 className="w-5 h-5" />}
-        </button>
-        <MapContainer
-          center={[allPoints[0].lat, allPoints[0].lon]}
-          zoom={13}
-          className="w-full h-full"
-          scrollWheelZoom={true}
-        >
-          <TileLayer
-            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-          />
+        <TileLayer
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+        />
 
-          <FitBounds bounds={selectedBounds || bounds} />
-          <MapResizer isFullscreen={isFullscreen} />
+        <FitBounds bounds={selectedBounds || bounds} />
+        <MapResizer isFullscreen={isFullscreen} />
+        <FullscreenControl isFullscreen={isFullscreen} onToggle={toggleFullscreen} />
 
           {/* Full route - more visible */}
           <Polyline
@@ -204,6 +219,5 @@ export function MapViewer({ allPoints, selectedPoints, startKm = 0, endKm }: Map
           )}
         </MapContainer>
       </div>
-    </div>
   )
 }
