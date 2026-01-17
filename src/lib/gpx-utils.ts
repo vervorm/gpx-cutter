@@ -36,6 +36,14 @@ export function getDistanceFromLatLonInKm(
 export interface RoutePoint {
   lat: number;
   lon: number;
+  ele?: number; // Elevation in meters
+}
+
+export interface ElevationStats {
+  gain: number; // Total elevation gain in meters
+  loss: number; // Total elevation loss in meters
+  min: number;  // Minimum elevation in meters
+  max: number;  // Maximum elevation in meters
 }
 
 export interface GPXPreview {
@@ -47,6 +55,7 @@ export interface GPXPreview {
   endLat: number;
   endLon: number;
   allPoints: RoutePoint[];
+  elevation?: ElevationStats;
 }
 
 export interface GPXProcessOptions {
@@ -62,6 +71,44 @@ export interface GPXProcessResult {
   startKm: number;
   endKm: number;
   selectedPoints: RoutePoint[];
+  elevation?: ElevationStats;
+}
+
+/**
+ * Calculates elevation statistics from a set of points
+ * @param points - Array of RoutePoints with elevation data
+ * @returns Elevation statistics or undefined if no elevation data
+ */
+export function calculateElevationStats(points: RoutePoint[]): ElevationStats | undefined {
+  const elevations = points.map(p => p.ele).filter((e): e is number => e !== undefined);
+
+  if (elevations.length === 0) {
+    return undefined;
+  }
+
+  let gain = 0;
+  let loss = 0;
+  let min = elevations[0];
+  let max = elevations[0];
+
+  for (let i = 1; i < elevations.length; i++) {
+    const diff = elevations[i] - elevations[i - 1];
+    if (diff > 0) {
+      gain += diff;
+    } else if (diff < 0) {
+      loss += Math.abs(diff);
+    }
+
+    if (elevations[i] < min) min = elevations[i];
+    if (elevations[i] > max) max = elevations[i];
+  }
+
+  return {
+    gain: Math.round(gain),
+    loss: Math.round(loss),
+    min: Math.round(min),
+    max: Math.round(max),
+  };
 }
 
 /**
@@ -99,10 +146,19 @@ export function analyzeGPX(xmlDoc: Document): GPXPreview {
   const lastPoint = points[points.length - 1];
 
   // Extract all points for map display
-  const allPoints: RoutePoint[] = points.map(pt => ({
-    lat: parseFloat(pt.getAttribute('lat') || '0'),
-    lon: parseFloat(pt.getAttribute('lon') || '0'),
-  }));
+  const allPoints: RoutePoint[] = points.map(pt => {
+    const eleElement = pt.getElementsByTagName('ele')[0];
+    const ele = eleElement ? parseFloat(eleElement.textContent || '') : undefined;
+
+    return {
+      lat: parseFloat(pt.getAttribute('lat') || '0'),
+      lon: parseFloat(pt.getAttribute('lon') || '0'),
+      ele: !isNaN(ele as number) ? ele : undefined,
+    };
+  });
+
+  // Calculate elevation statistics
+  const elevation = calculateElevationStats(allPoints);
 
   return {
     originalName,
@@ -113,6 +169,7 @@ export function analyzeGPX(xmlDoc: Document): GPXPreview {
     endLat: parseFloat(lastPoint.getAttribute('lat') || '0'),
     endLon: parseFloat(lastPoint.getAttribute('lon') || '0'),
     allPoints,
+    elevation,
   };
 }
 
@@ -221,10 +278,19 @@ export function processGPX(
     : `${safeName}_${Math.round(rangeDistance)}km.gpx`;
 
   // Extract selected points for map display
-  const selectedPoints: RoutePoint[] = newPoints.map(pt => ({
-    lat: parseFloat(pt.getAttribute('lat') || '0'),
-    lon: parseFloat(pt.getAttribute('lon') || '0'),
-  }));
+  const selectedPoints: RoutePoint[] = newPoints.map(pt => {
+    const eleElement = pt.getElementsByTagName('ele')[0];
+    const ele = eleElement ? parseFloat(eleElement.textContent || '') : undefined;
+
+    return {
+      lat: parseFloat(pt.getAttribute('lat') || '0'),
+      lon: parseFloat(pt.getAttribute('lon') || '0'),
+      ele: !isNaN(ele as number) ? ele : undefined,
+    };
+  });
+
+  // Calculate elevation statistics for the selected segment
+  const elevation = calculateElevationStats(selectedPoints);
 
   return {
     blob,
@@ -234,5 +300,6 @@ export function processGPX(
     startKm: startFromKM,
     endKm: startFromKM + rangeDistance,
     selectedPoints,
+    elevation,
   };
 }

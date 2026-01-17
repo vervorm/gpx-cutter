@@ -44,6 +44,13 @@ export interface Translations {
   segment: string
   download: string
 
+  // Elevation
+  elevationGain: string
+  elevationLoss: string
+  elevationMin: string
+  elevationMax: string
+  noElevationData: string
+
   // Messages
   segmentsGenerated: string
   downloaded: string
@@ -126,6 +133,12 @@ export const translations: Record<Language, Translations> = {
     segment: 'Segment',
     download: 'Download',
 
+    elevationGain: 'Hoogtemeters stijging',
+    elevationLoss: 'Hoogtemeters daling',
+    elevationMin: 'Min. hoogte',
+    elevationMax: 'Max. hoogte',
+    noElevationData: 'Geen hoogte data',
+
     segmentsGenerated: 'segmenten gegenereerd!',
     downloaded: 'gedownload!',
     noRouteData: 'Geen route data beschikbaar',
@@ -200,6 +213,12 @@ export const translations: Record<Language, Translations> = {
     allSegmentsDescription: 'Click on a segment to download',
     segment: 'Segment',
     download: 'Download',
+
+    elevationGain: 'Elevation gain',
+    elevationLoss: 'Elevation loss',
+    elevationMin: 'Min. elevation',
+    elevationMax: 'Max. elevation',
+    noElevationData: 'No elevation data',
 
     segmentsGenerated: 'segments generated!',
     downloaded: 'downloaded!',
@@ -276,6 +295,12 @@ export const translations: Record<Language, Translations> = {
     segment: 'Segment',
     download: 'Télécharger',
 
+    elevationGain: 'Dénivelé positif',
+    elevationLoss: 'Dénivelé négatif',
+    elevationMin: 'Altitude min.',
+    elevationMax: 'Altitude max.',
+    noElevationData: 'Pas de données d\'altitude',
+
     segmentsGenerated: 'segments générés!',
     downloaded: 'téléchargé!',
     noRouteData: 'Aucune donnée d\'itinéraire disponible',
@@ -350,6 +375,12 @@ export const translations: Record<Language, Translations> = {
     allSegmentsDescription: 'Haz clic en un segmento para descargar',
     segment: 'Segmento',
     download: 'Descargar',
+
+    elevationGain: 'Desnivel positivo',
+    elevationLoss: 'Desnivel negativo',
+    elevationMin: 'Altitud mín.',
+    elevationMax: 'Altitud máx.',
+    noElevationData: 'Sin datos de altitud',
 
     segmentsGenerated: 'segmentos generados!',
     downloaded: 'descargado!',
@@ -426,6 +457,12 @@ export const translations: Record<Language, Translations> = {
     segment: 'Segment',
     download: 'Herunterladen',
 
+    elevationGain: 'Höhenmeter bergauf',
+    elevationLoss: 'Höhenmeter bergab',
+    elevationMin: 'Min. Höhe',
+    elevationMax: 'Max. Höhe',
+    noElevationData: 'Keine Höhendaten',
+
     segmentsGenerated: 'Segmente generiert!',
     downloaded: 'heruntergeladen!',
     noRouteData: 'Keine Routendaten verfügbar',
@@ -501,6 +538,12 @@ export const translations: Record<Language, Translations> = {
     segment: 'Segment',
     download: 'Last Ned',
 
+    elevationGain: 'Høydemeter opp',
+    elevationLoss: 'Høydemeter ned',
+    elevationMin: 'Min. høyde',
+    elevationMax: 'Maks. høyde',
+    noElevationData: 'Ingen høydedata',
+
     segmentsGenerated: 'segmenter generert!',
     downloaded: 'lastet ned!',
     noRouteData: 'Ingen rutedata tilgjengelig',
@@ -575,6 +618,12 @@ export const translations: Record<Language, Translations> = {
     allSegmentsDescription: 'Clique em um segmento para baixar',
     segment: 'Segmento',
     download: 'Baixar',
+
+    elevationGain: 'Ganho de elevação',
+    elevationLoss: 'Perda de elevação',
+    elevationMin: 'Elevação mín.',
+    elevationMax: 'Elevação máx.',
+    noElevationData: 'Sem dados de elevação',
 
     segmentsGenerated: 'segmentos gerados!',
     downloaded: 'baixado!',

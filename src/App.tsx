@@ -251,6 +251,18 @@ function App() {
                   <p className="text-muted-foreground">{t.maxSelection}</p>
                   <p className="font-semibold">0 - {preview.totalDistance.toFixed(0)} km</p>
                 </div>
+                {preview.elevation && (
+                  <>
+                    <div>
+                      <p className="text-muted-foreground">{t.elevationGain}</p>
+                      <p className="font-semibold">↗ {preview.elevation.gain} m</p>
+                    </div>
+                    <div>
+                      <p className="text-muted-foreground">{t.elevationLoss}</p>
+                      <p className="font-semibold">↘ {preview.elevation.loss} m</p>
+                    </div>
+                  </>
+                )}
               </div>
             </CardContent>
           </Card>
@@ -312,9 +324,16 @@ function App() {
                   📍 {t.selectedSegment} <span className="text-primary font-bold">{startFromKM} km</span> → <span className="text-primary font-bold">{startFromKM + distanceKM} km</span>
                 </p>
                 {liveSegment && (
-                  <p className="text-xs text-center mt-1 text-muted-foreground">
-                    {liveSegment.pointCount} {t.points} · {liveSegment.distance.toFixed(2)} km
-                  </p>
+                  <>
+                    <p className="text-xs text-center mt-1 text-muted-foreground">
+                      {liveSegment.pointCount} {t.points} · {liveSegment.distance.toFixed(2)} km
+                    </p>
+                    {liveSegment.elevation && (
+                      <p className="text-xs text-center mt-1 text-muted-foreground">
+                        ↗ {liveSegment.elevation.gain}m · ↘ {liveSegment.elevation.loss}m
+                      </p>
+                    )}
+                  </>
                 )}
               </div>
             </CardContent>
@@ -399,6 +418,11 @@ function App() {
                       <p className="font-medium">
                         {segment.distance.toFixed(2)} km · {segment.pointCount} {t.points}
                       </p>
+                      {segment.elevation && (
+                        <p className="text-xs text-muted-foreground">
+                          ↗ {segment.elevation.gain}m · ↘ {segment.elevation.loss}m
+                        </p>
+                      )}
                     </div>
                   </button>
                 ))}
