@@ -75,6 +75,10 @@ export interface Translations {
   aboutLinkKomoot: string
   aboutLinkKomOpTegenKanker: string
   aboutLinkInstagram: string
+  aboutTechTitle: string
+  aboutTechText: string
+  aboutTechGithub: string
+  aboutTechClaude: string
 
   // Language names
   languageName: string
@@ -150,6 +154,10 @@ export const translations: Record<Language, Translations> = {
     aboutLinkKomoot: 'Bekijk de volledige route op Komoot',
     aboutLinkKomOpTegenKanker: 'Steun de actie "10K voor K"',
     aboutLinkInstagram: 'Volg het avontuur op Instagram',
+    aboutTechTitle: 'Open Source & Technologie',
+    aboutTechText: 'Deze tool is volledig open source en beschikbaar op GitHub. Iedereen kan de code bekijken, gebruiken en verbeteren.',
+    aboutTechGithub: 'Bekijk de code op GitHub',
+    aboutTechClaude: 'Volledig ontwikkeld met Claude Code (AI-assisted development)',
 
     languageName: 'Nederlands',
 
@@ -221,6 +229,10 @@ export const translations: Record<Language, Translations> = {
     aboutLinkKomoot: 'View the complete route on Komoot',
     aboutLinkKomOpTegenKanker: 'Support the "10K for K" campaign',
     aboutLinkInstagram: 'Follow the adventure on Instagram',
+    aboutTechTitle: 'Open Source & Technology',
+    aboutTechText: 'This tool is fully open source and available on GitHub. Anyone can view, use, and improve the code.',
+    aboutTechGithub: 'View code on GitHub',
+    aboutTechClaude: 'Fully developed with Claude Code (AI-assisted development)',
 
     languageName: 'English',
 
@@ -292,6 +304,10 @@ export const translations: Record<Language, Translations> = {
     aboutLinkKomoot: 'Voir l\'itinéraire complet sur Komoot',
     aboutLinkKomOpTegenKanker: 'Soutenez la campagne "10K pour K"',
     aboutLinkInstagram: 'Suivez l\'aventure sur Instagram',
+    aboutTechTitle: 'Open Source & Technologie',
+    aboutTechText: 'Cet outil est entièrement open source et disponible sur GitHub. Tout le monde peut voir, utiliser et améliorer le code.',
+    aboutTechGithub: 'Voir le code sur GitHub',
+    aboutTechClaude: 'Entièrement développé avec Claude Code (développement assisté par IA)',
 
     languageName: 'Français',
 
@@ -363,6 +379,10 @@ export const translations: Record<Language, Translations> = {
     aboutLinkKomoot: 'Ver la ruta completa en Komoot',
     aboutLinkKomOpTegenKanker: 'Apoya la campaña "10K para K"',
     aboutLinkInstagram: 'Sigue la aventura en Instagram',
+    aboutTechTitle: 'Código Abierto & Tecnología',
+    aboutTechText: 'Esta herramienta es completamente de código abierto y está disponible en GitHub. Cualquiera puede ver, usar y mejorar el código.',
+    aboutTechGithub: 'Ver el código en GitHub',
+    aboutTechClaude: 'Completamente desarrollado con Claude Code (desarrollo asistido por IA)',
 
     languageName: 'Español',
 
@@ -434,6 +454,10 @@ export const translations: Record<Language, Translations> = {
     aboutLinkKomoot: 'Vollständige Route auf Komoot ansehen',
     aboutLinkKomOpTegenKanker: 'Unterstützen Sie die Kampagne "10K für K"',
     aboutLinkInstagram: 'Folgen Sie dem Abenteuer auf Instagram',
+    aboutTechTitle: 'Open Source & Technologie',
+    aboutTechText: 'Dieses Tool ist vollständig Open Source und auf GitHub verfügbar. Jeder kann den Code einsehen, verwenden und verbessern.',
+    aboutTechGithub: 'Code auf GitHub ansehen',
+    aboutTechClaude: 'Vollständig entwickelt mit Claude Code (KI-gestützte Entwicklung)',
 
     languageName: 'Deutsch',
 
@@ -505,6 +529,10 @@ export const translations: Record<Language, Translations> = {
     aboutLinkKomoot: 'Se hele ruten på Komoot',
     aboutLinkKomOpTegenKanker: 'Støtt kampanjen "10K for K"',
     aboutLinkInstagram: 'Følg eventyret på Instagram',
+    aboutTechTitle: 'Open Source & Teknologi',
+    aboutTechText: 'Dette verktøyet er fullstendig åpen kildekode og tilgjengelig på GitHub. Alle kan se, bruke og forbedre koden.',
+    aboutTechGithub: 'Se koden på GitHub',
+    aboutTechClaude: 'Fullstendig utviklet med Claude Code (AI-assistert utvikling)',
 
     languageName: 'Norsk',
 
@@ -576,6 +604,10 @@ export const translations: Record<Language, Translations> = {
     aboutLinkKomoot: 'Veja a rota completa no Komoot',
     aboutLinkKomOpTegenKanker: 'Apoie a campanha "10K para K"',
     aboutLinkInstagram: 'Siga a aventura no Instagram',
+    aboutTechTitle: 'Código Aberto & Tecnologia',
+    aboutTechText: 'Esta ferramenta é totalmente de código aberto e disponível no GitHub. Qualquer pessoa pode ver, usar e melhorar o código.',
+    aboutTechGithub: 'Ver código no GitHub',
+    aboutTechClaude: 'Totalmente desenvolvido com Claude Code (desenvolvimento assistido por IA)',
 
     languageName: 'Português',
 

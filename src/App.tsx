@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useMemo } from 'react'
-import { UploadCloud, FileUp, CheckCircle, Settings, Download, Eye, Map, HelpCircle, ExternalLink, Heart } from 'lucide-react'
+import { UploadCloud, FileUp, CheckCircle, Settings, Download, Eye, Map, HelpCircle, ExternalLink, Heart, Code2, Github } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Label } from '@/components/ui/label'
@@ -514,6 +514,31 @@ function App() {
                       {t.aboutLinkInstagram}
                       <ExternalLink className="w-4 h-4" />
                     </a>
+                  </div>
+                </div>
+
+                {/* Technology & Open Source */}
+                <div className="space-y-3 bg-gradient-to-r from-gray-50/80 to-blue-50/80 dark:from-gray-900/30 dark:to-blue-950/30 p-4 rounded-lg border-2 border-gray-200 dark:border-gray-700">
+                  <h3 className="font-bold text-lg text-gray-900 dark:text-gray-100 flex items-center gap-2">
+                    <Code2 className="w-5 h-5" />
+                    {t.aboutTechTitle}
+                  </h3>
+                  <p className="text-sm text-gray-700 dark:text-gray-300">{t.aboutTechText}</p>
+                  <div className="space-y-2 pt-2">
+                    <a
+                      href="https://github.com/vervorm/gpx-cutter"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-2 text-gray-800 dark:text-gray-200 hover:text-gray-950 dark:hover:text-white hover:underline transition-colors font-medium"
+                    >
+                      <Github className="w-5 h-5" />
+                      {t.aboutTechGithub}
+                      <ExternalLink className="w-4 h-4" />
+                    </a>
+                    <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 pt-2 border-t border-gray-300 dark:border-gray-600">
+                      <Code2 className="w-4 h-4" />
+                      <span>{t.aboutTechClaude}</span>
+                    </div>
                   </div>
                 </div>
               </CardContent>
