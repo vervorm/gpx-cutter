@@ -69,10 +69,23 @@ export interface Translations {
   aboutStoryText2: string
   aboutStoryText3: string
   aboutStoryText4: string
+  aboutCancerText: string
   aboutDedication: string
+  aboutLinksTitle: string
+  aboutLinkKomoot: string
+  aboutLinkKomOpTegenKanker: string
+  aboutLinkInstagram: string
+  aboutTechTitle: string
+  aboutTechText: string
+  aboutTechGithub: string
+  aboutTechClaude: string
 
   // Language names
   languageName: string
+
+  // Tabs
+  tabRoute: string
+  tabAbout: string
 }
 
 export const translations: Record<Language, Translations> = {
@@ -135,9 +148,21 @@ export const translations: Record<Language, Translations> = {
     aboutStoryText2: 'Ter herdenking van het 10-jarig overlijden van mijn broer Koenraad (aka Koene), die uitgestrooid is op zee.',
     aboutStoryText3: 'De route volgt de volledige Europese westkust:',
     aboutStoryText4: 'Oostende → Faro → Noordkaap → Oostende',
+    aboutCancerText: 'Deze reis is ook in het teken van "Kom op tegen Kanker" om geld in te zamelen voor kankeronderzoek en ondersteuning.',
     aboutDedication: '100 dagen × 100 km/dag, in liefdevolle herinnering aan Koene',
+    aboutLinksTitle: 'Volg de reis',
+    aboutLinkKomoot: 'Bekijk de volledige route op Komoot',
+    aboutLinkKomOpTegenKanker: 'Steun de actie "10K voor K"',
+    aboutLinkInstagram: 'Volg het avontuur op Instagram',
+    aboutTechTitle: 'Open Source & Technologie',
+    aboutTechText: 'Deze tool is volledig open source en beschikbaar op GitHub. Iedereen kan de code bekijken, gebruiken en verbeteren.',
+    aboutTechGithub: 'Bekijk de code op GitHub',
+    aboutTechClaude: 'Volledig ontwikkeld met Claude Code (AI-assisted development)',
 
     languageName: 'Nederlands',
+
+    tabRoute: 'Route Tool',
+    tabAbout: 'Over dit project',
   },
   en: {
     title: 'Shorten Route',
@@ -198,9 +223,21 @@ export const translations: Record<Language, Translations> = {
     aboutStoryText2: 'In memory of the 10th anniversary of my brother Koenraad\'s (aka Koene) passing, whose ashes were scattered at sea.',
     aboutStoryText3: 'The route follows the entire European west coast:',
     aboutStoryText4: 'Ostend → Faro → North Cape → Ostend',
+    aboutCancerText: 'This journey also supports "Kom op tegen Kanker" (Stand up to Cancer) to raise funds for cancer research and support.',
     aboutDedication: '100 days × 100 km/day, in loving memory of Koene',
+    aboutLinksTitle: 'Follow the journey',
+    aboutLinkKomoot: 'View the complete route on Komoot',
+    aboutLinkKomOpTegenKanker: 'Support the "10K for K" campaign',
+    aboutLinkInstagram: 'Follow the adventure on Instagram',
+    aboutTechTitle: 'Open Source & Technology',
+    aboutTechText: 'This tool is fully open source and available on GitHub. Anyone can view, use, and improve the code.',
+    aboutTechGithub: 'View code on GitHub',
+    aboutTechClaude: 'Fully developed with Claude Code (AI-assisted development)',
 
     languageName: 'English',
+
+    tabRoute: 'Route Tool',
+    tabAbout: 'About this project',
   },
   fr: {
     title: 'Raccourcir l\'Itinéraire',
@@ -261,9 +298,21 @@ export const translations: Record<Language, Translations> = {
     aboutStoryText2: 'En mémoire du 10e anniversaire du décès de mon frère Koenraad (alias Koene), dont les cendres ont été dispersées en mer.',
     aboutStoryText3: 'L\'itinéraire suit toute la côte ouest européenne :',
     aboutStoryText4: 'Ostende → Faro → Cap Nord → Ostende',
+    aboutCancerText: 'Ce voyage soutient également "Kom op tegen Kanker" (Lutte contre le Cancer) pour collecter des fonds pour la recherche et le soutien.',
     aboutDedication: '100 jours × 100 km/jour, en mémoire affectueuse de Koene',
+    aboutLinksTitle: 'Suivez le voyage',
+    aboutLinkKomoot: 'Voir l\'itinéraire complet sur Komoot',
+    aboutLinkKomOpTegenKanker: 'Soutenez la campagne "10K pour K"',
+    aboutLinkInstagram: 'Suivez l\'aventure sur Instagram',
+    aboutTechTitle: 'Open Source & Technologie',
+    aboutTechText: 'Cet outil est entièrement open source et disponible sur GitHub. Tout le monde peut voir, utiliser et améliorer le code.',
+    aboutTechGithub: 'Voir le code sur GitHub',
+    aboutTechClaude: 'Entièrement développé avec Claude Code (développement assisté par IA)',
 
     languageName: 'Français',
+
+    tabRoute: 'Outil d\'Itinéraire',
+    tabAbout: 'À propos de ce projet',
   },
   es: {
     title: 'Acortar Ruta',
@@ -324,9 +373,21 @@ export const translations: Record<Language, Translations> = {
     aboutStoryText2: 'En memoria del 10° aniversario del fallecimiento de mi hermano Koenraad (alias Koene), cuyas cenizas fueron esparcidas en el mar.',
     aboutStoryText3: 'La ruta sigue toda la costa oeste europea:',
     aboutStoryText4: 'Ostende → Faro → Cabo Norte → Ostende',
+    aboutCancerText: 'Este viaje también apoya "Kom op tegen Kanker" (Lucha contra el Cáncer) para recaudar fondos para la investigación y el apoyo.',
     aboutDedication: '100 días × 100 km/día, en memoria amorosa de Koene',
+    aboutLinksTitle: 'Sigue el viaje',
+    aboutLinkKomoot: 'Ver la ruta completa en Komoot',
+    aboutLinkKomOpTegenKanker: 'Apoya la campaña "10K para K"',
+    aboutLinkInstagram: 'Sigue la aventura en Instagram',
+    aboutTechTitle: 'Código Abierto & Tecnología',
+    aboutTechText: 'Esta herramienta es completamente de código abierto y está disponible en GitHub. Cualquiera puede ver, usar y mejorar el código.',
+    aboutTechGithub: 'Ver el código en GitHub',
+    aboutTechClaude: 'Completamente desarrollado con Claude Code (desarrollo asistido por IA)',
 
     languageName: 'Español',
+
+    tabRoute: 'Herramienta de Ruta',
+    tabAbout: 'Sobre este proyecto',
   },
   de: {
     title: 'Route Kürzen',
@@ -387,9 +448,21 @@ export const translations: Record<Language, Translations> = {
     aboutStoryText2: 'Zum Gedenken an den 10. Jahrestag des Todes meines Bruders Koenraad (alias Koene), dessen Asche auf See verstreut wurde.',
     aboutStoryText3: 'Die Route folgt der gesamten europäischen Westküste:',
     aboutStoryText4: 'Ostende → Faro → Nordkap → Ostende',
+    aboutCancerText: 'Diese Reise unterstützt auch "Kom op tegen Kanker" (Kampf gegen Krebs) zur Finanzierung von Krebsforschung und Unterstützung.',
     aboutDedication: '100 Tage × 100 km/Tag, in liebevoller Erinnerung an Koene',
+    aboutLinksTitle: 'Folgen Sie der Reise',
+    aboutLinkKomoot: 'Vollständige Route auf Komoot ansehen',
+    aboutLinkKomOpTegenKanker: 'Unterstützen Sie die Kampagne "10K für K"',
+    aboutLinkInstagram: 'Folgen Sie dem Abenteuer auf Instagram',
+    aboutTechTitle: 'Open Source & Technologie',
+    aboutTechText: 'Dieses Tool ist vollständig Open Source und auf GitHub verfügbar. Jeder kann den Code einsehen, verwenden und verbessern.',
+    aboutTechGithub: 'Code auf GitHub ansehen',
+    aboutTechClaude: 'Vollständig entwickelt mit Claude Code (KI-gestützte Entwicklung)',
 
     languageName: 'Deutsch',
+
+    tabRoute: 'Routen-Tool',
+    tabAbout: 'Über dieses Projekt',
   },
   no: {
     title: 'Forkort Rute',
@@ -450,9 +523,21 @@ export const translations: Record<Language, Translations> = {
     aboutStoryText2: 'Til minne om 10-årsdagen for min bror Koenraads (alias Koene) bortgang, hvis aske ble strødd i havet.',
     aboutStoryText3: 'Ruten følger hele den europeiske vestkysten:',
     aboutStoryText4: 'Oostende → Faro → Nordkapp → Oostende',
+    aboutCancerText: 'Denne reisen støtter også "Kom op tegen Kanker" (Stå opp mot Kreft) for å samle inn penger til kreftforskning og støtte.',
     aboutDedication: '100 dager × 100 km/dag, i kjærlig minne om Koene',
+    aboutLinksTitle: 'Følg reisen',
+    aboutLinkKomoot: 'Se hele ruten på Komoot',
+    aboutLinkKomOpTegenKanker: 'Støtt kampanjen "10K for K"',
+    aboutLinkInstagram: 'Følg eventyret på Instagram',
+    aboutTechTitle: 'Open Source & Teknologi',
+    aboutTechText: 'Dette verktøyet er fullstendig åpen kildekode og tilgjengelig på GitHub. Alle kan se, bruke og forbedre koden.',
+    aboutTechGithub: 'Se koden på GitHub',
+    aboutTechClaude: 'Fullstendig utviklet med Claude Code (AI-assistert utvikling)',
 
     languageName: 'Norsk',
+
+    tabRoute: 'Ruteverktøy',
+    tabAbout: 'Om dette prosjektet',
   },
   pt: {
     title: 'Encurtar Rota',
@@ -513,9 +598,21 @@ export const translations: Record<Language, Translations> = {
     aboutStoryText2: 'Em memória do 10º aniversário do falecimento de meu irmão Koenraad (alias Koene), cujas cinzas foram espalhadas no mar.',
     aboutStoryText3: 'A rota segue toda a costa oeste europeia:',
     aboutStoryText4: 'Ostende → Faro → Cabo Norte → Ostende',
+    aboutCancerText: 'Esta jornada também apoia "Kom op tegen Kanker" (Combate ao Câncer) para arrecadar fundos para pesquisa e apoio.',
     aboutDedication: '100 dias × 100 km/dia, em memória amorosa de Koene',
+    aboutLinksTitle: 'Siga a jornada',
+    aboutLinkKomoot: 'Veja a rota completa no Komoot',
+    aboutLinkKomOpTegenKanker: 'Apoie a campanha "10K para K"',
+    aboutLinkInstagram: 'Siga a aventura no Instagram',
+    aboutTechTitle: 'Código Aberto & Tecnologia',
+    aboutTechText: 'Esta ferramenta é totalmente de código aberto e disponível no GitHub. Qualquer pessoa pode ver, usar e melhorar o código.',
+    aboutTechGithub: 'Ver código no GitHub',
+    aboutTechClaude: 'Totalmente desenvolvido com Claude Code (desenvolvimento assistido por IA)',
 
     languageName: 'Português',
+
+    tabRoute: 'Ferramenta de Rota',
+    tabAbout: 'Sobre este projeto',
   },
 }
 

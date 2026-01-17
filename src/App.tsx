@@ -1,10 +1,11 @@
 import { useState, useRef, useEffect, useMemo } from 'react'
-import { UploadCloud, FileUp, CheckCircle, Settings, Download, Eye, Map, HelpCircle } from 'lucide-react'
+import { UploadCloud, FileUp, CheckCircle, Settings, Download, Eye, Map, HelpCircle, ExternalLink, Heart, Code2, Github } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Label } from '@/components/ui/label'
 import { Toast } from '@/components/ui/toast'
 import { Slider } from '@/components/ui/slider'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { processGPX, analyzeGPX, type GPXPreview, type GPXProcessResult } from '@/lib/gpx-utils'
 import { MapViewer } from '@/components/MapViewer'
 import { Language, getTranslations } from '@/lib/i18n'
@@ -27,7 +28,6 @@ function App() {
   const [selectedSegmentIndex, setSelectedSegmentIndex] = useState<number | null>(null)
   const [toast, setToast] = useState({ show: false, message: '' })
   const [helpOpen, setHelpOpen] = useState(false)
-  const [aboutOpen, setAboutOpen] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   // Save language preference to localStorage
@@ -183,7 +183,14 @@ function App() {
         </div>
       </header>
 
-      <div className="max-w-7xl mx-auto space-y-4">
+      <div className="max-w-7xl mx-auto px-2">
+        <Tabs defaultValue="route" className="w-full">
+          <TabsList className="grid w-full grid-cols-2 mb-6">
+            <TabsTrigger value="route">{t.tabRoute}</TabsTrigger>
+            <TabsTrigger value="about">{t.tabAbout}</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="route" className="space-y-4">
         {/* Step 1: Upload */}
         <Card>
           <CardHeader>
@@ -314,9 +321,9 @@ function App() {
           </Card>
 
             {/* Map Card */}
-            <Card className="border-purple-200 bg-purple-50/50 dark:bg-purple-950/20 h-fit lg:sticky lg:top-4">
+            <Card className="border-amber-200 bg-amber-50/50 dark:bg-amber-950/20 h-fit lg:sticky lg:top-4">
               <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-purple-900 dark:text-purple-100">
+                <CardTitle className="flex items-center gap-2 text-amber-900 dark:text-amber-100">
                   <Map className="w-5 h-5" />
                   {t.mapTitle}
                 </CardTitle>
@@ -347,7 +354,7 @@ function App() {
         {preview && (
           <Button
             onClick={generateAllSegments}
-            className="w-full h-12 text-base bg-purple-600 hover:bg-purple-700"
+            className="w-full h-12 text-base bg-amber-600 hover:bg-amber-700"
             size="lg"
           >
             <Settings className="w-5 h-5" />
@@ -400,48 +407,6 @@ function App() {
           </Card>
         )}
 
-        {/* About Section */}
-        <Card className="mt-12 border-2 border-blue-200 bg-gradient-to-br from-blue-50/50 to-purple-50/50 dark:from-blue-950/20 dark:to-purple-950/20">
-          <CardHeader
-            className="cursor-pointer hover:bg-accent/50 transition-colors"
-            onClick={() => setAboutOpen(!aboutOpen)}
-          >
-            <CardTitle className="flex items-center gap-2 text-blue-900 dark:text-blue-100">
-              <HelpCircle className="w-5 h-5" />
-              {t.aboutTitle}
-            </CardTitle>
-          </CardHeader>
-          {aboutOpen && (
-            <CardContent className="space-y-6">
-              {/* Why this tool */}
-              <div className="space-y-3">
-                <h3 className="font-semibold text-lg text-blue-900 dark:text-blue-100">{t.aboutWhyTitle}</h3>
-                <div className="space-y-2 text-muted-foreground">
-                  <p>• {t.aboutWhyText1}</p>
-                  <p>• {t.aboutWhyText2}</p>
-                  <p>• {t.aboutWhyText3}</p>
-                </div>
-              </div>
-
-              {/* Personal story */}
-              <div className="space-y-3 pt-4 border-t border-blue-200 dark:border-blue-800">
-                <h3 className="font-semibold text-lg text-purple-900 dark:text-purple-100">{t.aboutStoryTitle}</h3>
-                <div className="space-y-2 text-muted-foreground">
-                  <p>{t.aboutStoryText1}</p>
-                  <p>{t.aboutStoryText2}</p>
-                  <p className="pt-2">{t.aboutStoryText3}</p>
-                  <p className="font-semibold text-blue-700 dark:text-blue-300 text-center text-lg py-2">
-                    {t.aboutStoryText4}
-                  </p>
-                  <p className="text-center italic font-medium text-purple-700 dark:text-purple-300 pt-2">
-                    ⚓ {t.aboutDedication} ⚓
-                  </p>
-                </div>
-              </div>
-            </CardContent>
-          )}
-        </Card>
-
         {/* Help Section */}
         <Card className="mt-8">
           <CardHeader
@@ -467,6 +432,119 @@ function App() {
             </CardContent>
           )}
         </Card>
+          </TabsContent>
+
+          <TabsContent value="about" className="space-y-4">
+            {/* About Section */}
+            <Card className="border-4 border-blue-300 bg-gradient-to-br from-blue-50 via-amber-50 to-yellow-50 dark:from-blue-950/40 dark:via-amber-950/40 dark:to-yellow-950/40 shadow-xl">
+              <CardHeader className="pb-4">
+                <CardTitle className="flex items-center gap-3 text-2xl text-blue-900 dark:text-blue-100">
+                  <Heart className="w-7 h-7 text-yellow-600 fill-yellow-600" />
+                  {t.aboutTitle}
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                {/* Why this tool */}
+                <div className="space-y-3 bg-white/60 dark:bg-gray-900/20 p-4 rounded-lg">
+                  <h3 className="font-bold text-lg text-blue-900 dark:text-blue-100">{t.aboutWhyTitle}</h3>
+                  <div className="space-y-2 text-sm">
+                    <p>• {t.aboutWhyText1}</p>
+                    <p>• {t.aboutWhyText2}</p>
+                    <p>• {t.aboutWhyText3}</p>
+                  </div>
+                </div>
+
+                {/* Personal story */}
+                <div className="space-y-4 bg-gradient-to-r from-amber-50/80 to-yellow-50/80 dark:from-amber-950/30 dark:to-yellow-950/30 p-5 rounded-lg border-2 border-amber-200 dark:border-amber-800">
+                  <h3 className="font-bold text-xl text-amber-900 dark:text-amber-100 flex items-center gap-2">
+                     {t.aboutStoryTitle}
+                  </h3>
+                  <div className="space-y-3 text-sm">
+                    <p className="font-medium">{t.aboutStoryText1}</p>
+                    <p>{t.aboutStoryText2}</p>
+                    <p className="pt-2 font-semibold">{t.aboutStoryText3}</p>
+                    <p className="font-bold text-blue-700 dark:text-blue-300 text-xl py-3 bg-white/50 dark:bg-gray-900/30 rounded-lg">
+                       {t.aboutStoryText4} 
+                    </p>
+
+                    {/* Kom op tegen Kanker */}
+                    <div className="bg-yellow-300/80 dark:bg-yellow-950/40 p-4 rounded-lg border-2 border-yellow-500 dark:border-yellow-700 mt-4">
+                      <p className="font-bold text-yellow-900 dark:text-yellow-100 text-lg flex items-center justify-center gap-2">
+                        {t.aboutCancerText}
+                      </p>
+                    </div>
+
+                    <p className="italic font-bold text-lg text-amber-700 dark:text-amber-300 pt-3">
+                       {t.aboutDedication} 
+                    </p>
+                  </div>
+                </div>
+
+                {/* Links */}
+                <div className="space-y-3 bg-white/60 dark:bg-gray-900/20 p-4 rounded-lg">
+                  <h3 className="font-bold text-lg text-blue-900 dark:text-blue-100 mb-3">{t.aboutLinksTitle}</h3>
+                  <div className="space-y-2">
+                    <a
+                      href="https://www.komoot.com/collection/3148111/-tenkfork"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-2 text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-200 hover:underline transition-colors font-medium"
+                    >
+                      <Map className="w-5 h-5" />
+                      {t.aboutLinkKomoot}
+                      <ExternalLink className="w-4 h-4" />
+                    </a>
+                    <a
+                      href="https://www.komoptegenkanker.be/acties/10k-voor-k"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-2 text-yellow-600 dark:text-yellow-400 hover:text-yellow-800 dark:hover:text-yellow-200 hover:underline transition-colors font-medium"
+                    >
+                      <Heart className="w-5 h-5 fill-current" />
+                      {t.aboutLinkKomOpTegenKanker}
+                      <ExternalLink className="w-4 h-4" />
+                    </a>
+                    <a
+                      href="https://www.instagram.com/steven_verhoest?igsh=eHY0Y3BsOXd3dTdv&utm_source=qr"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-2 text-amber-600 dark:text-amber-400 hover:text-amber-800 dark:hover:text-amber-200 hover:underline transition-colors font-medium"
+                    >
+                      <Eye className="w-5 h-5" />
+                      {t.aboutLinkInstagram}
+                      <ExternalLink className="w-4 h-4" />
+                    </a>
+                  </div>
+                </div>
+
+                {/* Technology & Open Source */}
+                <div className="space-y-3 bg-gradient-to-r from-gray-50/80 to-blue-50/80 dark:from-gray-900/30 dark:to-blue-950/30 p-4 rounded-lg border-2 border-gray-200 dark:border-gray-700">
+                  <h3 className="font-bold text-lg text-gray-900 dark:text-gray-100 flex items-center gap-2">
+                    <Code2 className="w-5 h-5" />
+                    {t.aboutTechTitle}
+                  </h3>
+                  <p className="text-sm text-gray-700 dark:text-gray-300">{t.aboutTechText}</p>
+                  <div className="space-y-2 pt-2">
+                    <a
+                      href="https://github.com/vervorm/gpx-cutter"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-2 text-gray-800 dark:text-gray-200 hover:text-gray-950 dark:hover:text-white hover:underline transition-colors font-medium"
+                    >
+                      <Github className="w-5 h-5" />
+                      {t.aboutTechGithub}
+                      <ExternalLink className="w-4 h-4" />
+                    </a>
+                    <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 pt-2 border-t border-gray-300 dark:border-gray-600">
+                      <Code2 className="w-4 h-4" />
+                      <span>{t.aboutTechClaude}</span>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   )
