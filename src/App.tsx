@@ -503,7 +503,11 @@ function App() {
                     <p>{t.aboutStoryText2}</p>
                     <p className="pt-2 font-semibold">{t.aboutStoryText3}</p>
                     <p className="font-bold text-blue-700 dark:text-blue-300 text-xl py-3 bg-white/50 dark:bg-gray-900/30 rounded-lg">
-                       {t.aboutStoryText4} 
+                       {t.aboutStoryText4}
+                    </p>
+
+                    <p className="text-sm font-medium bg-blue-50/80 dark:bg-blue-950/30 p-3 rounded-lg border border-blue-200 dark:border-blue-800">
+                      {t.aboutJourneyDates}
                     </p>
 
                     {/* Kom op tegen Kanker */}

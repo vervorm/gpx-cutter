@@ -12,6 +12,8 @@ GPX Route Cutter allows you to take long GPS routes and create shorter versions 
 
 **Personal story**: This tool was created for a 10,000+ km journey in memory of my brother Koenraad (aka Koene), marking 10 years since his passing. My brother's ashes were scattered at sea, which is why the route follows the entire European west coast: Oostende → Faro → North Cape → Oostende. That's 100 days × 100 km/day.
 
+The journey starts on **May 1st, 2026** at the pier in Ostend and ends on **August 23rd, 2026** at the same pier. 10 years after my brother's passing.
+
 This journey is also in support of **Kom op tegen Kanker** (Stand up to Cancer):
 - 🎗️ **Donate**: [10k voor K](https://www.komoptegenkanker.be/acties/10k-voor-k)
 - 🗺️ **Route**: [Komoot Collection](https://www.komoot.com/collection/3148111/-tenkfork)
