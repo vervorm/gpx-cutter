@@ -8,6 +8,7 @@ import { Slider } from '@/components/ui/slider'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { processGPX, analyzeGPX, type GPXPreview, type GPXProcessResult } from '@/lib/gpx-utils'
 import { MapViewer } from '@/components/MapViewer'
+import { ElevationProfile } from '@/components/ElevationProfile'
 import { Language, getTranslations } from '@/lib/i18n'
 import { LanguageSelector } from '@/components/LanguageSelector'
 
@@ -251,18 +252,6 @@ function App() {
                   <p className="text-muted-foreground">{t.maxSelection}</p>
                   <p className="font-semibold">0 - {preview.totalDistance.toFixed(0)} km</p>
                 </div>
-                {preview.elevation && (
-                  <>
-                    <div>
-                      <p className="text-muted-foreground">{t.elevationGain}</p>
-                      <p className="font-semibold">↗ {preview.elevation.gain} m</p>
-                    </div>
-                    <div>
-                      <p className="text-muted-foreground">{t.elevationLoss}</p>
-                      <p className="font-semibold">↘ {preview.elevation.loss} m</p>
-                    </div>
-                  </>
-                )}
               </div>
             </CardContent>
           </Card>
@@ -336,6 +325,20 @@ function App() {
                   </>
                 )}
               </div>
+
+              {/* Elevation Profile for selected segment */}
+              {liveSegment && liveSegment.selectedPoints.length > 0 && liveSegment.elevation && (
+                <div className="mt-4 p-4 bg-white dark:bg-gray-800 rounded-lg border-2 border-orange-200">
+                  <h4 className="text-sm font-semibold text-orange-900 dark:text-orange-100 mb-3">
+                    {t.elevationProfile}
+                  </h4>
+                  <ElevationProfile
+                    points={liveSegment.selectedPoints}
+                    startKm={startFromKM}
+                    className="w-full"
+                  />
+                </div>
+              )}
             </CardContent>
           </Card>
 

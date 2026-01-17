@@ -50,6 +50,7 @@ export interface Translations {
   elevationMin: string
   elevationMax: string
   noElevationData: string
+  elevationProfile: string
 
   // Messages
   segmentsGenerated: string
@@ -138,6 +139,7 @@ export const translations: Record<Language, Translations> = {
     elevationMin: 'Min. hoogte',
     elevationMax: 'Max. hoogte',
     noElevationData: 'Geen hoogte data',
+    elevationProfile: 'Hoogteprofiel',
 
     segmentsGenerated: 'segmenten gegenereerd!',
     downloaded: 'gedownload!',
@@ -219,6 +221,7 @@ export const translations: Record<Language, Translations> = {
     elevationMin: 'Min. elevation',
     elevationMax: 'Max. elevation',
     noElevationData: 'No elevation data',
+    elevationProfile: 'Elevation Profile',
 
     segmentsGenerated: 'segments generated!',
     downloaded: 'downloaded!',
@@ -300,6 +303,7 @@ export const translations: Record<Language, Translations> = {
     elevationMin: 'Altitude min.',
     elevationMax: 'Altitude max.',
     noElevationData: 'Pas de données d\'altitude',
+    elevationProfile: 'Profil d\'Altitude',
 
     segmentsGenerated: 'segments générés!',
     downloaded: 'téléchargé!',
@@ -381,6 +385,7 @@ export const translations: Record<Language, Translations> = {
     elevationMin: 'Altitud mín.',
     elevationMax: 'Altitud máx.',
     noElevationData: 'Sin datos de altitud',
+    elevationProfile: 'Perfil de Altitud',
 
     segmentsGenerated: 'segmentos generados!',
     downloaded: 'descargado!',
@@ -462,6 +467,7 @@ export const translations: Record<Language, Translations> = {
     elevationMin: 'Min. Höhe',
     elevationMax: 'Max. Höhe',
     noElevationData: 'Keine Höhendaten',
+    elevationProfile: 'Höhenprofil',
 
     segmentsGenerated: 'Segmente generiert!',
     downloaded: 'heruntergeladen!',
@@ -543,6 +549,7 @@ export const translations: Record<Language, Translations> = {
     elevationMin: 'Min. høyde',
     elevationMax: 'Maks. høyde',
     noElevationData: 'Ingen høydedata',
+    elevationProfile: 'Høydeprofil',
 
     segmentsGenerated: 'segmenter generert!',
     downloaded: 'lastet ned!',
@@ -624,6 +631,7 @@ export const translations: Record<Language, Translations> = {
     elevationMin: 'Elevação mín.',
     elevationMax: 'Elevação máx.',
     noElevationData: 'Sem dados de elevação',
+    elevationProfile: 'Perfil de Elevação',
 
     segmentsGenerated: 'segmentos gerados!',
     downloaded: 'baixado!',
