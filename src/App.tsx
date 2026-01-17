@@ -359,6 +359,18 @@ function App() {
                   selectedPoints={liveSegment?.selectedPoints}
                   startKm={startFromKM}
                   endKm={startFromKM + distanceKM}
+                  onStartKmChange={(km) => {
+                    // Ensure the new start position doesn't exceed the total distance
+                    const maxStart = Math.floor(preview.totalDistance - 10) // Leave at least 10km for segment
+                    const newStart = Math.max(0, Math.min(km, maxStart))
+                    setStartFromKM(newStart)
+                  }}
+                  onDistanceChange={(km) => {
+                    // Ensure distance doesn't exceed available distance from start point
+                    const maxDistance = Math.floor(preview.totalDistance - startFromKM)
+                    const newDistance = Math.max(10, Math.min(km, maxDistance, 200)) // Min 10km, max 200km or remaining
+                    setDistanceKM(newDistance)
+                  }}
                   translations={{
                     openFullscreen: t.openFullscreen,
                     closeFullscreen: t.closeFullscreen,
