@@ -321,9 +321,9 @@ function App() {
           </Card>
 
             {/* Map Card */}
-            <Card className="border-purple-200 bg-purple-50/50 dark:bg-purple-950/20 h-fit lg:sticky lg:top-4">
+            <Card className="border-amber-200 bg-amber-50/50 dark:bg-amber-950/20 h-fit lg:sticky lg:top-4">
               <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-purple-900 dark:text-purple-100">
+                <CardTitle className="flex items-center gap-2 text-amber-900 dark:text-amber-100">
                   <Map className="w-5 h-5" />
                   {t.mapTitle}
                 </CardTitle>
@@ -354,7 +354,7 @@ function App() {
         {preview && (
           <Button
             onClick={generateAllSegments}
-            className="w-full h-12 text-base bg-purple-600 hover:bg-purple-700"
+            className="w-full h-12 text-base bg-amber-600 hover:bg-amber-700"
             size="lg"
           >
             <Settings className="w-5 h-5" />
@@ -436,10 +436,10 @@ function App() {
 
           <TabsContent value="about" className="space-y-4">
             {/* About Section */}
-            <Card className="border-4 border-blue-300 bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 dark:from-blue-950/40 dark:via-purple-950/40 dark:to-pink-950/40 shadow-xl">
+            <Card className="border-4 border-blue-300 bg-gradient-to-br from-blue-50 via-amber-50 to-yellow-50 dark:from-blue-950/40 dark:via-amber-950/40 dark:to-yellow-950/40 shadow-xl">
               <CardHeader className="pb-4">
                 <CardTitle className="flex items-center gap-3 text-2xl text-blue-900 dark:text-blue-100">
-                  <Heart className="w-7 h-7 text-pink-600 fill-pink-600" />
+                  <Heart className="w-7 h-7 text-yellow-600 fill-yellow-600" />
                   {t.aboutTitle}
                 </CardTitle>
               </CardHeader>
@@ -455,8 +455,8 @@ function App() {
                 </div>
 
                 {/* Personal story */}
-                <div className="space-y-4 bg-gradient-to-r from-purple-50/80 to-pink-50/80 dark:from-purple-950/30 dark:to-pink-950/30 p-5 rounded-lg border-2 border-purple-200 dark:border-purple-800">
-                  <h3 className="font-bold text-xl text-purple-900 dark:text-purple-100 flex items-center gap-2">
+                <div className="space-y-4 bg-gradient-to-r from-amber-50/80 to-yellow-50/80 dark:from-amber-950/30 dark:to-yellow-950/30 p-5 rounded-lg border-2 border-amber-200 dark:border-amber-800">
+                  <h3 className="font-bold text-xl text-amber-900 dark:text-amber-100 flex items-center gap-2">
                      {t.aboutStoryTitle}
                   </h3>
                   <div className="space-y-3 text-sm">
@@ -468,13 +468,13 @@ function App() {
                     </p>
 
                     {/* Kom op tegen Kanker */}
-                    <div className="bg-yellow-300/80 dark:bg-pink-950/40 p-4 rounded-lg border-2 border-yellow-500 dark:border-pink-700 mt-4">
-                      <p className="font-bold text-yellow-900 dark:text-pink-100 text-lg flex items-center justify-center gap-2">
+                    <div className="bg-yellow-300/80 dark:bg-yellow-950/40 p-4 rounded-lg border-2 border-yellow-500 dark:border-yellow-700 mt-4">
+                      <p className="font-bold text-yellow-900 dark:text-yellow-100 text-lg flex items-center justify-center gap-2">
                         {t.aboutCancerText}
                       </p>
                     </div>
 
-                    <p className="italic font-bold text-lg text-purple-700 dark:text-purple-300 pt-3">
+                    <p className="italic font-bold text-lg text-amber-700 dark:text-amber-300 pt-3">
                        {t.aboutDedication} 
                     </p>
                   </div>
@@ -498,7 +498,7 @@ function App() {
                       href="https://www.komoptegenkanker.be/acties/10k-voor-k"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex items-center gap-2 text-pink-600 dark:text-pink-400 hover:text-pink-800 dark:hover:text-pink-200 hover:underline transition-colors font-medium"
+                      className="flex items-center gap-2 text-yellow-600 dark:text-yellow-400 hover:text-yellow-800 dark:hover:text-yellow-200 hover:underline transition-colors font-medium"
                     >
                       <Heart className="w-5 h-5 fill-current" />
                       {t.aboutLinkKomOpTegenKanker}
@@ -508,7 +508,7 @@ function App() {
                       href="https://www.instagram.com/steven_verhoest?igsh=eHY0Y3BsOXd3dTdv&utm_source=qr"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex items-center gap-2 text-purple-600 dark:text-purple-400 hover:text-purple-800 dark:hover:text-purple-200 hover:underline transition-colors font-medium"
+                      className="flex items-center gap-2 text-amber-600 dark:text-amber-400 hover:text-amber-800 dark:hover:text-amber-200 hover:underline transition-colors font-medium"
                     >
                       <Eye className="w-5 h-5" />
                       {t.aboutLinkInstagram}
