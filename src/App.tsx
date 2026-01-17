@@ -457,26 +457,25 @@ function App() {
                 {/* Personal story */}
                 <div className="space-y-4 bg-gradient-to-r from-purple-50/80 to-pink-50/80 dark:from-purple-950/30 dark:to-pink-950/30 p-5 rounded-lg border-2 border-purple-200 dark:border-purple-800">
                   <h3 className="font-bold text-xl text-purple-900 dark:text-purple-100 flex items-center gap-2">
-                    ⚓ {t.aboutStoryTitle}
+                     {t.aboutStoryTitle}
                   </h3>
                   <div className="space-y-3 text-sm">
                     <p className="font-medium">{t.aboutStoryText1}</p>
                     <p>{t.aboutStoryText2}</p>
                     <p className="pt-2 font-semibold">{t.aboutStoryText3}</p>
-                    <p className="font-bold text-blue-700 dark:text-blue-300 text-center text-xl py-3 bg-white/50 dark:bg-gray-900/30 rounded-lg">
-                      🚴 {t.aboutStoryText4} 🚴
+                    <p className="font-bold text-blue-700 dark:text-blue-300 text-xl py-3 bg-white/50 dark:bg-gray-900/30 rounded-lg">
+                       {t.aboutStoryText4} 
                     </p>
 
                     {/* Kom op tegen Kanker */}
-                    <div className="bg-pink-100/80 dark:bg-pink-950/40 p-4 rounded-lg border-2 border-pink-300 dark:border-pink-700 mt-4">
-                      <p className="font-bold text-pink-900 dark:text-pink-100 text-center text-lg flex items-center justify-center gap-2">
-                        <Heart className="w-6 h-6 text-pink-600 fill-pink-600 animate-pulse" />
+                    <div className="bg-yellow-300/80 dark:bg-pink-950/40 p-4 rounded-lg border-2 border-yellow-500 dark:border-pink-700 mt-4">
+                      <p className="font-bold text-yellow-900 dark:text-pink-100 text-lg flex items-center justify-center gap-2">
                         {t.aboutCancerText}
                       </p>
                     </div>
 
-                    <p className="text-center italic font-bold text-lg text-purple-700 dark:text-purple-300 pt-3">
-                      ⚓ {t.aboutDedication} ⚓
+                    <p className="italic font-bold text-lg text-purple-700 dark:text-purple-300 pt-3">
+                       {t.aboutDedication} 
                     </p>
                   </div>
                 </div>
