@@ -5,6 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Label } from '@/components/ui/label'
 import { Toast } from '@/components/ui/toast'
 import { Slider } from '@/components/ui/slider'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { processGPX, analyzeGPX, type GPXPreview, type GPXProcessResult } from '@/lib/gpx-utils'
 import { MapViewer } from '@/components/MapViewer'
 import { Language, getTranslations } from '@/lib/i18n'
@@ -182,7 +183,14 @@ function App() {
         </div>
       </header>
 
-      <div className="max-w-7xl mx-auto space-y-4">
+      <div className="max-w-7xl mx-auto px-2">
+        <Tabs defaultValue="route" className="w-full">
+          <TabsList className="grid w-full grid-cols-2 mb-6">
+            <TabsTrigger value="route">{t.tabRoute}</TabsTrigger>
+            <TabsTrigger value="about">{t.tabAbout}</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="route" className="space-y-4">
         {/* Step 1: Upload */}
         <Card>
           <CardHeader>
@@ -213,91 +221,6 @@ function App() {
                 <span>{file.name}</span>
               </div>
             )}
-          </CardContent>
-        </Card>
-
-        {/* About Section - Prominent */}
-        <Card className="border-4 border-blue-300 bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 dark:from-blue-950/40 dark:via-purple-950/40 dark:to-pink-950/40 shadow-xl">
-          <CardHeader className="pb-4">
-            <CardTitle className="flex items-center gap-3 text-2xl text-blue-900 dark:text-blue-100">
-              <Heart className="w-7 h-7 text-pink-600 fill-pink-600" />
-              {t.aboutTitle}
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            {/* Why this tool */}
-            <div className="space-y-3 bg-white/60 dark:bg-gray-900/20 p-4 rounded-lg">
-              <h3 className="font-bold text-lg text-blue-900 dark:text-blue-100">{t.aboutWhyTitle}</h3>
-              <div className="space-y-2 text-sm">
-                <p>• {t.aboutWhyText1}</p>
-                <p>• {t.aboutWhyText2}</p>
-                <p>• {t.aboutWhyText3}</p>
-              </div>
-            </div>
-
-            {/* Personal story */}
-            <div className="space-y-4 bg-gradient-to-r from-purple-50/80 to-pink-50/80 dark:from-purple-950/30 dark:to-pink-950/30 p-5 rounded-lg border-2 border-purple-200 dark:border-purple-800">
-              <h3 className="font-bold text-xl text-purple-900 dark:text-purple-100 flex items-center gap-2">
-                ⚓ {t.aboutStoryTitle}
-              </h3>
-              <div className="space-y-3 text-sm">
-                <p className="font-medium">{t.aboutStoryText1}</p>
-                <p>{t.aboutStoryText2}</p>
-                <p className="pt-2 font-semibold">{t.aboutStoryText3}</p>
-                <p className="font-bold text-blue-700 dark:text-blue-300 text-center text-xl py-3 bg-white/50 dark:bg-gray-900/30 rounded-lg">
-                  🚴 {t.aboutStoryText4} 🚴
-                </p>
-
-                {/* Kom op tegen Kanker */}
-                <div className="bg-pink-100/80 dark:bg-pink-950/40 p-4 rounded-lg border-2 border-pink-300 dark:border-pink-700 mt-4">
-                  <p className="font-bold text-pink-900 dark:text-pink-100 text-center text-lg flex items-center justify-center gap-2">
-                    <Heart className="w-6 h-6 text-pink-600 fill-pink-600 animate-pulse" />
-                    {t.aboutCancerText}
-                  </p>
-                </div>
-
-                <p className="text-center italic font-bold text-lg text-purple-700 dark:text-purple-300 pt-3">
-                  ⚓ {t.aboutDedication} ⚓
-                </p>
-              </div>
-            </div>
-
-            {/* Links */}
-            <div className="space-y-3 bg-white/60 dark:bg-gray-900/20 p-4 rounded-lg">
-              <h3 className="font-bold text-lg text-blue-900 dark:text-blue-100 mb-3">{t.aboutLinksTitle}</h3>
-              <div className="space-y-2">
-                <a
-                  href="https://www.komoot.com/collection/3148111/-tenkfork"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-2 text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-200 hover:underline transition-colors font-medium"
-                >
-                  <Map className="w-5 h-5" />
-                  {t.aboutLinkKomoot}
-                  <ExternalLink className="w-4 h-4" />
-                </a>
-                <a
-                  href="https://www.komoptegenkanker.be/acties/10k-voor-k"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-2 text-pink-600 dark:text-pink-400 hover:text-pink-800 dark:hover:text-pink-200 hover:underline transition-colors font-medium"
-                >
-                  <Heart className="w-5 h-5 fill-current" />
-                  {t.aboutLinkKomOpTegenKanker}
-                  <ExternalLink className="w-4 h-4" />
-                </a>
-                <a
-                  href="https://www.instagram.com/steven_verhoest?igsh=eHY0Y3BsOXd3dTdv&utm_source=qr"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-2 text-purple-600 dark:text-purple-400 hover:text-purple-800 dark:hover:text-purple-200 hover:underline transition-colors font-medium"
-                >
-                  <Eye className="w-5 h-5" />
-                  {t.aboutLinkInstagram}
-                  <ExternalLink className="w-4 h-4" />
-                </a>
-              </div>
-            </div>
           </CardContent>
         </Card>
 
@@ -509,6 +432,95 @@ function App() {
             </CardContent>
           )}
         </Card>
+          </TabsContent>
+
+          <TabsContent value="about" className="space-y-4">
+            {/* About Section */}
+            <Card className="border-4 border-blue-300 bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 dark:from-blue-950/40 dark:via-purple-950/40 dark:to-pink-950/40 shadow-xl">
+              <CardHeader className="pb-4">
+                <CardTitle className="flex items-center gap-3 text-2xl text-blue-900 dark:text-blue-100">
+                  <Heart className="w-7 h-7 text-pink-600 fill-pink-600" />
+                  {t.aboutTitle}
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                {/* Why this tool */}
+                <div className="space-y-3 bg-white/60 dark:bg-gray-900/20 p-4 rounded-lg">
+                  <h3 className="font-bold text-lg text-blue-900 dark:text-blue-100">{t.aboutWhyTitle}</h3>
+                  <div className="space-y-2 text-sm">
+                    <p>• {t.aboutWhyText1}</p>
+                    <p>• {t.aboutWhyText2}</p>
+                    <p>• {t.aboutWhyText3}</p>
+                  </div>
+                </div>
+
+                {/* Personal story */}
+                <div className="space-y-4 bg-gradient-to-r from-purple-50/80 to-pink-50/80 dark:from-purple-950/30 dark:to-pink-950/30 p-5 rounded-lg border-2 border-purple-200 dark:border-purple-800">
+                  <h3 className="font-bold text-xl text-purple-900 dark:text-purple-100 flex items-center gap-2">
+                    ⚓ {t.aboutStoryTitle}
+                  </h3>
+                  <div className="space-y-3 text-sm">
+                    <p className="font-medium">{t.aboutStoryText1}</p>
+                    <p>{t.aboutStoryText2}</p>
+                    <p className="pt-2 font-semibold">{t.aboutStoryText3}</p>
+                    <p className="font-bold text-blue-700 dark:text-blue-300 text-center text-xl py-3 bg-white/50 dark:bg-gray-900/30 rounded-lg">
+                      🚴 {t.aboutStoryText4} 🚴
+                    </p>
+
+                    {/* Kom op tegen Kanker */}
+                    <div className="bg-pink-100/80 dark:bg-pink-950/40 p-4 rounded-lg border-2 border-pink-300 dark:border-pink-700 mt-4">
+                      <p className="font-bold text-pink-900 dark:text-pink-100 text-center text-lg flex items-center justify-center gap-2">
+                        <Heart className="w-6 h-6 text-pink-600 fill-pink-600 animate-pulse" />
+                        {t.aboutCancerText}
+                      </p>
+                    </div>
+
+                    <p className="text-center italic font-bold text-lg text-purple-700 dark:text-purple-300 pt-3">
+                      ⚓ {t.aboutDedication} ⚓
+                    </p>
+                  </div>
+                </div>
+
+                {/* Links */}
+                <div className="space-y-3 bg-white/60 dark:bg-gray-900/20 p-4 rounded-lg">
+                  <h3 className="font-bold text-lg text-blue-900 dark:text-blue-100 mb-3">{t.aboutLinksTitle}</h3>
+                  <div className="space-y-2">
+                    <a
+                      href="https://www.komoot.com/collection/3148111/-tenkfork"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-2 text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-200 hover:underline transition-colors font-medium"
+                    >
+                      <Map className="w-5 h-5" />
+                      {t.aboutLinkKomoot}
+                      <ExternalLink className="w-4 h-4" />
+                    </a>
+                    <a
+                      href="https://www.komoptegenkanker.be/acties/10k-voor-k"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-2 text-pink-600 dark:text-pink-400 hover:text-pink-800 dark:hover:text-pink-200 hover:underline transition-colors font-medium"
+                    >
+                      <Heart className="w-5 h-5 fill-current" />
+                      {t.aboutLinkKomOpTegenKanker}
+                      <ExternalLink className="w-4 h-4" />
+                    </a>
+                    <a
+                      href="https://www.instagram.com/steven_verhoest?igsh=eHY0Y3BsOXd3dTdv&utm_source=qr"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-2 text-purple-600 dark:text-purple-400 hover:text-purple-800 dark:hover:text-purple-200 hover:underline transition-colors font-medium"
+                    >
+                      <Eye className="w-5 h-5" />
+                      {t.aboutLinkInstagram}
+                      <ExternalLink className="w-4 h-4" />
+                    </a>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   )

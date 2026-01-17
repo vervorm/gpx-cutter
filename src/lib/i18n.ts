@@ -78,6 +78,10 @@ export interface Translations {
 
   // Language names
   languageName: string
+
+  // Tabs
+  tabRoute: string
+  tabAbout: string
 }
 
 export const translations: Record<Language, Translations> = {
@@ -148,6 +152,9 @@ export const translations: Record<Language, Translations> = {
     aboutLinkInstagram: 'Volg het avontuur op Instagram',
 
     languageName: 'Nederlands',
+
+    tabRoute: 'Route Tool',
+    tabAbout: 'Over dit project',
   },
   en: {
     title: 'Shorten Route',
@@ -216,6 +223,9 @@ export const translations: Record<Language, Translations> = {
     aboutLinkInstagram: 'Follow the adventure on Instagram',
 
     languageName: 'English',
+
+    tabRoute: 'Route Tool',
+    tabAbout: 'About this project',
   },
   fr: {
     title: 'Raccourcir l\'Itinéraire',
@@ -284,6 +294,9 @@ export const translations: Record<Language, Translations> = {
     aboutLinkInstagram: 'Suivez l\'aventure sur Instagram',
 
     languageName: 'Français',
+
+    tabRoute: 'Outil d\'Itinéraire',
+    tabAbout: 'À propos de ce projet',
   },
   es: {
     title: 'Acortar Ruta',
@@ -352,6 +365,9 @@ export const translations: Record<Language, Translations> = {
     aboutLinkInstagram: 'Sigue la aventura en Instagram',
 
     languageName: 'Español',
+
+    tabRoute: 'Herramienta de Ruta',
+    tabAbout: 'Sobre este proyecto',
   },
   de: {
     title: 'Route Kürzen',
@@ -420,6 +436,9 @@ export const translations: Record<Language, Translations> = {
     aboutLinkInstagram: 'Folgen Sie dem Abenteuer auf Instagram',
 
     languageName: 'Deutsch',
+
+    tabRoute: 'Routen-Tool',
+    tabAbout: 'Über dieses Projekt',
   },
   no: {
     title: 'Forkort Rute',
@@ -488,6 +507,9 @@ export const translations: Record<Language, Translations> = {
     aboutLinkInstagram: 'Følg eventyret på Instagram',
 
     languageName: 'Norsk',
+
+    tabRoute: 'Ruteverktøy',
+    tabAbout: 'Om dette prosjektet',
   },
   pt: {
     title: 'Encurtar Rota',
@@ -556,6 +578,9 @@ export const translations: Record<Language, Translations> = {
     aboutLinkInstagram: 'Siga a aventura no Instagram',
 
     languageName: 'Português',
+
+    tabRoute: 'Ferramenta de Rota',
+    tabAbout: 'Sobre este projeto',
   },
 }
 
