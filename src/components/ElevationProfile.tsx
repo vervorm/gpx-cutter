@@ -7,7 +7,6 @@ interface ElevationProfileProps {
   className?: string
   currentStartKm?: number
   currentDistanceKm?: number
-  totalRouteDistance?: number
   onStartKmChange?: (km: number) => void
   onDistanceChange?: (km: number) => void
 }
@@ -18,7 +17,6 @@ export function ElevationProfile({
   className = '',
   currentStartKm = 0,
   currentDistanceKm = 100,
-  totalRouteDistance = 0,
   onStartKmChange,
   onDistanceChange
 }: ElevationProfileProps) {
