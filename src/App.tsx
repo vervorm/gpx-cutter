@@ -297,14 +297,17 @@ function App() {
                         <Label htmlFor="startFromKM">{t.startFromLabel}</Label>
                         <span className="text-lg font-semibold text-primary">{startFromKM} km</span>
                       </div>
-                      <Slider
-                        id="startFromKM"
-                        min={0}
-                        max={roundedMaxDistance}
-                        step={1}
-                        value={startFromKM}
-                        onValueChange={setStartFromKM}
-                      />
+                      {/* Extra padding for mobile touch targets */}
+                      <div className="py-2 px-1">
+                        <Slider
+                          id="startFromKM"
+                          min={0}
+                          max={roundedMaxDistance}
+                          step={1}
+                          value={startFromKM}
+                          onValueChange={setStartFromKM}
+                        />
+                      </div>
                       <p className="text-xs text-muted-foreground">
                         Stappen van 1 km
                       </p>
@@ -315,14 +318,17 @@ function App() {
                         <Label htmlFor="distanceKM">{t.distanceLabel}</Label>
                         <span className="text-lg font-semibold text-primary">{distanceKM} km</span>
                       </div>
-                      <Slider
-                        id="distanceKM"
-                        min={10}
-                        max={Math.min(200, roundedMaxDistance)}
-                        step={10}
-                        value={distanceKM}
-                        onValueChange={setDistanceKM}
-                      />
+                      {/* Extra padding for mobile touch targets */}
+                      <div className="py-2 px-1">
+                        <Slider
+                          id="distanceKM"
+                          min={10}
+                          max={Math.min(200, roundedMaxDistance)}
+                          step={10}
+                          value={distanceKM}
+                          onValueChange={setDistanceKM}
+                        />
+                      </div>
                       <p className="text-xs text-muted-foreground">
                         Stappen van 10 km (max 200 km)
                       </p>
