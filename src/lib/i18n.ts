@@ -33,6 +33,7 @@ export interface Translations {
   closeFullscreen: string;
   startMarker: string;
   endMarker: string;
+  dragToAdjust: string;
 
   // Generate
   generate2Segments: string;
@@ -127,6 +128,7 @@ export const translations: Record<Language, Translations> = {
     closeFullscreen: "Sluit fullscreen",
     startMarker: "Start",
     endMarker: "Einde",
+    dragToAdjust: "Sleep om aan te passen",
 
     generate2Segments: "Genereer 2 Segmenten",
     generate3Segments: "Genereer 3 Segmenten",
@@ -225,6 +227,7 @@ export const translations: Record<Language, Translations> = {
     closeFullscreen: "Close fullscreen",
     startMarker: "Start",
     endMarker: "End",
+    dragToAdjust: "Drag to adjust",
 
     generate2Segments: "Generate 2 Segments",
     generate3Segments: "Generate 3 Segments",
@@ -321,6 +324,7 @@ export const translations: Record<Language, Translations> = {
     closeFullscreen: "Fermer le plein écran",
     startMarker: "Départ",
     endMarker: "Fin",
+    dragToAdjust: "Glisser pour ajuster",
 
     generate2Segments: "Générer 2 Segments",
     generate3Segments: "Générer 3 Segments",
@@ -419,6 +423,7 @@ export const translations: Record<Language, Translations> = {
     closeFullscreen: "Cerrar pantalla completa",
     startMarker: "Inicio",
     endMarker: "Fin",
+    dragToAdjust: "Arrastrar para ajustar",
 
     generate2Segments: "Generar 2 Segmentos",
     generate3Segments: "Generar 3 Segmentos",
@@ -517,6 +522,7 @@ export const translations: Record<Language, Translations> = {
     closeFullscreen: "Vollbild schließen",
     startMarker: "Start",
     endMarker: "Ende",
+    dragToAdjust: "Ziehen zum Anpassen",
 
     generate2Segments: "2 Segmente Generieren",
     generate3Segments: "3 Segmente Generieren",
@@ -616,6 +622,7 @@ export const translations: Record<Language, Translations> = {
     closeFullscreen: "Lukk fullskjerm",
     startMarker: "Start",
     endMarker: "Slutt",
+    dragToAdjust: "Dra for å justere",
 
     generate2Segments: "Generer 2 Segmenter",
     generate3Segments: "Generer 3 Segmenter",
@@ -711,6 +718,7 @@ export const translations: Record<Language, Translations> = {
     closeFullscreen: "Fechar tela cheia",
     startMarker: "Início",
     endMarker: "Fim",
+    dragToAdjust: "Arrastar para ajustar",
 
     generate2Segments: "Gerar 2 Segmentos",
     generate3Segments: "Gerar 3 Segmentos",

@@ -24,6 +24,7 @@ interface MapViewerProps {
     startMarker: string
     endMarker: string
     noRouteData: string
+    dragToAdjust: string
   }
 }
 
@@ -126,6 +127,7 @@ export function MapViewer({
     startMarker: 'Start',
     endMarker: 'End',
     noRouteData: 'No route data available',
+    dragToAdjust: 'Drag to adjust',
   }
 
   // Create custom icons using MapPin from lucide
@@ -208,8 +210,8 @@ export function MapViewer({
     const { lat, lng } = event.target.getLatLng()
     const distanceFromStart = findDistanceAlongRoute(lat, lng, allPoints)
 
-    // Round to nearest 10km for usability
-    const roundedDistance = Math.round(distanceFromStart / 10) * 10
+    // Round to nearest 1km (consistent with slider)
+    const roundedDistance = Math.round(distanceFromStart)
     onStartKmChange(roundedDistance)
   }
 
@@ -300,7 +302,7 @@ export function MapViewer({
                 <div className="text-sm">
                   <p className="font-semibold">{t.startMarker}</p>
                   <p>{startKm.toFixed(1)} km</p>
-                  {onStartKmChange && <p className="text-xs text-gray-500 mt-1">Sleep om aan te passen</p>}
+                  {onStartKmChange && <p className="text-xs text-gray-500 mt-1">{t.dragToAdjust}</p>}
                 </div>
               </Popup>
             </Marker>
@@ -320,7 +322,7 @@ export function MapViewer({
                 <div className="text-sm">
                   <p className="font-semibold">{t.endMarker}</p>
                   <p>{endKm?.toFixed(1)} km</p>
-                  {onDistanceChange && <p className="text-xs text-gray-500 mt-1">Sleep om aan te passen</p>}
+                  {onDistanceChange && <p className="text-xs text-gray-500 mt-1">{t.dragToAdjust}</p>}
                 </div>
               </Popup>
             </Marker>

@@ -397,6 +397,7 @@ function App() {
                         startMarker: t.startMarker,
                         endMarker: t.endMarker,
                         noRouteData: t.noRouteData,
+                        dragToAdjust: t.dragToAdjust,
                       }}
                     />
                   </CardContent>

@@ -37,10 +37,20 @@ export function ElevationProfile({ points, startKm = 0, className = '' }: Elevat
     const maxEle = Math.max(...elevations)
     const eleRange = maxEle - minEle
 
-    // Add 10% padding to elevation range
+    // Bottom boundary is the lowest point (no padding below)
+    const displayMin = minEle
+
+    // Add 10% padding to the top
     const padding = eleRange * 0.1
-    const displayMin = minEle - padding
-    const displayMax = maxEle + padding
+    let displayMax = maxEle + padding
+
+    // Ensure minimum range of 50 meters for realistic perspective
+    // Only add padding to the top to maintain the minimum range
+    const currentRange = displayMax - displayMin
+    const minRange = 50
+    if (currentRange < minRange) {
+      displayMax = displayMin + minRange
+    }
 
     return {
       points: pointsWithEle,
