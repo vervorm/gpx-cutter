@@ -1,5 +1,6 @@
 import { useMemo, useState, useRef } from 'react'
 import { RoutePoint, getDistanceFromLatLonInKm } from '@/lib/gpx-utils'
+import { SeparatorVertical } from 'lucide-react'
 
 interface ElevationProfileProps {
   points: RoutePoint[]
@@ -192,7 +193,7 @@ export function ElevationProfile({
   }, [tempEndX, padding.left, sliderWidth])
 
   // Slider event handlers - adjust segment boundaries
-  const handleMouseMove = (e: React.MouseEvent<SVGSVGElement>) => {
+  const handleMove = (clientX: number) => {
     if (!isDraggingStart && !isDraggingEnd) return
     if (!svgRef.current) return
 
@@ -200,7 +201,7 @@ export function ElevationProfile({
     const rect = svg.getBoundingClientRect()
 
     // Calculate position along the slider bar
-    const mouseX = e.clientX - rect.left
+    const mouseX = clientX - rect.left
     const clampedX = Math.max(padding.left, Math.min(mouseX, padding.left + sliderWidth))
 
     if (isDraggingStart) {
@@ -212,8 +213,18 @@ export function ElevationProfile({
     }
   }
 
-  const handleMouseUp = () => {
-    // Apply changes when mouse is released
+  const handleMouseMove = (e: React.MouseEvent<SVGSVGElement>) => {
+    handleMove(e.clientX)
+  }
+
+  const handleTouchMove = (e: React.TouchEvent<SVGSVGElement>) => {
+    if (e.touches.length > 0) {
+      handleMove(e.touches[0].clientX)
+    }
+  }
+
+  const handleEnd = () => {
+    // Apply changes when mouse/touch is released
     if (isDraggingStart && tempStartX !== null && onStartKmChange) {
       const relativeX = (tempStartX - padding.left) / sliderWidth
       const clampedPosition = Math.max(0, Math.min(1, relativeX))
@@ -248,6 +259,14 @@ export function ElevationProfile({
     setTempEndX(null)
   }
 
+  const handleMouseUp = () => {
+    handleEnd()
+  }
+
+  const handleTouchEnd = () => {
+    handleEnd()
+  }
+
   return (
     <div className={className}>
       <svg
@@ -259,7 +278,13 @@ export function ElevationProfile({
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUp}
         onMouseLeave={handleMouseUp}
-        style={{ cursor: isDraggingStart || isDraggingEnd ? 'ew-resize' : 'default' }}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
+        onTouchCancel={handleTouchEnd}
+        style={{
+          cursor: isDraggingStart || isDraggingEnd ? 'ew-resize' : 'default',
+          touchAction: 'none' // Prevent default touch behavior
+        }}
       >
         {/* Grid lines */}
         {yLabels.map((label, i) => (
@@ -390,36 +415,76 @@ export function ElevationProfile({
 
             {/* Start handle */}
             {onStartKmChange && (
-              <circle
-                cx={startHandleX}
-                cy={sliderBarY + sliderBarHeight / 2}
-                r="14"
-                fill="#3B82F6"
-                stroke="white"
-                strokeWidth="3"
-                style={{ cursor: 'ew-resize' }}
-                onMouseDown={(e) => {
-                  e.stopPropagation()
-                  setIsDraggingStart(true)
-                }}
-              />
+              <g>
+                {/* Touch target background */}
+                <rect
+                  x={startHandleX - 22}
+                  y={sliderBarY - 7}
+                  width="44"
+                  height="44"
+                  fill="transparent"
+                  style={{ cursor: 'ew-resize' }}
+                  onMouseDown={(e) => {
+                    e.stopPropagation()
+                    setIsDraggingStart(true)
+                  }}
+                  onTouchStart={(e) => {
+                    e.stopPropagation()
+                    setIsDraggingStart(true)
+                  }}
+                />
+                {/* Icon */}
+                <foreignObject
+                  x={startHandleX - 18}
+                  y={sliderBarY}
+                  width="36"
+                  height="36"
+                  style={{ pointerEvents: 'none' }}
+                >
+                  <div className="flex items-center justify-center w-full h-full">
+                    <div className="bg-primary rounded-full p-1.5 border-2 border-white shadow-lg">
+                      <SeparatorVertical className="w-5 h-5 text-white" />
+                    </div>
+                  </div>
+                </foreignObject>
+              </g>
             )}
 
             {/* End handle */}
             {onDistanceChange && (
-              <circle
-                cx={endHandleX}
-                cy={sliderBarY + sliderBarHeight / 2}
-                r="14"
-                fill="#3B82F6"
-                stroke="white"
-                strokeWidth="3"
-                style={{ cursor: 'ew-resize' }}
-                onMouseDown={(e) => {
-                  e.stopPropagation()
-                  setIsDraggingEnd(true)
-                }}
-              />
+              <g>
+                {/* Touch target background */}
+                <rect
+                  x={endHandleX - 22}
+                  y={sliderBarY - 7}
+                  width="44"
+                  height="44"
+                  fill="transparent"
+                  style={{ cursor: 'ew-resize' }}
+                  onMouseDown={(e) => {
+                    e.stopPropagation()
+                    setIsDraggingEnd(true)
+                  }}
+                  onTouchStart={(e) => {
+                    e.stopPropagation()
+                    setIsDraggingEnd(true)
+                  }}
+                />
+                {/* Icon */}
+                <foreignObject
+                  x={endHandleX - 18}
+                  y={sliderBarY}
+                  width="36"
+                  height="36"
+                  style={{ pointerEvents: 'none' }}
+                >
+                  <div className="flex items-center justify-center w-full h-full">
+                    <div className="bg-primary rounded-full p-1.5 border-2 border-white shadow-lg">
+                      <SeparatorVertical className="w-5 h-5 text-white" />
+                    </div>
+                  </div>
+                </foreignObject>
+              </g>
             )}
           </g>
         )}
