@@ -316,7 +316,7 @@ function App() {
                         id="distanceKM"
                         min={10}
                         max={Math.min(200, roundedMaxDistance)}
-                        step={10}
+                        step={1}
                         value={distanceKM}
                         onValueChange={setDistanceKM}
                       />

@@ -248,7 +248,7 @@ export function ElevationProfile({
 
       // Ensure minimum 10km and max 200km
       const clampedDistance = Math.max(10, Math.min(newDistance, 200, currentDistanceKm))
-      const roundedDistance = Math.round(clampedDistance / 10) * 10
+      const roundedDistance = Math.round(clampedDistance)
       onDistanceChange(roundedDistance)
     }
 
