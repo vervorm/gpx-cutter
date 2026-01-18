@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Label } from '@/components/ui/label'
 import { Toast } from '@/components/ui/toast'
-import { Slider } from '@/components/ui/slider'
+import { IconSlider } from '@/components/ui/icon-slider'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { processGPX, analyzeGPX, type GPXPreview, type GPXProcessResult } from '@/lib/gpx-utils'
 import { MapViewer } from '@/components/MapViewer'
@@ -291,50 +291,38 @@ function App() {
                       {t.step2Description}
                     </CardDescription>
                   </CardHeader>
-                  <CardContent className="space-y-6">
-                    <div className="space-y-3">
+                  <CardContent className="space-y-4">
+                    <div className="space-y-2">
                       <div className="flex justify-between items-center">
-                        <Label htmlFor="startFromKM">{t.startFromLabel}</Label>
-                        <span className="text-lg font-semibold text-primary">{startFromKM} km</span>
+                        <Label htmlFor="startFromKM" className="text-sm">{t.startFromLabel}</Label>
+                        <span className="text-base font-semibold text-primary">{startFromKM} km</span>
                       </div>
-                      {/* Extra padding for mobile touch targets */}
-                      <div className="py-2 px-1">
-                        <Slider
-                          id="startFromKM"
-                          min={0}
-                          max={roundedMaxDistance}
-                          step={1}
-                          value={startFromKM}
-                          onValueChange={setStartFromKM}
-                        />
-                      </div>
-                      <p className="text-xs text-muted-foreground">
-                        Stappen van 1 km
-                      </p>
+                      <IconSlider
+                        id="startFromKM"
+                        min={0}
+                        max={roundedMaxDistance}
+                        step={1}
+                        value={startFromKM}
+                        onValueChange={setStartFromKM}
+                      />
                     </div>
 
-                    <div className="space-y-3">
+                    <div className="space-y-2">
                       <div className="flex justify-between items-center">
-                        <Label htmlFor="distanceKM">{t.distanceLabel}</Label>
-                        <span className="text-lg font-semibold text-primary">{distanceKM} km</span>
+                        <Label htmlFor="distanceKM" className="text-sm">{t.distanceLabel}</Label>
+                        <span className="text-base font-semibold text-primary">{distanceKM} km</span>
                       </div>
-                      {/* Extra padding for mobile touch targets */}
-                      <div className="py-2 px-1">
-                        <Slider
-                          id="distanceKM"
-                          min={10}
-                          max={Math.min(200, roundedMaxDistance)}
-                          step={10}
-                          value={distanceKM}
-                          onValueChange={setDistanceKM}
-                        />
-                      </div>
-                      <p className="text-xs text-muted-foreground">
-                        Stappen van 10 km (max 200 km)
-                      </p>
+                      <IconSlider
+                        id="distanceKM"
+                        min={10}
+                        max={Math.min(200, roundedMaxDistance)}
+                        step={10}
+                        value={distanceKM}
+                        onValueChange={setDistanceKM}
+                      />
                     </div>
 
-                    <div className="p-4 bg-gradient-to-r from-green-50 to-blue-50 dark:from-green-950/20 dark:to-blue-950/20 rounded-lg border-2 border-primary/20">
+                    <div className="p-3 bg-gradient-to-r from-green-50 to-blue-50 dark:from-green-950/20 dark:to-blue-950/20 rounded-lg border-2 border-primary/20">
                       <p className="text-sm font-medium text-center">
                         📍 {t.selectedSegment} <span className="text-primary font-bold">{startFromKM} km</span> → <span className="text-primary font-bold">{startFromKM + distanceKM} km</span>
                       </p>
@@ -354,8 +342,8 @@ function App() {
 
                     {/* Elevation Profile for selected segment */}
                     {liveSegment && liveSegment.selectedPoints.length > 0 && liveSegment.elevation && (
-                      <div className="mt-4 p-4 bg-white dark:bg-gray-800 rounded-lg border-2 border-orange-200">
-                        <h4 className="text-sm font-semibold text-orange-900 dark:text-orange-100 mb-3">
+                      <div className="mt-3 p-3 bg-white dark:bg-gray-800 rounded-lg border-2 border-orange-200">
+                        <h4 className="text-sm font-semibold text-orange-900 dark:text-orange-100 mb-2">
                           {t.elevationProfile}
                         </h4>
                         <ElevationProfile
