@@ -177,7 +177,7 @@ function App() {
       {/* Header with Language Selector */}
       <header className="mb-4 md:mb-8 mt-2 md:mt-4 max-w-7xl mx-auto px-2">
         <div className="flex flex-col">
-          <div className="lg:hidden ml-6">
+          <div className="lg:hidden mb-6">
             <div className="sticky top-4">
               <a
                 href="https://www.komoptegenkanker.be/acties/10k-voor-k"
