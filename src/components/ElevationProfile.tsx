@@ -1,13 +1,32 @@
-import { useMemo } from 'react'
+import { useMemo, useState, useRef } from 'react'
 import { RoutePoint, getDistanceFromLatLonInKm } from '@/lib/gpx-utils'
 
 interface ElevationProfileProps {
   points: RoutePoint[]
   startKm?: number
   className?: string
+  currentStartKm?: number
+  currentDistanceKm?: number
+  totalRouteDistance?: number
+  onStartKmChange?: (km: number) => void
+  onDistanceChange?: (km: number) => void
 }
 
-export function ElevationProfile({ points, startKm = 0, className = '' }: ElevationProfileProps) {
+export function ElevationProfile({
+  points,
+  startKm = 0,
+  className = '',
+  currentStartKm = 0,
+  currentDistanceKm = 100,
+  totalRouteDistance = 0,
+  onStartKmChange,
+  onDistanceChange
+}: ElevationProfileProps) {
+  const [isDraggingStart, setIsDraggingStart] = useState(false)
+  const [isDraggingEnd, setIsDraggingEnd] = useState(false)
+  const [tempStartX, setTempStartX] = useState<number | null>(null)
+  const [tempEndX, setTempEndX] = useState<number | null>(null)
+  const svgRef = useRef<SVGSVGElement>(null)
   const profileData = useMemo(() => {
     // Filter points with elevation data
     const pointsWithEle = points.filter(p => p.ele !== undefined)
@@ -156,9 +175,94 @@ export function ElevationProfile({ points, startKm = 0, className = '' }: Elevat
     }
   })
 
+  // Slider bar dimensions (above the chart)
+  const sliderBarY = 5
+  const sliderBarHeight = 30
+  const sliderWidth = width - padding.left - padding.right
+
+  // Calculate slider handle positions - slider represents the current segment
+  // The slider bar spans from 0 to 100% of the segment
+  // Use temporary positions during drag, otherwise use edge positions
+  const startHandleX = useMemo(() => {
+    if (tempStartX !== null) return tempStartX
+    return padding.left
+  }, [tempStartX, padding.left])
+
+  const endHandleX = useMemo(() => {
+    if (tempEndX !== null) return tempEndX
+    return padding.left + sliderWidth
+  }, [tempEndX, padding.left, sliderWidth])
+
+  // Slider event handlers - adjust segment boundaries
+  const handleMouseMove = (e: React.MouseEvent<SVGSVGElement>) => {
+    if (!isDraggingStart && !isDraggingEnd) return
+    if (!svgRef.current) return
+
+    const svg = svgRef.current
+    const rect = svg.getBoundingClientRect()
+
+    // Calculate position along the slider bar
+    const mouseX = e.clientX - rect.left
+    const clampedX = Math.max(padding.left, Math.min(mouseX, padding.left + sliderWidth))
+
+    if (isDraggingStart) {
+      setTempStartX(clampedX)
+    }
+
+    if (isDraggingEnd) {
+      setTempEndX(clampedX)
+    }
+  }
+
+  const handleMouseUp = () => {
+    // Apply changes when mouse is released
+    if (isDraggingStart && tempStartX !== null && onStartKmChange) {
+      const relativeX = (tempStartX - padding.left) / sliderWidth
+      const clampedPosition = Math.max(0, Math.min(1, relativeX))
+
+      // Moving start handle to the right shortens segment from the left
+      const kmIntoSegment = clampedPosition * currentDistanceKm
+      const newStartKm = currentStartKm + kmIntoSegment
+
+      // Ensure we don't go past the end (leave at least 10km)
+      const maxStartKm = currentStartKm + currentDistanceKm - 10
+      const roundedStart = Math.round(newStartKm)
+      onStartKmChange(Math.max(currentStartKm, Math.min(roundedStart, maxStartKm)))
+    }
+
+    if (isDraggingEnd && tempEndX !== null && onDistanceChange) {
+      const relativeX = (tempEndX - padding.left) / sliderWidth
+      const clampedPosition = Math.max(0, Math.min(1, relativeX))
+
+      // Moving end handle to the left shortens segment from the right
+      const newDistance = clampedPosition * currentDistanceKm
+
+      // Ensure minimum 10km and max 200km
+      const clampedDistance = Math.max(10, Math.min(newDistance, 200, currentDistanceKm))
+      const roundedDistance = Math.round(clampedDistance / 10) * 10
+      onDistanceChange(roundedDistance)
+    }
+
+    // Reset drag state
+    setIsDraggingStart(false)
+    setIsDraggingEnd(false)
+    setTempStartX(null)
+    setTempEndX(null)
+  }
+
   return (
     <div className={className}>
-      <svg width="100%" height="100%" viewBox={`0 0 ${width} ${height}`} preserveAspectRatio="xMidYMid meet">
+      <svg
+        ref={svgRef}
+        width="100%"
+        height="100%"
+        viewBox={`0 0 ${width} ${height}`}
+        preserveAspectRatio="xMidYMid meet"
+        onMouseMove={handleMouseMove}
+        onMouseUp={handleMouseUp}
+        onMouseLeave={handleMouseUp}
+        style={{ cursor: isDraggingStart || isDraggingEnd ? 'ew-resize' : 'default' }}
+      >
         {/* Grid lines */}
         {yLabels.map((label, i) => (
           <line
@@ -231,28 +335,96 @@ export function ElevationProfile({ points, startKm = 0, className = '' }: Elevat
           </text>
         ))}
 
-        {/* Axis labels */}
-        <text
-          x={padding.left + chartWidth / 2}
-          y={height - 5}
-          textAnchor="middle"
-          fontSize="14"
-          fill="#374151"
-          fontWeight="500"
-        >
-          Afstand (km)
-        </text>
-        <text
-          x={15}
-          y={padding.top + chartHeight / 2}
-          textAnchor="middle"
-          fontSize="14"
-          fill="#374151"
-          fontWeight="500"
-          transform={`rotate(-90 15 ${padding.top + chartHeight / 2})`}
-        >
-          Hoogte (m)
-        </text>
+
+
+        {/* Horizontal range slider above the chart */}
+        {(onStartKmChange || onDistanceChange) && (
+          <g>
+            {/* Background slider bar (full route) */}
+            <rect
+              x={padding.left}
+              y={sliderBarY}
+              width={sliderWidth}
+              height={sliderBarHeight}
+              fill="#E5E7EB"
+              rx="15"
+            />
+
+            {/* Selected segment highlight */}
+            <rect
+              x={startHandleX}
+              y={sliderBarY}
+              width={endHandleX - startHandleX}
+              height={sliderBarHeight}
+              fill="#3B82F6"
+              fillOpacity="0.6"
+              rx="15"
+            />
+
+            {/* Vertical dashed lines from handles to chart */}
+            {onStartKmChange && (
+              <line
+                x1={startHandleX}
+                y1={sliderBarY + sliderBarHeight}
+                x2={startHandleX}
+                y2={height - padding.bottom}
+                stroke="#3B82F6"
+                strokeWidth="2"
+                strokeDasharray="5,5"
+                strokeOpacity="0.5"
+                pointerEvents="none"
+              />
+            )}
+
+            {onDistanceChange && (
+              <line
+                x1={endHandleX}
+                y1={sliderBarY + sliderBarHeight}
+                x2={endHandleX}
+                y2={height - padding.bottom}
+                stroke="#3B82F6"
+                strokeWidth="2"
+                strokeDasharray="5,5"
+                strokeOpacity="0.5"
+                pointerEvents="none"
+              />
+            )}
+
+            {/* Start handle */}
+            {onStartKmChange && (
+              <circle
+                cx={startHandleX}
+                cy={sliderBarY + sliderBarHeight / 2}
+                r="14"
+                fill="#3B82F6"
+                stroke="white"
+                strokeWidth="3"
+                style={{ cursor: 'ew-resize' }}
+                onMouseDown={(e) => {
+                  e.stopPropagation()
+                  setIsDraggingStart(true)
+                }}
+              />
+            )}
+
+            {/* End handle */}
+            {onDistanceChange && (
+              <circle
+                cx={endHandleX}
+                cy={sliderBarY + sliderBarHeight / 2}
+                r="14"
+                fill="#3B82F6"
+                stroke="white"
+                strokeWidth="3"
+                style={{ cursor: 'ew-resize' }}
+                onMouseDown={(e) => {
+                  e.stopPropagation()
+                  setIsDraggingEnd(true)
+                }}
+              />
+            )}
+          </g>
+        )}
       </svg>
     </div>
   )

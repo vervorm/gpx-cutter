@@ -355,6 +355,19 @@ function App() {
                         <ElevationProfile
                           points={liveSegment.selectedPoints}
                           startKm={startFromKM}
+                          currentStartKm={startFromKM}
+                          currentDistanceKm={distanceKM}
+                          totalRouteDistance={startFromKM + distanceKM}
+                          onStartKmChange={(km) => {
+                            const maxStart = Math.floor(preview.totalDistance - 10)
+                            const newStart = Math.max(0, Math.min(km, maxStart))
+                            setStartFromKM(newStart)
+                          }}
+                          onDistanceChange={(km) => {
+                            const maxDistance = Math.floor(preview.totalDistance - startFromKM)
+                            const newDistance = Math.max(10, Math.min(km, maxDistance, 200))
+                            setDistanceKM(newDistance)
+                          }}
                           className="w-full"
                         />
                       </div>
