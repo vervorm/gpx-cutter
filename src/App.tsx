@@ -183,14 +183,15 @@ function App() {
                 href="https://www.komoptegenkanker.be/acties/10k-voor-k"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="block hover:opacity-80 transition-opacity"
+                className=" hover:opacity-80 transition-opacity flex gap-4 items-end"
                 title="Kom op tegen Kanker - 10K voor K"
               >
                 <img
                   src="kotk_base_logo-mobile.svg"
                   alt="Kom op tegen Kanker"
-
-                />
+                /><span className="italic text-sm block mt-2 text-amber-900">
+                  #10k-voor-k <br />#KomOpTegenKanker
+                </span>
               </a>
             </div>
           </div>
@@ -629,6 +630,9 @@ function App() {
                 alt="Kom op tegen Kanker"
                 className="w-40 rounded-lg shadow-lg"
               />
+              <span className="italic text-sm block mt-2 text-amber-900">
+                #10k-voor-k #KomOpTegenKanker
+              </span>
             </a>
           </div>
         </div>
