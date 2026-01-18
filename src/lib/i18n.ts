@@ -682,7 +682,8 @@ export const translations: Record<Language, Translations> = {
 }
 
 export function getTranslations(lang: Language): Translations {
-  return translations[lang]
+  // Fallback to 'nl' if the provided language doesn't exist
+  return translations[lang] || translations.nl
 }
 
 export const LANGUAGES: { code: Language; name: string; flag: string }[] = [
