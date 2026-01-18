@@ -88,8 +88,8 @@ export function ElevationProfile({
 
   // SVG dimensions
   const width = 600
-  const height = 200
-  const padding = { top: 20, right: 20, bottom: 30, left: 50 }
+  const height = 240
+  const padding = { top: 50, right: 20, bottom: 30, left: 50 }
   const chartWidth = width - padding.left - padding.right
   const chartHeight = height - padding.top - padding.bottom
 
@@ -175,7 +175,7 @@ export function ElevationProfile({
   })
 
   // Slider bar dimensions (above the chart)
-  const sliderBarY = 5
+  const sliderBarY = 10
   const sliderBarHeight = 30
   const sliderWidth = width - padding.left - padding.right
 
