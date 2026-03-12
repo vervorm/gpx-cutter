@@ -34,6 +34,10 @@ function App() {
   const [toast, setToast] = useState({ show: false, message: '' })
   const [helpOpen, setHelpOpen] = useState(false)
   const [hasCachedRoute, setHasCachedRoute] = useState<string | null>(null)
+  const [maxDistanceSetting, setMaxDistanceSetting] = useState<number>(() => {
+    const saved = localStorage.getItem('maxDistanceSetting')
+    return saved ? parseInt(saved, 10) : 250
+  })
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   // Laad route automatisch bij opstarten als er iets in IndexedDB staat
@@ -65,6 +69,11 @@ function App() {
     setLanguage(lang)
     localStorage.setItem('language', lang)
   }
+
+  // Save max distance setting to localStorage
+  useEffect(() => {
+    localStorage.setItem('maxDistanceSetting', maxDistanceSetting.toString())
+  }, [maxDistanceSetting])
 
   const showToast = (message: string) => {
     setToast({ show: true, message })
@@ -241,7 +250,7 @@ function App() {
 
   const maxDistance = preview?.totalDistance || 0
   const roundedMaxDistance = Math.ceil(maxDistance)
-  const maxDistanceKM = Math.max(10, Math.min(250, Math.floor(maxDistance - startFromKM)))
+  const maxDistanceKM = Math.max(10, Math.min(maxDistanceSetting, Math.floor(maxDistance - startFromKM)))
 
   // Clamp distanceKM when startFromKM changes and leaves no room
   useEffect(() => {
@@ -449,6 +458,27 @@ function App() {
                         value={distanceKM}
                         onValueChange={setDistanceKM}
                       />
+                    </div>
+
+                    <div className="pt-2 border-t border-orange-200/50">
+                      <div className="flex items-center justify-between gap-3">
+                        <Label htmlFor="maxDistance" className="text-xs text-muted-foreground">Max afstand (km)</Label>
+                        <input
+                          id="maxDistance"
+                          type="number"
+                          min={10}
+                          max={1000}
+                          step={10}
+                          value={maxDistanceSetting}
+                          onChange={(e) => {
+                            const value = parseInt(e.target.value, 10)
+                            if (!isNaN(value) && value >= 10) {
+                              setMaxDistanceSetting(value)
+                            }
+                          }}
+                          className="w-20 px-2 py-1 text-sm border rounded focus:outline-none focus:ring-2 focus:ring-primary"
+                        />
+                      </div>
                     </div>
 
                     {/* Elevation Profile for selected segment */}
