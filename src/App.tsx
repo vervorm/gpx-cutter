@@ -39,9 +39,21 @@ function App() {
     loadRoute().then((entry) => {
       if (entry) {
         setHasCachedRoute(entry.filename)
-        loadXMLString(entry.xml, entry.filename)
-        if (entry.startFromKM !== undefined) setStartFromKM(entry.startFromKM)
-        if (entry.distanceKM !== undefined) setDistanceKM(entry.distanceKM)
+        const parser = new DOMParser()
+        const xml = parser.parseFromString(entry.xml, 'text/xml')
+        setCurrentXML(xml)
+
+        // Preview maken en dan slider posities herstellen
+        try {
+          const previewData = analyzeGPX(xml)
+          setPreview(previewData)
+
+          // Herstel opgeslagen slider posities, of gebruik defaults
+          setStartFromKM(entry.startFromKM ?? 0)
+          setDistanceKM(entry.distanceKM ?? Math.min(100, Math.floor(previewData.totalDistance)))
+        } catch (error) {
+          console.error('Failed to preview cached route:', error)
+        }
       }
     })
   }, [])
@@ -103,9 +115,24 @@ function App() {
   const handleLoadCachedRoute = async () => {
     const entry = await loadRoute()
     if (entry) {
-      loadXMLString(entry.xml, entry.filename)
-      if (entry.startFromKM !== undefined) setStartFromKM(entry.startFromKM)
-      if (entry.distanceKM !== undefined) setDistanceKM(entry.distanceKM)
+      setHasCachedRoute(entry.filename)
+      const parser = new DOMParser()
+      const xml = parser.parseFromString(entry.xml, 'text/xml')
+      setCurrentXML(xml)
+      setAllSegments([])
+      setSelectedSegmentIndex(null)
+
+      // Preview maken en dan slider posities herstellen
+      try {
+        const previewData = analyzeGPX(xml)
+        setPreview(previewData)
+
+        // Herstel opgeslagen slider posities, of gebruik defaults
+        setStartFromKM(entry.startFromKM ?? 0)
+        setDistanceKM(entry.distanceKM ?? Math.min(100, Math.floor(previewData.totalDistance)))
+      } catch (error) {
+        console.error('Failed to preview cached route:', error)
+      }
     }
   }
 
