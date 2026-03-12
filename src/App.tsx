@@ -11,6 +11,7 @@ import { MapViewer } from '@/components/MapViewer'
 import { ElevationProfile } from '@/components/ElevationProfile'
 import { Language, getTranslations } from '@/lib/i18n'
 import { LanguageSelector } from '@/components/LanguageSelector'
+import { saveRoute, loadRoute, clearRoute, getCachedFilename } from '@/lib/route-cache'
 
 function App() {
   // Initialize language from localStorage or default to 'nl'
@@ -30,10 +31,13 @@ function App() {
   const [selectedSegmentIndex, setSelectedSegmentIndex] = useState<number | null>(null)
   const [toast, setToast] = useState({ show: false, message: '' })
   const [helpOpen, setHelpOpen] = useState(false)
-  const [hasCachedRoute, setHasCachedRoute] = useState<string | null>(() =>
-    localStorage.getItem('gpx_filename')
-  )
+  const [hasCachedRoute, setHasCachedRoute] = useState<string | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
+
+  // Laad cachenaam asynchroon bij opstarten
+  useEffect(() => {
+    getCachedFilename().then(setHasCachedRoute)
+  }, [])
 
   // Save language preference to localStorage
   const handleLanguageChange = (lang: Language) => {
@@ -83,30 +87,19 @@ function App() {
       reader.onload = (e) => {
         const xmlString = e.target?.result as string
         loadXMLString(xmlString, selectedFile.name)
-        // Sla op in localStorage voor hergebruik
-        try {
-          localStorage.setItem('gpx_xml', xmlString)
-          localStorage.setItem('gpx_filename', selectedFile.name)
-          setHasCachedRoute(selectedFile.name)
-        } catch {
-          // localStorage vol (>5MB GPX bestand), geen probleem
-        }
+        saveRoute(xmlString, selectedFile.name).catch(() => {})
       }
       reader.readAsText(selectedFile)
     }
   }
 
-  const handleLoadCachedRoute = () => {
-    const xmlString = localStorage.getItem('gpx_xml')
-    const filename = localStorage.getItem('gpx_filename')
-    if (xmlString && filename) {
-      loadXMLString(xmlString, filename)
-    }
+  const handleLoadCachedRoute = async () => {
+    const entry = await loadRoute()
+    if (entry) loadXMLString(entry.xml, entry.filename)
   }
 
   const handleClearCachedRoute = () => {
-    localStorage.removeItem('gpx_xml')
-    localStorage.removeItem('gpx_filename')
+    clearRoute().catch(() => {})
     setHasCachedRoute(null)
     setFile(null)
     setCurrentXML(null)
