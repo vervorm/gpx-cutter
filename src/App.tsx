@@ -248,7 +248,7 @@ function App() {
     if (preview && distanceKM > maxDistanceKM) {
       setDistanceKM(Math.max(10, maxDistanceKM))
     }
-  }, [startFromKM, preview])
+  }, [startFromKM, preview, maxDistanceKM, distanceKM])
 
   // Save slider positions to IndexedDB when they change
   useEffect(() => {
