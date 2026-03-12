@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import { createPortal } from 'react-dom'
 import { MapContainer, TileLayer, Polyline, Marker, Popup, useMap } from 'react-leaflet'
 import { LatLngBounds, LatLngExpression, DivIcon, DragEndEvent } from 'leaflet'
 import { Maximize2, Minimize2, MapPin } from 'lucide-react'
@@ -264,9 +265,9 @@ export function MapViewer({
     )
   }
 
-  return (
+  const mapContent = (
     <div
-      className={`overflow-hidden shadow-lg transition-all relative ${
+      className={`overflow-hidden shadow-lg relative ${
         isFullscreen
           ? 'fixed inset-0 md:inset-4 z-[9999] w-screen h-screen md:w-[calc(100vw-2rem)] md:h-[calc(100vh-2rem)] md:rounded-lg md:border-2 md:border-border'
           : 'w-full h-full rounded-lg border-2 border-border'
@@ -367,4 +368,11 @@ export function MapViewer({
         </MapContainer>
       </div>
   )
+
+  // Use portal for fullscreen to render from document root
+  if (isFullscreen && typeof window !== 'undefined') {
+    return createPortal(mapContent, document.body)
+  }
+
+  return mapContent
 }
