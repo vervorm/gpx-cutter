@@ -217,7 +217,7 @@ export function MapViewer({
 
   // Handle end marker drag
   const handleEndMarkerDrag = (event: DragEndEvent) => {
-    if (!onDistanceChange || !startKm) return
+    if (!onDistanceChange || startKm === undefined) return
 
     const { lat, lng } = event.target.getLatLng()
     const distanceFromStart = findDistanceAlongRoute(lat, lng, allPoints)
@@ -225,8 +225,8 @@ export function MapViewer({
     // Calculate the distance from start marker to end marker
     const segmentDistance = distanceFromStart - startKm
 
-    // Round to nearest 10km and ensure it's at least 10km
-    const roundedDistance = Math.max(10, Math.round(segmentDistance / 10) * 10)
+    // Round to nearest 1km and ensure it's at least 10km
+    const roundedDistance = Math.max(10, Math.round(segmentDistance))
     onDistanceChange(roundedDistance)
   }
 
