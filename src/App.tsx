@@ -30,6 +30,9 @@ function App() {
   const [selectedSegmentIndex, setSelectedSegmentIndex] = useState<number | null>(null)
   const [toast, setToast] = useState({ show: false, message: '' })
   const [helpOpen, setHelpOpen] = useState(false)
+  const [hasCachedRoute, setHasCachedRoute] = useState<string | null>(() =>
+    localStorage.getItem('gpx_filename')
+  )
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   // Save language preference to localStorage
@@ -59,6 +62,16 @@ function App() {
     }
   }, [currentXML, startFromKM, distanceKM, preview])
 
+  const loadXMLString = (xmlString: string, filename: string) => {
+    const parser = new DOMParser()
+    const xml = parser.parseFromString(xmlString, 'text/xml')
+    setCurrentXML(xml)
+    setPreview(null)
+    setAllSegments([])
+    setSelectedSegmentIndex(null)
+    setHasCachedRoute(filename)
+  }
+
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = event.target.files?.[0]
     if (selectedFile) {
@@ -68,12 +81,38 @@ function App() {
       setSelectedSegmentIndex(null)
       const reader = new FileReader()
       reader.onload = (e) => {
-        const parser = new DOMParser()
-        const xml = parser.parseFromString(e.target?.result as string, 'text/xml')
-        setCurrentXML(xml)
+        const xmlString = e.target?.result as string
+        loadXMLString(xmlString, selectedFile.name)
+        // Sla op in localStorage voor hergebruik
+        try {
+          localStorage.setItem('gpx_xml', xmlString)
+          localStorage.setItem('gpx_filename', selectedFile.name)
+          setHasCachedRoute(selectedFile.name)
+        } catch {
+          // localStorage vol (>5MB GPX bestand), geen probleem
+        }
       }
       reader.readAsText(selectedFile)
     }
+  }
+
+  const handleLoadCachedRoute = () => {
+    const xmlString = localStorage.getItem('gpx_xml')
+    const filename = localStorage.getItem('gpx_filename')
+    if (xmlString && filename) {
+      loadXMLString(xmlString, filename)
+    }
+  }
+
+  const handleClearCachedRoute = () => {
+    localStorage.removeItem('gpx_xml')
+    localStorage.removeItem('gpx_filename')
+    setHasCachedRoute(null)
+    setFile(null)
+    setCurrentXML(null)
+    setPreview(null)
+    setAllSegments([])
+    setSelectedSegmentIndex(null)
   }
 
   const handlePreview = () => {
@@ -222,6 +261,27 @@ function App() {
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
+                {/* Cached route banner */}
+                {hasCachedRoute && !preview && (
+                  <div className="bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800 rounded-lg p-3 flex items-center justify-between gap-3">
+                    <div className="flex items-center gap-2 min-w-0">
+                      <CheckCircle className="w-4 h-4 text-blue-600 shrink-0" />
+                      <div className="min-w-0">
+                        <p className="text-xs text-blue-600 dark:text-blue-400 font-medium">Vorige route opgeslagen</p>
+                        <p className="text-sm font-semibold text-blue-900 dark:text-blue-100 truncate">{hasCachedRoute}</p>
+                      </div>
+                    </div>
+                    <div className="flex gap-2 shrink-0">
+                      <Button size="sm" onClick={handleLoadCachedRoute}>
+                        Laad opnieuw
+                      </Button>
+                      <Button size="sm" variant="ghost" className="text-muted-foreground" onClick={handleClearCachedRoute}>
+                        Wis
+                      </Button>
+                    </div>
+                  </div>
+                )}
+
                 <div
                   className="relative border-2 border-dashed border-border rounded-xl p-8 text-center hover:bg-accent/50 transition-colors cursor-pointer"
                   onClick={() => fileInputRef.current?.click()}
