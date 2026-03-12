@@ -13,6 +13,8 @@ import { Language, getTranslations } from '@/lib/i18n'
 import { LanguageSelector } from '@/components/LanguageSelector'
 import { saveRoute, loadRoute, clearRoute } from '@/lib/route-cache'
 
+const APP_VERSION = '1.1.0'
+
 function App() {
   // Initialize language from localStorage or default to 'nl'
   const [language, setLanguage] = useState<Language>(() => {
@@ -736,6 +738,9 @@ function App() {
                     <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 pt-2 border-t border-gray-300 dark:border-gray-600">
                       <Code2 className="w-4 h-4" />
                       <span>{t.aboutTechClaude}</span>
+                    </div>
+                    <div className="text-xs text-gray-500 dark:text-gray-500 pt-2 text-center">
+                      v{APP_VERSION}
                     </div>
                   </div>
                 </div>
