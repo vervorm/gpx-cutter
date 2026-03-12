@@ -2,7 +2,10 @@ name: Deploy to GitHub Pages
 
 on:
   push:
-    branches: ['claude/shadcn-framework-update-JjcV9']
+    branches:
+      - 'main'
+      - 'claude/shadcn-framework-update-JjcV9'
+      - 'claude/elevation-slider-refactor-JjcV9'
   workflow_dispatch:
 
 permissions:
