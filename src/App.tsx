@@ -38,6 +38,10 @@ function App() {
     const saved = localStorage.getItem('maxDistanceSetting')
     return saved ? parseInt(saved, 10) : 250
   })
+  const [maxDistanceInput, setMaxDistanceInput] = useState<string>(() => {
+    const saved = localStorage.getItem('maxDistanceSetting')
+    return saved || '250'
+  })
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   // Laad route automatisch bij opstarten als er iets in IndexedDB staat
@@ -469,12 +473,19 @@ function App() {
                           min={10}
                           max={1000}
                           step={10}
-                          value={maxDistanceSetting}
+                          value={maxDistanceInput}
                           onFocus={(e) => e.target.select()}
                           onChange={(e) => {
+                            setMaxDistanceInput(e.target.value)
+                          }}
+                          onBlur={(e) => {
                             const value = parseInt(e.target.value, 10)
-                            if (!isNaN(value) && value >= 10) {
+                            if (!isNaN(value) && value >= 10 && value <= 1000) {
                               setMaxDistanceSetting(value)
+                              setMaxDistanceInput(value.toString())
+                            } else {
+                              // Reset to current setting if invalid
+                              setMaxDistanceInput(maxDistanceSetting.toString())
                             }
                           }}
                           className="w-20 px-2 py-1 text-sm border rounded focus:outline-none focus:ring-2 focus:ring-primary"
