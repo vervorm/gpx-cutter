@@ -69,6 +69,19 @@ function FitBounds({ bounds }: { bounds: LatLngBounds | null }) {
   return null
 }
 
+// Component to handle map ready event
+function MapReady({ onReady }: { onReady: () => void }) {
+  const map = useMap()
+
+  useEffect(() => {
+    map.whenReady(() => {
+      onReady()
+    })
+  }, [map, onReady])
+
+  return null
+}
+
 // Component to handle map resize on fullscreen toggle
 function MapResizer({ isFullscreen }: { isFullscreen: boolean }) {
   const map = useMap()
@@ -119,6 +132,7 @@ export function MapViewer({
   translations
 }: MapViewerProps) {
   const [isFullscreen, setIsFullscreen] = useState(false)
+  const [isLoading, setIsLoading] = useState(true)
 
   // Default translations
   const t = translations || {
@@ -240,12 +254,22 @@ export function MapViewer({
 
   return (
     <div
-      className={`rounded-lg overflow-hidden border-2 border-border shadow-lg transition-all ${
+      className={`rounded-lg overflow-hidden border-2 border-border shadow-lg transition-all relative ${
         isFullscreen
           ? 'fixed inset-4 z-[999] w-[calc(100vw-2rem)] h-[calc(100vh-2rem)]'
           : 'w-full h-full'
       }`}
     >
+      {/* Loading indicator */}
+      {isLoading && (
+        <div className="absolute inset-0 bg-gray-100 dark:bg-gray-800 z-[1000] flex items-center justify-center">
+          <div className="flex flex-col items-center gap-3">
+            <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+            <p className="text-sm text-gray-600 dark:text-gray-400">Kaart laden...</p>
+          </div>
+        </div>
+      )}
+
       <MapContainer
         center={[allPoints[0].lat, allPoints[0].lon]}
         zoom={13}
@@ -257,6 +281,7 @@ export function MapViewer({
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
 
+        <MapReady onReady={() => setIsLoading(false)} />
         <FitBounds bounds={selectedBounds || bounds} />
         <MapResizer isFullscreen={isFullscreen} />
         <FullscreenControl
