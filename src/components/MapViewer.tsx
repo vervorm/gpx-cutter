@@ -217,6 +217,18 @@ export function MapViewer({
     setIsFullscreen(!isFullscreen)
   }
 
+  // Prevent body scroll when fullscreen is active
+  useEffect(() => {
+    if (isFullscreen) {
+      document.body.style.overflow = 'hidden'
+    } else {
+      document.body.style.overflow = ''
+    }
+    return () => {
+      document.body.style.overflow = ''
+    }
+  }, [isFullscreen])
+
   // Handle start marker drag
   const handleStartMarkerDrag = (event: DragEndEvent) => {
     if (!onStartKmChange) return
@@ -254,10 +266,10 @@ export function MapViewer({
 
   return (
     <div
-      className={`rounded-lg overflow-hidden border-2 border-border shadow-lg transition-all relative ${
+      className={`overflow-hidden shadow-lg transition-all relative ${
         isFullscreen
-          ? 'fixed inset-0 md:inset-4 z-[999] w-screen h-screen md:w-[calc(100vw-2rem)] md:h-[calc(100vh-2rem)]'
-          : 'w-full h-full'
+          ? 'fixed inset-0 md:inset-4 z-[9999] w-screen h-screen md:w-[calc(100vw-2rem)] md:h-[calc(100vh-2rem)] md:rounded-lg md:border-2 md:border-border'
+          : 'w-full h-full rounded-lg border-2 border-border'
       }`}
     >
       {/* Loading indicator */}
