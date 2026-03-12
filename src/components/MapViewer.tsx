@@ -276,6 +276,8 @@ export function MapViewer({
 
   const toggleFullscreen = () => {
     setIsFullscreen(!isFullscreen)
+    // Ensure loading state is reset when toggling fullscreen
+    setIsLoading(false)
   }
 
   // Prevent body scroll when fullscreen is active
