@@ -206,6 +206,14 @@ function App() {
 
   const maxDistance = preview?.totalDistance || 0
   const roundedMaxDistance = Math.ceil(maxDistance)
+  const maxDistanceKM = Math.max(10, Math.floor(maxDistance - startFromKM))
+
+  // Clamp distanceKM when startFromKM changes and leaves no room
+  useEffect(() => {
+    if (preview && distanceKM > maxDistanceKM) {
+      setDistanceKM(Math.max(10, maxDistanceKM))
+    }
+  }, [startFromKM, preview])
 
   return (
     <div className="min-h-screen bg-background p-2 md:p-4 pb-20">
@@ -392,7 +400,7 @@ function App() {
                       <IconSlider
                         id="distanceKM"
                         min={10}
-                        max={Math.min(200, roundedMaxDistance)}
+                        max={maxDistanceKM}
                         step={1}
                         value={distanceKM}
                         onValueChange={setDistanceKM}
@@ -436,7 +444,7 @@ function App() {
                           }}
                           onDistanceChange={(km) => {
                             const maxDistance = Math.floor(preview.totalDistance - startFromKM)
-                            const newDistance = Math.max(10, Math.min(km, maxDistance, 200))
+                            const newDistance = Math.max(10, Math.min(km, maxDistance))
                             setDistanceKM(newDistance)
                           }}
                           className="w-full"
@@ -472,7 +480,7 @@ function App() {
                       onDistanceChange={(km) => {
                         // Ensure distance doesn't exceed available distance from start point
                         const maxDistance = Math.floor(preview.totalDistance - startFromKM)
-                        const newDistance = Math.max(10, Math.min(km, maxDistance, 200)) // Min 10km, max 200km or remaining
+                        const newDistance = Math.max(10, Math.min(km, maxDistance))
                         setDistanceKM(newDistance)
                       }}
                       translations={{
