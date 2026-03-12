@@ -19,6 +19,8 @@ interface MapViewerProps {
   endKm?: number
   onStartKmChange?: (km: number) => void
   onDistanceChange?: (km: number) => void
+  pointerKm?: number | null
+  onPointerKmChange?: (km: number | null) => void
   translations?: {
     openFullscreen: string
     closeFullscreen: string
@@ -26,6 +28,7 @@ interface MapViewerProps {
     endMarker: string
     noRouteData: string
     dragToAdjust: string
+    pointerMarker?: string
   }
 }
 
@@ -55,6 +58,35 @@ function findDistanceAlongRoute(lat: number, lon: number, routePoints: RoutePoin
   }
 
   return cumulativeDistance
+}
+
+/**
+ * Find the lat/lon position at a given distance along the route
+ */
+function findPointAtDistance(distanceKm: number, routePoints: RoutePoint[]): RoutePoint | null {
+  if (routePoints.length === 0) return null
+
+  let cumulativeDistance = 0
+
+  for (let i = 1; i < routePoints.length; i++) {
+    const prev = routePoints[i - 1]
+    const curr = routePoints[i]
+    const segmentDistance = getDistanceFromLatLonInKm(prev.lat, prev.lon, curr.lat, curr.lon)
+
+    if (cumulativeDistance + segmentDistance >= distanceKm) {
+      // Interpolate between prev and curr
+      const ratio = (distanceKm - cumulativeDistance) / segmentDistance
+      return {
+        lat: prev.lat + (curr.lat - prev.lat) * ratio,
+        lon: prev.lon + (curr.lon - prev.lon) * ratio,
+      }
+    }
+
+    cumulativeDistance += segmentDistance
+  }
+
+  // If distance exceeds route length, return last point
+  return routePoints[routePoints.length - 1]
 }
 
 // Component to fit map bounds
@@ -130,6 +162,8 @@ export function MapViewer({
   endKm,
   onStartKmChange,
   onDistanceChange,
+  pointerKm,
+  onPointerKmChange,
   translations
 }: MapViewerProps) {
   const [isFullscreen, setIsFullscreen] = useState(false)
@@ -182,6 +216,24 @@ export function MapViewer({
     })
   }, [])
 
+  const pointerIcon = useMemo(() => {
+    const iconMarkup = renderToStaticMarkup(
+      <div style={{
+        color: '#F59E0B',
+        filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.3))',
+      }}>
+        <MapPin size={28} fill="#F59E0B" strokeWidth={2} />
+      </div>
+    )
+    return new DivIcon({
+      html: iconMarkup,
+      className: 'custom-marker-icon',
+      iconSize: [28, 28],
+      iconAnchor: [14, 28],
+      popupAnchor: [0, -28],
+    })
+  }, [])
+
   // Convert points to Leaflet format
   const fullRoute: LatLngExpression[] = useMemo(
     () => allPoints.map(p => [p.lat, p.lon] as LatLngExpression),
@@ -213,6 +265,14 @@ export function MapViewer({
   // Get start and end markers
   const startPoint = selectedPoints?.[0] || allPoints[0]
   const endPoint = selectedPoints?.[selectedPoints.length - 1] || allPoints[allPoints.length - 1]
+
+  // Calculate pointer position
+  const pointerPoint = useMemo(() => {
+    if (pointerKm === null || pointerKm === undefined || !selectedPoints || selectedPoints.length === 0) {
+      return null
+    }
+    return findPointAtDistance(pointerKm, selectedPoints)
+  }, [pointerKm, selectedPoints])
 
   const toggleFullscreen = () => {
     setIsFullscreen(!isFullscreen)
@@ -255,6 +315,16 @@ export function MapViewer({
     // Round to nearest 1km and ensure it's at least 10km
     const roundedDistance = Math.max(10, Math.round(segmentDistance))
     onDistanceChange(roundedDistance)
+  }
+
+  // Handle pointer marker drag
+  const handlePointerMarkerDrag = (event: DragEndEvent) => {
+    if (!onPointerKmChange || !selectedPoints || selectedPoints.length === 0) return
+
+    const { lat, lng } = event.target.getLatLng()
+    const distanceFromSegmentStart = findDistanceAlongRoute(lat, lng, selectedPoints)
+
+    onPointerKmChange(distanceFromSegmentStart)
   }
 
   if (allPoints.length === 0) {
@@ -361,6 +431,26 @@ export function MapViewer({
                   <p className="font-semibold">{t.endMarker}</p>
                   <p>{endKm?.toFixed(1)} km</p>
                   {onDistanceChange && <p className="text-xs text-gray-500 mt-1">{t.dragToAdjust}</p>}
+                </div>
+              </Popup>
+            </Marker>
+          )}
+
+          {/* Pointer marker - interactive position indicator */}
+          {pointerPoint && (
+            <Marker
+              position={[pointerPoint.lat, pointerPoint.lon]}
+              icon={pointerIcon}
+              draggable={!!onPointerKmChange}
+              eventHandlers={{
+                dragend: handlePointerMarkerDrag,
+              }}
+            >
+              <Popup>
+                <div className="text-sm">
+                  <p className="font-semibold">{t.pointerMarker || 'Position'}</p>
+                  <p>{pointerKm?.toFixed(2)} km</p>
+                  {onPointerKmChange && <p className="text-xs text-gray-500 mt-1">{t.dragToAdjust}</p>}
                 </div>
               </Popup>
             </Marker>

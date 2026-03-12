@@ -34,6 +34,8 @@ function App() {
   const [toast, setToast] = useState({ show: false, message: '' })
   const [helpOpen, setHelpOpen] = useState(false)
   const [hasCachedRoute, setHasCachedRoute] = useState<string | null>(null)
+  // Interactive pointer position (km from start of selected segment)
+  const [pointerKm, setPointerKm] = useState<number | null>(null)
   const [maxDistanceSetting, setMaxDistanceSetting] = useState<number>(() => {
     const saved = localStorage.getItem('maxDistanceSetting')
     return saved ? parseInt(saved, 10) : 250
@@ -500,6 +502,8 @@ function App() {
                           points={liveSegment.selectedPoints}
                           startKm={startFromKM}
                           className="w-full"
+                          pointerKm={pointerKm}
+                          onPointerKmChange={setPointerKm}
                         />
                       </div>
                     )}
@@ -535,11 +539,14 @@ function App() {
                         const newDistance = Math.max(10, Math.min(km, maxDistance))
                         setDistanceKM(newDistance)
                       }}
+                      pointerKm={pointerKm}
+                      onPointerKmChange={setPointerKm}
                       translations={{
                         openFullscreen: t.openFullscreen,
                         closeFullscreen: t.closeFullscreen,
                         startMarker: t.startMarker,
                         endMarker: t.endMarker,
+                        pointerMarker: 'Positie',
                         noRouteData: t.noRouteData,
                         dragToAdjust: t.dragToAdjust,
                       }}
