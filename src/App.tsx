@@ -241,7 +241,7 @@ function App() {
 
   const maxDistance = preview?.totalDistance || 0
   const roundedMaxDistance = Math.ceil(maxDistance)
-  const maxDistanceKM = Math.max(10, Math.floor(maxDistance - startFromKM))
+  const maxDistanceKM = Math.max(10, Math.min(250, Math.floor(maxDistance - startFromKM)))
 
   // Clamp distanceKM when startFromKM changes and leaves no room
   useEffect(() => {
@@ -449,24 +449,6 @@ function App() {
                         value={distanceKM}
                         onValueChange={setDistanceKM}
                       />
-                    </div>
-
-                    <div className="p-3 bg-gradient-to-r from-green-50 to-blue-50 dark:from-green-950/20 dark:to-blue-950/20 rounded-lg border-2 border-primary/20">
-                      <p className="text-sm font-medium text-center">
-                        📍 {t.selectedSegment} <span className="text-primary font-bold">{startFromKM} km</span> → <span className="text-primary font-bold">{startFromKM + distanceKM} km</span>
-                      </p>
-                      {liveSegment && (
-                        <>
-                          <p className="text-xs text-center mt-1 text-muted-foreground">
-                            {liveSegment.pointCount} {t.points} · {liveSegment.distance.toFixed(2)} km
-                          </p>
-                          {liveSegment.elevation && (
-                            <p className="text-xs text-center mt-1 text-muted-foreground">
-                              ↗ {liveSegment.elevation.gain}m · ↘ {liveSegment.elevation.loss}m
-                            </p>
-                          )}
-                        </>
-                      )}
                     </div>
 
                     {/* Elevation Profile for selected segment */}
