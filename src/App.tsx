@@ -40,6 +40,8 @@ function App() {
       if (entry) {
         setHasCachedRoute(entry.filename)
         loadXMLString(entry.xml, entry.filename)
+        if (entry.startFromKM !== undefined) setStartFromKM(entry.startFromKM)
+        if (entry.distanceKM !== undefined) setDistanceKM(entry.distanceKM)
       }
     })
   }, [])
@@ -100,7 +102,11 @@ function App() {
 
   const handleLoadCachedRoute = async () => {
     const entry = await loadRoute()
-    if (entry) loadXMLString(entry.xml, entry.filename)
+    if (entry) {
+      loadXMLString(entry.xml, entry.filename)
+      if (entry.startFromKM !== undefined) setStartFromKM(entry.startFromKM)
+      if (entry.distanceKM !== undefined) setDistanceKM(entry.distanceKM)
+    }
   }
 
   const handleClearCachedRoute = () => {
@@ -214,6 +220,15 @@ function App() {
       setDistanceKM(Math.max(10, maxDistanceKM))
     }
   }, [startFromKM, preview])
+
+  // Save slider positions to IndexedDB when they change
+  useEffect(() => {
+    if (currentXML && hasCachedRoute) {
+      const serializer = new XMLSerializer()
+      const xmlString = serializer.serializeToString(currentXML)
+      saveRoute(xmlString, hasCachedRoute, startFromKM, distanceKM).catch(() => {})
+    }
+  }, [startFromKM, distanceKM])
 
   return (
     <div className="min-h-screen bg-background p-2 md:p-4 pb-20">

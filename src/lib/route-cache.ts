@@ -11,17 +11,27 @@ function openDB(): Promise<IDBDatabase> {
   })
 }
 
-export async function saveRoute(xml: string, filename: string): Promise<void> {
+export async function saveRoute(
+  xml: string,
+  filename: string,
+  startFromKM?: number,
+  distanceKM?: number
+): Promise<void> {
   const db = await openDB()
   return new Promise((resolve, reject) => {
     const tx = db.transaction(STORE, 'readwrite')
-    tx.objectStore(STORE).put({ xml, filename }, KEY)
+    tx.objectStore(STORE).put({ xml, filename, startFromKM, distanceKM }, KEY)
     tx.oncomplete = () => resolve()
     tx.onerror = () => reject(tx.error)
   })
 }
 
-export async function loadRoute(): Promise<{ xml: string; filename: string } | null> {
+export async function loadRoute(): Promise<{
+  xml: string
+  filename: string
+  startFromKM?: number
+  distanceKM?: number
+} | null> {
   const db = await openDB()
   return new Promise((resolve, reject) => {
     const tx = db.transaction(STORE, 'readonly')
