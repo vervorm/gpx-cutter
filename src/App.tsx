@@ -470,6 +470,7 @@ function App() {
                           max={1000}
                           step={10}
                           value={maxDistanceSetting}
+                          onFocus={(e) => e.target.select()}
                           onChange={(e) => {
                             const value = parseInt(e.target.value, 10)
                             if (!isNaN(value) && value >= 10) {
