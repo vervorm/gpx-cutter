@@ -4,18 +4,21 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Label } from '@/components/ui/label'
 import { Toast } from '@/components/ui/toast'
-import { Slider } from '@/components/ui/slider'
+import { IconSlider } from '@/components/ui/icon-slider'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { processGPX, analyzeGPX, type GPXPreview, type GPXProcessResult } from '@/lib/gpx-utils'
 import { MapViewer } from '@/components/MapViewer'
+import { ElevationProfile } from '@/components/ElevationProfile'
 import { Language, getTranslations } from '@/lib/i18n'
 import { LanguageSelector } from '@/components/LanguageSelector'
+import { saveRoute, loadRoute, clearRoute } from '@/lib/route-cache'
 
 function App() {
   // Initialize language from localStorage or default to 'nl'
   const [language, setLanguage] = useState<Language>(() => {
     const saved = localStorage.getItem('language')
-    return (saved as Language) || 'nl'
+    const validLanguages: Language[] = ['nl', 'en', 'fr', 'es', 'de', 'no', 'pt']
+    return (saved && validLanguages.includes(saved as Language)) ? (saved as Language) : 'nl'
   })
   const t = getTranslations(language)
 
@@ -28,7 +31,18 @@ function App() {
   const [selectedSegmentIndex, setSelectedSegmentIndex] = useState<number | null>(null)
   const [toast, setToast] = useState({ show: false, message: '' })
   const [helpOpen, setHelpOpen] = useState(false)
+  const [hasCachedRoute, setHasCachedRoute] = useState<string | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
+
+  // Laad route automatisch bij opstarten als er iets in IndexedDB staat
+  useEffect(() => {
+    loadRoute().then((entry) => {
+      if (entry) {
+        setHasCachedRoute(entry.filename)
+        loadXMLString(entry.xml, entry.filename)
+      }
+    })
+  }, [])
 
   // Save language preference to localStorage
   const handleLanguageChange = (lang: Language) => {
@@ -57,6 +71,16 @@ function App() {
     }
   }, [currentXML, startFromKM, distanceKM, preview])
 
+  const loadXMLString = (xmlString: string, filename: string) => {
+    const parser = new DOMParser()
+    const xml = parser.parseFromString(xmlString, 'text/xml')
+    setCurrentXML(xml)
+    setPreview(null)
+    setAllSegments([])
+    setSelectedSegmentIndex(null)
+    setHasCachedRoute(filename)
+  }
+
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = event.target.files?.[0]
     if (selectedFile) {
@@ -66,12 +90,27 @@ function App() {
       setSelectedSegmentIndex(null)
       const reader = new FileReader()
       reader.onload = (e) => {
-        const parser = new DOMParser()
-        const xml = parser.parseFromString(e.target?.result as string, 'text/xml')
-        setCurrentXML(xml)
+        const xmlString = e.target?.result as string
+        loadXMLString(xmlString, selectedFile.name)
+        saveRoute(xmlString, selectedFile.name).catch(() => {})
       }
       reader.readAsText(selectedFile)
     }
+  }
+
+  const handleLoadCachedRoute = async () => {
+    const entry = await loadRoute()
+    if (entry) loadXMLString(entry.xml, entry.filename)
+  }
+
+  const handleClearCachedRoute = () => {
+    clearRoute().catch(() => {})
+    setHasCachedRoute(null)
+    setFile(null)
+    setCurrentXML(null)
+    setPreview(null)
+    setAllSegments([])
+    setSelectedSegmentIndex(null)
   }
 
   const handlePreview = () => {
@@ -174,16 +213,36 @@ function App() {
 
       {/* Header with Language Selector */}
       <header className="mb-4 md:mb-8 mt-2 md:mt-4 max-w-7xl mx-auto px-2">
-        <div className="flex justify-between items-start gap-4">
-          <div>
-            <h1 className="text-2xl md:text-3xl font-bold text-foreground tracking-tight">{t.title}</h1>
-            <p className="text-sm md:text-base text-muted-foreground mt-1">{t.subtitle}</p>
+        <div className="flex flex-col">
+          <div className="lg:hidden mb-6">
+            <div className="sticky top-4">
+              <a
+                href="https://www.komoptegenkanker.be/acties/10k-voor-k"
+                target="_blank"
+                rel="noopener noreferrer"
+                className=" hover:opacity-80 transition-opacity flex gap-4 items-end"
+                title="Kom op tegen Kanker - 10K voor K"
+              >
+                <img
+                  src="kotk_base_logo-mobile.svg"
+                  alt="Kom op tegen Kanker"
+                /><span className="italic text-sm block mt-2 text-amber-900">
+                  #10k-voor-k <br />#KomOpTegenKanker
+                </span>
+              </a>
+            </div>
           </div>
-          <LanguageSelector currentLanguage={language} onLanguageChange={handleLanguageChange} />
+          <div className="flex justify-between items-start gap-4">
+            <div>
+              <h1 className="text-2xl md:text-3xl font-bold text-foreground tracking-tight">{t.title}</h1>
+              <p className="text-sm md:text-base text-muted-foreground mt-1">{t.subtitle}</p>
+            </div>
+            <LanguageSelector currentLanguage={language} onLanguageChange={handleLanguageChange} />
+          </div>
         </div>
       </header>
 
-      <div className="max-w-7xl mx-auto px-2">
+      <div className="max-w-7xl mx-auto px-2 flex">
         <Tabs defaultValue="route" className="w-full">
           <TabsList className="grid w-full grid-cols-2 mb-6">
             <TabsTrigger value="route">{t.tabRoute}</TabsTrigger>
@@ -191,247 +250,331 @@ function App() {
           </TabsList>
 
           <TabsContent value="route" className="space-y-4">
-        {/* Step 1: Upload */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <UploadCloud className="w-5 h-5 text-primary" />
-              {t.step1Title}
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div
-              className="relative border-2 border-dashed border-border rounded-xl p-8 text-center hover:bg-accent/50 transition-colors cursor-pointer"
-              onClick={() => fileInputRef.current?.click()}
-            >
-              <FileUp className="w-8 h-8 mx-auto text-muted-foreground mb-2" />
-              <p className="text-sm text-muted-foreground">{t.uploadPrompt}</p>
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept=".gpx"
-                className="hidden"
-                onChange={handleFileSelect}
-              />
-            </div>
+            {/* Hidden file input — altijd aanwezig */}
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept=".gpx"
+              className="hidden"
+              onChange={handleFileSelect}
+            />
 
-            {file && (
-              <div className="bg-primary/10 text-primary p-3 rounded-lg text-sm flex items-center gap-2">
-                <CheckCircle className="w-4 h-4" />
-                <span>{file.name}</span>
+            {/* Step 1: Upload — verborgen zodra een route geladen is */}
+            {!preview && (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <UploadCloud className="w-5 h-5 text-primary" />
+                    {t.step1Title}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  {/* Cached route banner */}
+                  {hasCachedRoute && (
+                    <div className="bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800 rounded-lg p-3 flex items-center justify-between gap-3">
+                      <div className="flex items-center gap-2 min-w-0">
+                        <CheckCircle className="w-4 h-4 text-blue-600 shrink-0" />
+                        <div className="min-w-0">
+                          <p className="text-xs text-blue-600 dark:text-blue-400 font-medium">Vorige route opgeslagen</p>
+                          <p className="text-sm font-semibold text-blue-900 dark:text-blue-100 truncate">{hasCachedRoute}</p>
+                        </div>
+                      </div>
+                      <div className="flex gap-2 shrink-0">
+                        <Button size="sm" onClick={handleLoadCachedRoute}>
+                          Laad opnieuw
+                        </Button>
+                        <Button size="sm" variant="ghost" className="text-muted-foreground" onClick={handleClearCachedRoute}>
+                          Wis
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+
+                  <div
+                    className="relative border-2 border-dashed border-border rounded-xl p-8 text-center hover:bg-accent/50 transition-colors cursor-pointer"
+                    onClick={() => fileInputRef.current?.click()}
+                  >
+                    <FileUp className="w-8 h-8 mx-auto text-muted-foreground mb-2" />
+                    <p className="text-sm text-muted-foreground">{t.uploadPrompt}</p>
+                  </div>
+
+                  {file && (
+                    <div className="bg-primary/10 text-primary p-3 rounded-lg text-sm flex items-center gap-2">
+                      <CheckCircle className="w-4 h-4" />
+                      <span>{file.name}</span>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Kleine "andere route laden" knop als een route actief is */}
+            {preview && (
+              <div className="flex items-center justify-between gap-3 px-1">
+                <div className="flex items-center gap-2 text-sm text-muted-foreground min-w-0">
+                  <CheckCircle className="w-4 h-4 text-primary shrink-0" />
+                  <span className="truncate font-medium">{hasCachedRoute || file?.name}</span>
+                </div>
+                <Button size="sm" variant="outline" onClick={() => fileInputRef.current?.click()}>
+                  <FileUp className="w-4 h-4" />
+                  Andere route
+                </Button>
               </div>
             )}
-          </CardContent>
-        </Card>
 
-        {/* Preview */}
-        {preview && (
-          <Card className="border-blue-200 bg-blue-50/50 dark:bg-blue-950/20">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-blue-900 dark:text-blue-100">
-                <Eye className="w-5 h-5" />
-                {t.previewTitle}
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-2 gap-4 text-sm">
-                <div>
-                  <p className="text-muted-foreground">{t.routeName}</p>
-                  <p className="font-semibold">{preview.originalName}</p>
-                </div>
-                <div>
-                  <p className="text-muted-foreground">{t.totalDistance}</p>
-                  <p className="font-semibold">{preview.totalDistance.toFixed(2)} km</p>
-                </div>
-                <div>
-                  <p className="text-muted-foreground">{t.totalPoints}</p>
-                  <p className="font-semibold">{preview.totalPoints.toLocaleString()}</p>
-                </div>
-                <div>
-                  <p className="text-muted-foreground">{t.maxSelection}</p>
-                  <p className="font-semibold">0 - {preview.totalDistance.toFixed(0)} km</p>
-                </div>
+            {/* Preview */}
+            {preview && (
+              <Card className="border-blue-200 bg-blue-50/50 dark:bg-blue-950/20">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2 text-blue-900 dark:text-blue-100">
+                    <Eye className="w-5 h-5" />
+                    {t.previewTitle}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-2 gap-4 text-sm">
+                    <div>
+                      <p className="text-muted-foreground">{t.routeName}</p>
+                      <p className="font-semibold">{preview.originalName}</p>
+                    </div>
+                    <div>
+                      <p className="text-muted-foreground">{t.totalDistance}</p>
+                      <p className="font-semibold">{preview.totalDistance.toFixed(2)} km</p>
+                    </div>
+                    <div>
+                      <p className="text-muted-foreground">{t.totalPoints}</p>
+                      <p className="font-semibold">{preview.totalPoints.toLocaleString()}</p>
+                    </div>
+                    <div>
+                      <p className="text-muted-foreground">{t.maxSelection}</p>
+                      <p className="font-semibold">0 - {preview.totalDistance.toFixed(0)} km</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Step 2: Settings and Map - Side by side on desktop */}
+            {preview && (
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                {/* Settings Card */}
+                <Card className="border-orange-200 bg-orange-50/50 dark:bg-orange-950/20">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2 text-orange-900 dark:text-orange-100">
+                      <Settings className="w-5 h-5" />
+                      {t.step2Title}
+                    </CardTitle>
+                    <CardDescription>
+                      {t.step2Description}
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="space-y-2">
+                      <div className="flex justify-between items-center">
+                        <Label htmlFor="startFromKM" className="text-sm">{t.startFromLabel}</Label>
+                        <span className="text-base font-semibold text-primary">{startFromKM} km</span>
+                      </div>
+                      <IconSlider
+                        id="startFromKM"
+                        min={0}
+                        max={roundedMaxDistance}
+                        step={1}
+                        value={startFromKM}
+                        onValueChange={setStartFromKM}
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <div className="flex justify-between items-center">
+                        <Label htmlFor="distanceKM" className="text-sm">{t.distanceLabel}</Label>
+                        <span className="text-base font-semibold text-primary">{distanceKM} km</span>
+                      </div>
+                      <IconSlider
+                        id="distanceKM"
+                        min={10}
+                        max={Math.min(200, roundedMaxDistance)}
+                        step={1}
+                        value={distanceKM}
+                        onValueChange={setDistanceKM}
+                      />
+                    </div>
+
+                    <div className="p-3 bg-gradient-to-r from-green-50 to-blue-50 dark:from-green-950/20 dark:to-blue-950/20 rounded-lg border-2 border-primary/20">
+                      <p className="text-sm font-medium text-center">
+                        📍 {t.selectedSegment} <span className="text-primary font-bold">{startFromKM} km</span> → <span className="text-primary font-bold">{startFromKM + distanceKM} km</span>
+                      </p>
+                      {liveSegment && (
+                        <>
+                          <p className="text-xs text-center mt-1 text-muted-foreground">
+                            {liveSegment.pointCount} {t.points} · {liveSegment.distance.toFixed(2)} km
+                          </p>
+                          {liveSegment.elevation && (
+                            <p className="text-xs text-center mt-1 text-muted-foreground">
+                              ↗ {liveSegment.elevation.gain}m · ↘ {liveSegment.elevation.loss}m
+                            </p>
+                          )}
+                        </>
+                      )}
+                    </div>
+
+                    {/* Elevation Profile for selected segment */}
+                    {liveSegment && liveSegment.selectedPoints.length > 0 && liveSegment.elevation && (
+                      <div className="mt-3 p-3 bg-white dark:bg-gray-800 rounded-lg border-2 border-orange-200">
+                        <h4 className="text-sm font-semibold text-orange-900 dark:text-orange-100 mb-2">
+                          {t.elevationProfile}
+                        </h4>
+                        <ElevationProfile
+                          points={liveSegment.selectedPoints}
+                          startKm={startFromKM}
+                          currentStartKm={startFromKM}
+                          currentDistanceKm={distanceKM}
+                          onStartKmChange={(km) => {
+                            const maxStart = Math.floor(preview.totalDistance - 10)
+                            const newStart = Math.max(0, Math.min(km, maxStart))
+                            setStartFromKM(newStart)
+                          }}
+                          onDistanceChange={(km) => {
+                            const maxDistance = Math.floor(preview.totalDistance - startFromKM)
+                            const newDistance = Math.max(10, Math.min(km, maxDistance, 200))
+                            setDistanceKM(newDistance)
+                          }}
+                          className="w-full"
+                        />
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+
+                {/* Map Card */}
+                <Card className="border-amber-200 bg-amber-50/50 dark:bg-amber-950/20 h-fit lg:sticky lg:top-4">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2 text-amber-900 dark:text-amber-100">
+                      <Map className="w-5 h-5" />
+                      {t.mapTitle}
+                    </CardTitle>
+                    <CardDescription>
+                      {t.mapDescription}
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="h-[400px] md:h-[500px] lg:h-[600px]">
+                    <MapViewer
+                      allPoints={preview.allPoints}
+                      selectedPoints={liveSegment?.selectedPoints}
+                      startKm={startFromKM}
+                      endKm={startFromKM + distanceKM}
+                      onStartKmChange={(km) => {
+                        // Ensure the new start position doesn't exceed the total distance
+                        const maxStart = Math.floor(preview.totalDistance - 10) // Leave at least 10km for segment
+                        const newStart = Math.max(0, Math.min(km, maxStart))
+                        setStartFromKM(newStart)
+                      }}
+                      onDistanceChange={(km) => {
+                        // Ensure distance doesn't exceed available distance from start point
+                        const maxDistance = Math.floor(preview.totalDistance - startFromKM)
+                        const newDistance = Math.max(10, Math.min(km, maxDistance, 200)) // Min 10km, max 200km or remaining
+                        setDistanceKM(newDistance)
+                      }}
+                      translations={{
+                        openFullscreen: t.openFullscreen,
+                        closeFullscreen: t.closeFullscreen,
+                        startMarker: t.startMarker,
+                        endMarker: t.endMarker,
+                        noRouteData: t.noRouteData,
+                        dragToAdjust: t.dragToAdjust,
+                      }}
+                    />
+                  </CardContent>
+                </Card>
               </div>
-            </CardContent>
-          </Card>
-        )}
+            )}
 
-        {/* Step 2: Settings and Map - Side by side on desktop */}
-        {preview && (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-            {/* Settings Card */}
-            <Card className="border-orange-200 bg-orange-50/50 dark:bg-orange-950/20">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-orange-900 dark:text-orange-100">
-                  <Settings className="w-5 h-5" />
-                  {t.step2Title}
+            {/* Generate All Segments Button */}
+            {preview && (
+              <Button
+                onClick={generateAllSegments}
+                className="w-full h-12 text-base bg-amber-600 hover:bg-amber-700"
+                size="lg"
+              >
+                <Settings className="w-5 h-5" />
+                {startFromKM === 0 ? t.generate2Segments : t.generate3Segments}
+              </Button>
+            )}
+
+            {/* All Segments Grid */}
+            {allSegments.length > 0 && (
+              <Card className="border-green-200 bg-green-50/50 dark:bg-green-950/20">
+                <CardHeader>
+                  <CardTitle className="text-green-900 dark:text-green-100">
+                    {t.allSegmentsTitle} ({allSegments.length})
+                  </CardTitle>
+                  <CardDescription>
+                    {t.allSegmentsDescription}
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    {allSegments.map((segment, index) => (
+                      <button
+                        key={index}
+                        onClick={() => handleDownload(segment)}
+                        onMouseEnter={() => setSelectedSegmentIndex(index)}
+                        onMouseLeave={() => setSelectedSegmentIndex(null)}
+                        className={`p-4 rounded-lg border-2 transition-all text-left ${selectedSegmentIndex === index
+                          ? 'border-green-500 bg-green-100 dark:bg-green-900/50 shadow-lg scale-105'
+                          : 'border-green-200 bg-white dark:bg-green-950/20 hover:border-green-400'
+                          }`}
+                      >
+                        <div className="flex items-center justify-between mb-2">
+                          <span className="font-semibold text-green-900 dark:text-green-100">
+                            {t.segment} {index + 1}
+                          </span>
+                          <Download className="w-4 h-4 text-green-600" />
+                        </div>
+                        <div className="text-sm space-y-1">
+                          <p className="text-muted-foreground">
+                            {segment.startKm.toFixed(1)} - {segment.endKm.toFixed(1)} km
+                          </p>
+                          <p className="font-medium">
+                            {segment.distance.toFixed(2)} km · {segment.pointCount} {t.points}
+                          </p>
+                          {segment.elevation && (
+                            <p className="text-xs text-muted-foreground">
+                              ↗ {segment.elevation.gain}m · ↘ {segment.elevation.loss}m
+                            </p>
+                          )}
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Help Section */}
+            <Card className="mt-8">
+              <CardHeader
+                className="cursor-pointer hover:bg-accent/50 transition-colors"
+                onClick={() => setHelpOpen(!helpOpen)}
+              >
+                <CardTitle className="flex items-center gap-2">
+                  <HelpCircle className="w-5 h-5" />
+                  {t.howItWorksTitle}
                 </CardTitle>
-                <CardDescription>
-                  {t.step2Description}
-                </CardDescription>
               </CardHeader>
-              <CardContent className="space-y-6">
-              <div className="space-y-3">
-                <div className="flex justify-between items-center">
-                  <Label htmlFor="startFromKM">{t.startFromLabel}</Label>
-                  <span className="text-lg font-semibold text-primary">{startFromKM} km</span>
-                </div>
-                <Slider
-                  id="startFromKM"
-                  min={0}
-                  max={roundedMaxDistance}
-                  step={1}
-                  value={startFromKM}
-                  onValueChange={setStartFromKM}
-                />
-                <p className="text-xs text-muted-foreground">
-                  Stappen van 1 km
-                </p>
-              </div>
-
-              <div className="space-y-3">
-                <div className="flex justify-between items-center">
-                  <Label htmlFor="distanceKM">{t.distanceLabel}</Label>
-                  <span className="text-lg font-semibold text-primary">{distanceKM} km</span>
-                </div>
-                <Slider
-                  id="distanceKM"
-                  min={10}
-                  max={Math.min(200, roundedMaxDistance)}
-                  step={10}
-                  value={distanceKM}
-                  onValueChange={setDistanceKM}
-                />
-                <p className="text-xs text-muted-foreground">
-                  Stappen van 10 km (max 200 km)
-                </p>
-              </div>
-
-              <div className="p-4 bg-gradient-to-r from-green-50 to-blue-50 dark:from-green-950/20 dark:to-blue-950/20 rounded-lg border-2 border-primary/20">
-                <p className="text-sm font-medium text-center">
-                  📍 {t.selectedSegment} <span className="text-primary font-bold">{startFromKM} km</span> → <span className="text-primary font-bold">{startFromKM + distanceKM} km</span>
-                </p>
-                {liveSegment && (
-                  <p className="text-xs text-center mt-1 text-muted-foreground">
-                    {liveSegment.pointCount} {t.points} · {liveSegment.distance.toFixed(2)} km
-                  </p>
-                )}
-              </div>
-            </CardContent>
-          </Card>
-
-            {/* Map Card */}
-            <Card className="border-amber-200 bg-amber-50/50 dark:bg-amber-950/20 h-fit lg:sticky lg:top-4">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-amber-900 dark:text-amber-100">
-                  <Map className="w-5 h-5" />
-                  {t.mapTitle}
-                </CardTitle>
-                <CardDescription>
-                  {t.mapDescription}
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="h-[400px] md:h-[500px] lg:h-[600px]">
-                <MapViewer
-                  allPoints={preview.allPoints}
-                  selectedPoints={liveSegment?.selectedPoints}
-                  startKm={startFromKM}
-                  endKm={startFromKM + distanceKM}
-                  translations={{
-                    openFullscreen: t.openFullscreen,
-                    closeFullscreen: t.closeFullscreen,
-                    startMarker: t.startMarker,
-                    endMarker: t.endMarker,
-                    noRouteData: t.noRouteData,
-                  }}
-                />
-              </CardContent>
+              {helpOpen && (
+                <CardContent>
+                  <CardDescription className="space-y-2">
+                    <ol className="list-decimal pl-5 space-y-2">
+                      <li>{t.howItWorksStep1}</li>
+                      <li>{t.howItWorksStep2}</li>
+                      <li>{t.howItWorksStep3}</li>
+                      <li>{t.howItWorksStep4}</li>
+                      <li>{t.howItWorksStep5}</li>
+                    </ol>
+                  </CardDescription>
+                </CardContent>
+              )}
             </Card>
-          </div>
-        )}
-
-        {/* Generate All Segments Button */}
-        {preview && (
-          <Button
-            onClick={generateAllSegments}
-            className="w-full h-12 text-base bg-amber-600 hover:bg-amber-700"
-            size="lg"
-          >
-            <Settings className="w-5 h-5" />
-            {startFromKM === 0 ? t.generate2Segments : t.generate3Segments}
-          </Button>
-        )}
-
-        {/* All Segments Grid */}
-        {allSegments.length > 0 && (
-          <Card className="border-green-200 bg-green-50/50 dark:bg-green-950/20">
-            <CardHeader>
-              <CardTitle className="text-green-900 dark:text-green-100">
-                {t.allSegmentsTitle} ({allSegments.length})
-              </CardTitle>
-              <CardDescription>
-                {t.allSegmentsDescription}
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                {allSegments.map((segment, index) => (
-                  <button
-                    key={index}
-                    onClick={() => handleDownload(segment)}
-                    onMouseEnter={() => setSelectedSegmentIndex(index)}
-                    onMouseLeave={() => setSelectedSegmentIndex(null)}
-                    className={`p-4 rounded-lg border-2 transition-all text-left ${selectedSegmentIndex === index
-                        ? 'border-green-500 bg-green-100 dark:bg-green-900/50 shadow-lg scale-105'
-                        : 'border-green-200 bg-white dark:bg-green-950/20 hover:border-green-400'
-                      }`}
-                  >
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="font-semibold text-green-900 dark:text-green-100">
-                        {t.segment} {index + 1}
-                      </span>
-                      <Download className="w-4 h-4 text-green-600" />
-                    </div>
-                    <div className="text-sm space-y-1">
-                      <p className="text-muted-foreground">
-                        {segment.startKm.toFixed(1)} - {segment.endKm.toFixed(1)} km
-                      </p>
-                      <p className="font-medium">
-                        {segment.distance.toFixed(2)} km · {segment.pointCount} {t.points}
-                      </p>
-                    </div>
-                  </button>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        )}
-
-        {/* Help Section */}
-        <Card className="mt-8">
-          <CardHeader
-            className="cursor-pointer hover:bg-accent/50 transition-colors"
-            onClick={() => setHelpOpen(!helpOpen)}
-          >
-            <CardTitle className="flex items-center gap-2">
-              <HelpCircle className="w-5 h-5" />
-              {t.howItWorksTitle}
-            </CardTitle>
-          </CardHeader>
-          {helpOpen && (
-            <CardContent>
-              <CardDescription className="space-y-2">
-                <ol className="list-decimal pl-5 space-y-2">
-                  <li>{t.howItWorksStep1}</li>
-                  <li>{t.howItWorksStep2}</li>
-                  <li>{t.howItWorksStep3}</li>
-                  <li>{t.howItWorksStep4}</li>
-                  <li>{t.howItWorksStep5}</li>
-                </ol>
-              </CardDescription>
-            </CardContent>
-          )}
-        </Card>
           </TabsContent>
 
           <TabsContent value="about" className="space-y-4">
@@ -457,14 +600,18 @@ function App() {
                 {/* Personal story */}
                 <div className="space-y-4 bg-gradient-to-r from-amber-50/80 to-yellow-50/80 dark:from-amber-950/30 dark:to-yellow-950/30 p-5 rounded-lg border-2 border-amber-200 dark:border-amber-800">
                   <h3 className="font-bold text-xl text-amber-900 dark:text-amber-100 flex items-center gap-2">
-                     {t.aboutStoryTitle}
+                    {t.aboutStoryTitle}
                   </h3>
                   <div className="space-y-3 text-sm">
                     <p className="font-medium">{t.aboutStoryText1}</p>
                     <p>{t.aboutStoryText2}</p>
                     <p className="pt-2 font-semibold">{t.aboutStoryText3}</p>
                     <p className="font-bold text-blue-700 dark:text-blue-300 text-xl py-3 bg-white/50 dark:bg-gray-900/30 rounded-lg">
-                       {t.aboutStoryText4} 
+                      {t.aboutStoryText4}
+                    </p>
+
+                    <p className="text-sm font-medium bg-blue-50/80 dark:bg-blue-950/30 p-3 rounded-lg border border-blue-200 dark:border-blue-800">
+                      {t.aboutJourneyDates}
                     </p>
 
                     {/* Kom op tegen Kanker */}
@@ -475,7 +622,7 @@ function App() {
                     </div>
 
                     <p className="italic font-bold text-lg text-amber-700 dark:text-amber-300 pt-3">
-                       {t.aboutDedication} 
+                      {t.aboutDedication}
                     </p>
                   </div>
                 </div>
@@ -545,6 +692,26 @@ function App() {
             </Card>
           </TabsContent>
         </Tabs>
+        <div className="hidden lg:block ml-6">
+          <div className="sticky top-4">
+            <a
+              href="https://www.komoptegenkanker.be/acties/10k-voor-k"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="block hover:opacity-80 transition-opacity"
+              title="Kom op tegen Kanker - 10K voor K"
+            >
+              <img
+                src="kom-op-tegen-kanker.svg"
+                alt="Kom op tegen Kanker"
+                className="w-40 rounded-lg shadow-lg"
+              />
+              <span className="italic text-sm block mt-2 text-amber-900">
+                #10k-voor-k #KomOpTegenKanker
+              </span>
+            </a>
+          </div>
+        </div>
       </div>
     </div>
   )

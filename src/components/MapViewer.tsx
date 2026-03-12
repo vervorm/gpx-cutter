@@ -1,8 +1,9 @@
 import { useEffect, useMemo, useState } from 'react'
 import { MapContainer, TileLayer, Polyline, Marker, Popup, useMap } from 'react-leaflet'
-import { LatLngBounds, LatLngExpression, DivIcon } from 'leaflet'
+import { LatLngBounds, LatLngExpression, DivIcon, DragEndEvent } from 'leaflet'
 import { Maximize2, Minimize2, MapPin } from 'lucide-react'
 import { renderToStaticMarkup } from 'react-dom/server'
+import { getDistanceFromLatLonInKm } from '@/lib/gpx-utils'
 import 'leaflet/dist/leaflet.css'
 
 interface RoutePoint {
@@ -15,13 +16,44 @@ interface MapViewerProps {
   selectedPoints?: RoutePoint[]
   startKm?: number
   endKm?: number
+  onStartKmChange?: (km: number) => void
+  onDistanceChange?: (km: number) => void
   translations?: {
     openFullscreen: string
     closeFullscreen: string
     startMarker: string
     endMarker: string
     noRouteData: string
+    dragToAdjust: string
   }
+}
+
+/**
+ * Find the distance (in km) along the route for a given lat/lon point
+ * by finding the closest point on the route
+ */
+function findDistanceAlongRoute(lat: number, lon: number, routePoints: RoutePoint[]): number {
+  let minDistance = Infinity
+  let closestIndex = 0
+
+  // Find the closest point on the route
+  routePoints.forEach((point, index) => {
+    const dist = getDistanceFromLatLonInKm(lat, lon, point.lat, point.lon)
+    if (dist < minDistance) {
+      minDistance = dist
+      closestIndex = index
+    }
+  })
+
+  // Calculate cumulative distance to that point
+  let cumulativeDistance = 0
+  for (let i = 1; i <= closestIndex; i++) {
+    const prev = routePoints[i - 1]
+    const curr = routePoints[i]
+    cumulativeDistance += getDistanceFromLatLonInKm(prev.lat, prev.lon, curr.lat, curr.lon)
+  }
+
+  return cumulativeDistance
 }
 
 // Component to fit map bounds
@@ -77,7 +109,15 @@ function FullscreenControl({ isFullscreen, onToggle, openText, closeText }: {
   )
 }
 
-export function MapViewer({ allPoints, selectedPoints, startKm = 0, endKm, translations }: MapViewerProps) {
+export function MapViewer({
+  allPoints,
+  selectedPoints,
+  startKm = 0,
+  endKm,
+  onStartKmChange,
+  onDistanceChange,
+  translations
+}: MapViewerProps) {
   const [isFullscreen, setIsFullscreen] = useState(false)
 
   // Default translations
@@ -87,6 +127,7 @@ export function MapViewer({ allPoints, selectedPoints, startKm = 0, endKm, trans
     startMarker: 'Start',
     endMarker: 'End',
     noRouteData: 'No route data available',
+    dragToAdjust: 'Drag to adjust',
   }
 
   // Create custom icons using MapPin from lucide
@@ -162,6 +203,33 @@ export function MapViewer({ allPoints, selectedPoints, startKm = 0, endKm, trans
     setIsFullscreen(!isFullscreen)
   }
 
+  // Handle start marker drag
+  const handleStartMarkerDrag = (event: DragEndEvent) => {
+    if (!onStartKmChange) return
+
+    const { lat, lng } = event.target.getLatLng()
+    const distanceFromStart = findDistanceAlongRoute(lat, lng, allPoints)
+
+    // Round to nearest 1km (consistent with slider)
+    const roundedDistance = Math.round(distanceFromStart)
+    onStartKmChange(roundedDistance)
+  }
+
+  // Handle end marker drag
+  const handleEndMarkerDrag = (event: DragEndEvent) => {
+    if (!onDistanceChange || !startKm) return
+
+    const { lat, lng } = event.target.getLatLng()
+    const distanceFromStart = findDistanceAlongRoute(lat, lng, allPoints)
+
+    // Calculate the distance from start marker to end marker
+    const segmentDistance = distanceFromStart - startKm
+
+    // Round to nearest 10km and ensure it's at least 10km
+    const roundedDistance = Math.max(10, Math.round(segmentDistance / 10) * 10)
+    onDistanceChange(roundedDistance)
+  }
+
   if (allPoints.length === 0) {
     return (
       <div className="w-full h-96 bg-gray-100 rounded-lg flex items-center justify-center">
@@ -222,11 +290,19 @@ export function MapViewer({ allPoints, selectedPoints, startKm = 0, endKm, trans
 
           {/* Start marker - using MapPin icon */}
           {startPoint && (
-            <Marker position={[startPoint.lat, startPoint.lon]} icon={startIcon}>
+            <Marker
+              position={[startPoint.lat, startPoint.lon]}
+              icon={startIcon}
+              draggable={!!onStartKmChange}
+              eventHandlers={{
+                dragend: handleStartMarkerDrag,
+              }}
+            >
               <Popup>
                 <div className="text-sm">
                   <p className="font-semibold">{t.startMarker}</p>
                   <p>{startKm.toFixed(1)} km</p>
+                  {onStartKmChange && <p className="text-xs text-gray-500 mt-1">{t.dragToAdjust}</p>}
                 </div>
               </Popup>
             </Marker>
@@ -234,11 +310,19 @@ export function MapViewer({ allPoints, selectedPoints, startKm = 0, endKm, trans
 
           {/* End marker - using MapPin icon */}
           {endPoint && selectedPoints && selectedPoints.length > 0 && (
-            <Marker position={[endPoint.lat, endPoint.lon]} icon={endIcon}>
+            <Marker
+              position={[endPoint.lat, endPoint.lon]}
+              icon={endIcon}
+              draggable={!!onDistanceChange}
+              eventHandlers={{
+                dragend: handleEndMarkerDrag,
+              }}
+            >
               <Popup>
                 <div className="text-sm">
                   <p className="font-semibold">{t.endMarker}</p>
                   <p>{endKm?.toFixed(1)} km</p>
+                  {onDistanceChange && <p className="text-xs text-gray-500 mt-1">{t.dragToAdjust}</p>}
                 </div>
               </Popup>
             </Marker>
