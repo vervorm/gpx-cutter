@@ -454,25 +454,9 @@ function App() {
                     {/* Elevation Profile for selected segment */}
                     {liveSegment && liveSegment.selectedPoints.length > 0 && liveSegment.elevation && (
                       <div className="mt-3 p-3 bg-white dark:bg-gray-800 rounded-lg border-2 border-orange-200">
-                        <h4 className="text-sm font-semibold text-orange-900 dark:text-orange-100 mb-2">
-                          {t.elevationProfile}
-                        </h4>
                         <ElevationProfile
                           points={liveSegment.selectedPoints}
                           startKm={startFromKM}
-                          currentStartKm={startFromKM}
-                          currentDistanceKm={distanceKM}
-                          totalRouteDistanceKm={Math.floor(preview.totalDistance)}
-                          onStartKmChange={(km) => {
-                            const maxStart = Math.floor(preview.totalDistance - 10)
-                            const newStart = Math.max(0, Math.min(km, maxStart))
-                            setStartFromKM(newStart)
-                          }}
-                          onDistanceChange={(km) => {
-                            const maxDistance = Math.floor(preview.totalDistance - startFromKM)
-                            const newDistance = Math.max(10, Math.min(km, maxDistance))
-                            setDistanceKM(newDistance)
-                          }}
                           className="w-full"
                         />
                       </div>
