@@ -280,13 +280,17 @@ export function MapViewer({
 
   // Prevent body scroll when fullscreen is active
   useEffect(() => {
+    const originalOverflow = document.body.style.overflow
+
     if (isFullscreen) {
       document.body.style.overflow = 'hidden'
     } else {
-      document.body.style.overflow = ''
+      document.body.style.overflow = originalOverflow || ''
     }
+
     return () => {
-      document.body.style.overflow = ''
+      // Always restore original overflow on cleanup
+      document.body.style.overflow = originalOverflow || ''
     }
   }, [isFullscreen])
 
@@ -337,7 +341,7 @@ export function MapViewer({
 
   const mapContent = (
     <div
-      className={`overflow-hidden shadow-lg relative ${
+      className={`overflow-hidden shadow-lg relative bg-white dark:bg-gray-900 ${
         isFullscreen
           ? 'fixed inset-0 md:inset-4 z-[9999] w-screen h-screen md:w-[calc(100vw-2rem)] md:h-[calc(100vh-2rem)] md:rounded-lg md:border-2 md:border-border'
           : 'w-full h-full rounded-lg border-2 border-border'
@@ -354,6 +358,7 @@ export function MapViewer({
       )}
 
       <MapContainer
+        key={`map-${isFullscreen ? 'fullscreen' : 'normal'}`}
         center={[allPoints[0].lat, allPoints[0].lon]}
         zoom={13}
         className="w-full h-full"
