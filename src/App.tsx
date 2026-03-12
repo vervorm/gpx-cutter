@@ -428,6 +428,7 @@ function App() {
                           startKm={startFromKM}
                           currentStartKm={startFromKM}
                           currentDistanceKm={distanceKM}
+                          totalRouteDistanceKm={Math.floor(preview.totalDistance)}
                           onStartKmChange={(km) => {
                             const maxStart = Math.floor(preview.totalDistance - 10)
                             const newStart = Math.max(0, Math.min(km, maxStart))
