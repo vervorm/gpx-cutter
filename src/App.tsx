@@ -39,7 +39,21 @@ function App() {
     loadRoute().then((entry) => {
       if (entry) {
         setHasCachedRoute(entry.filename)
-        loadXMLString(entry.xml, entry.filename)
+        const parser = new DOMParser()
+        const xml = parser.parseFromString(entry.xml, 'text/xml')
+        setCurrentXML(xml)
+
+        // Preview maken en dan slider posities herstellen
+        try {
+          const previewData = analyzeGPX(xml)
+          setPreview(previewData)
+
+          // Herstel opgeslagen slider posities, of gebruik defaults
+          setStartFromKM(entry.startFromKM ?? 0)
+          setDistanceKM(entry.distanceKM ?? Math.min(100, Math.floor(previewData.totalDistance)))
+        } catch (error) {
+          console.error('Failed to preview cached route:', error)
+        }
       }
     })
   }, [])
@@ -100,7 +114,26 @@ function App() {
 
   const handleLoadCachedRoute = async () => {
     const entry = await loadRoute()
-    if (entry) loadXMLString(entry.xml, entry.filename)
+    if (entry) {
+      setHasCachedRoute(entry.filename)
+      const parser = new DOMParser()
+      const xml = parser.parseFromString(entry.xml, 'text/xml')
+      setCurrentXML(xml)
+      setAllSegments([])
+      setSelectedSegmentIndex(null)
+
+      // Preview maken en dan slider posities herstellen
+      try {
+        const previewData = analyzeGPX(xml)
+        setPreview(previewData)
+
+        // Herstel opgeslagen slider posities, of gebruik defaults
+        setStartFromKM(entry.startFromKM ?? 0)
+        setDistanceKM(entry.distanceKM ?? Math.min(100, Math.floor(previewData.totalDistance)))
+      } catch (error) {
+        console.error('Failed to preview cached route:', error)
+      }
+    }
   }
 
   const handleClearCachedRoute = () => {
@@ -206,6 +239,23 @@ function App() {
 
   const maxDistance = preview?.totalDistance || 0
   const roundedMaxDistance = Math.ceil(maxDistance)
+  const maxDistanceKM = Math.max(10, Math.floor(maxDistance - startFromKM))
+
+  // Clamp distanceKM when startFromKM changes and leaves no room
+  useEffect(() => {
+    if (preview && distanceKM > maxDistanceKM) {
+      setDistanceKM(Math.max(10, maxDistanceKM))
+    }
+  }, [startFromKM, preview])
+
+  // Save slider positions to IndexedDB when they change
+  useEffect(() => {
+    if (currentXML && hasCachedRoute) {
+      const serializer = new XMLSerializer()
+      const xmlString = serializer.serializeToString(currentXML)
+      saveRoute(xmlString, hasCachedRoute, startFromKM, distanceKM).catch(() => {})
+    }
+  }, [startFromKM, distanceKM])
 
   return (
     <div className="min-h-screen bg-background p-2 md:p-4 pb-20">
@@ -392,7 +442,7 @@ function App() {
                       <IconSlider
                         id="distanceKM"
                         min={10}
-                        max={Math.min(200, roundedMaxDistance)}
+                        max={maxDistanceKM}
                         step={1}
                         value={distanceKM}
                         onValueChange={setDistanceKM}
@@ -436,7 +486,7 @@ function App() {
                           }}
                           onDistanceChange={(km) => {
                             const maxDistance = Math.floor(preview.totalDistance - startFromKM)
-                            const newDistance = Math.max(10, Math.min(km, maxDistance, 200))
+                            const newDistance = Math.max(10, Math.min(km, maxDistance))
                             setDistanceKM(newDistance)
                           }}
                           className="w-full"
@@ -472,7 +522,7 @@ function App() {
                       onDistanceChange={(km) => {
                         // Ensure distance doesn't exceed available distance from start point
                         const maxDistance = Math.floor(preview.totalDistance - startFromKM)
-                        const newDistance = Math.max(10, Math.min(km, maxDistance, 200)) // Min 10km, max 200km or remaining
+                        const newDistance = Math.max(10, Math.min(km, maxDistance))
                         setDistanceKM(newDistance)
                       }}
                       translations={{
