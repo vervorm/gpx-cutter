@@ -256,7 +256,7 @@ export function MapViewer({
     <div
       className={`rounded-lg overflow-hidden border-2 border-border shadow-lg transition-all relative ${
         isFullscreen
-          ? 'fixed inset-4 z-[999] w-[calc(100vw-2rem)] h-[calc(100vh-2rem)]'
+          ? 'fixed inset-0 md:inset-4 z-[999] w-screen h-screen md:w-[calc(100vw-2rem)] md:h-[calc(100vh-2rem)]'
           : 'w-full h-full'
       }`}
     >
