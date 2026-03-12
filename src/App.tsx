@@ -252,59 +252,77 @@ function App() {
           </TabsList>
 
           <TabsContent value="route" className="space-y-4">
-            {/* Step 1: Upload */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <UploadCloud className="w-5 h-5 text-primary" />
-                  {t.step1Title}
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                {/* Cached route banner */}
-                {hasCachedRoute && !preview && (
-                  <div className="bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800 rounded-lg p-3 flex items-center justify-between gap-3">
-                    <div className="flex items-center gap-2 min-w-0">
-                      <CheckCircle className="w-4 h-4 text-blue-600 shrink-0" />
-                      <div className="min-w-0">
-                        <p className="text-xs text-blue-600 dark:text-blue-400 font-medium">Vorige route opgeslagen</p>
-                        <p className="text-sm font-semibold text-blue-900 dark:text-blue-100 truncate">{hasCachedRoute}</p>
+            {/* Hidden file input — altijd aanwezig */}
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept=".gpx"
+              className="hidden"
+              onChange={handleFileSelect}
+            />
+
+            {/* Step 1: Upload — verborgen zodra een route geladen is */}
+            {!preview && (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <UploadCloud className="w-5 h-5 text-primary" />
+                    {t.step1Title}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  {/* Cached route banner */}
+                  {hasCachedRoute && (
+                    <div className="bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800 rounded-lg p-3 flex items-center justify-between gap-3">
+                      <div className="flex items-center gap-2 min-w-0">
+                        <CheckCircle className="w-4 h-4 text-blue-600 shrink-0" />
+                        <div className="min-w-0">
+                          <p className="text-xs text-blue-600 dark:text-blue-400 font-medium">Vorige route opgeslagen</p>
+                          <p className="text-sm font-semibold text-blue-900 dark:text-blue-100 truncate">{hasCachedRoute}</p>
+                        </div>
+                      </div>
+                      <div className="flex gap-2 shrink-0">
+                        <Button size="sm" onClick={handleLoadCachedRoute}>
+                          Laad opnieuw
+                        </Button>
+                        <Button size="sm" variant="ghost" className="text-muted-foreground" onClick={handleClearCachedRoute}>
+                          Wis
+                        </Button>
                       </div>
                     </div>
-                    <div className="flex gap-2 shrink-0">
-                      <Button size="sm" onClick={handleLoadCachedRoute}>
-                        Laad opnieuw
-                      </Button>
-                      <Button size="sm" variant="ghost" className="text-muted-foreground" onClick={handleClearCachedRoute}>
-                        Wis
-                      </Button>
+                  )}
+
+                  <div
+                    className="relative border-2 border-dashed border-border rounded-xl p-8 text-center hover:bg-accent/50 transition-colors cursor-pointer"
+                    onClick={() => fileInputRef.current?.click()}
+                  >
+                    <FileUp className="w-8 h-8 mx-auto text-muted-foreground mb-2" />
+                    <p className="text-sm text-muted-foreground">{t.uploadPrompt}</p>
+                  </div>
+
+                  {file && (
+                    <div className="bg-primary/10 text-primary p-3 rounded-lg text-sm flex items-center gap-2">
+                      <CheckCircle className="w-4 h-4" />
+                      <span>{file.name}</span>
                     </div>
-                  </div>
-                )}
+                  )}
+                </CardContent>
+              </Card>
+            )}
 
-                <div
-                  className="relative border-2 border-dashed border-border rounded-xl p-8 text-center hover:bg-accent/50 transition-colors cursor-pointer"
-                  onClick={() => fileInputRef.current?.click()}
-                >
-                  <FileUp className="w-8 h-8 mx-auto text-muted-foreground mb-2" />
-                  <p className="text-sm text-muted-foreground">{t.uploadPrompt}</p>
-                  <input
-                    ref={fileInputRef}
-                    type="file"
-                    accept=".gpx"
-                    className="hidden"
-                    onChange={handleFileSelect}
-                  />
+            {/* Kleine "andere route laden" knop als een route actief is */}
+            {preview && (
+              <div className="flex items-center justify-between gap-3 px-1">
+                <div className="flex items-center gap-2 text-sm text-muted-foreground min-w-0">
+                  <CheckCircle className="w-4 h-4 text-primary shrink-0" />
+                  <span className="truncate font-medium">{hasCachedRoute || file?.name}</span>
                 </div>
-
-                {file && (
-                  <div className="bg-primary/10 text-primary p-3 rounded-lg text-sm flex items-center gap-2">
-                    <CheckCircle className="w-4 h-4" />
-                    <span>{file.name}</span>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
+                <Button size="sm" variant="outline" onClick={() => fileInputRef.current?.click()}>
+                  <FileUp className="w-4 h-4" />
+                  Andere route
+                </Button>
+              </div>
+            )}
 
             {/* Preview */}
             {preview && (
