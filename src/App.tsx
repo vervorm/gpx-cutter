@@ -11,7 +11,7 @@ import { MapViewer } from '@/components/MapViewer'
 import { ElevationProfile } from '@/components/ElevationProfile'
 import { Language, getTranslations } from '@/lib/i18n'
 import { LanguageSelector } from '@/components/LanguageSelector'
-import { saveRoute, loadRoute, clearRoute, getCachedFilename } from '@/lib/route-cache'
+import { saveRoute, loadRoute, clearRoute } from '@/lib/route-cache'
 
 function App() {
   // Initialize language from localStorage or default to 'nl'
@@ -34,9 +34,14 @@ function App() {
   const [hasCachedRoute, setHasCachedRoute] = useState<string | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
-  // Laad cachenaam asynchroon bij opstarten
+  // Laad route automatisch bij opstarten als er iets in IndexedDB staat
   useEffect(() => {
-    getCachedFilename().then(setHasCachedRoute)
+    loadRoute().then((entry) => {
+      if (entry) {
+        setHasCachedRoute(entry.filename)
+        loadXMLString(entry.xml, entry.filename)
+      }
+    })
   }, [])
 
   // Save language preference to localStorage
