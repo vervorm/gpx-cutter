@@ -281,6 +281,33 @@ export function MapViewer({
     return findPointAtDistance(pointerKm, selectedPoints)
   }, [pointerKm, selectedPoints])
 
+  // Calculate slope at pointer position
+  const pointerSlope = useMemo(() => {
+    if (pointerKm === null || pointerKm === undefined || !selectedPoints || selectedPoints.length === 0) {
+      return null
+    }
+
+    let cumulativeDistance = 0
+    for (let i = 1; i < selectedPoints.length; i++) {
+      const prev = selectedPoints[i - 1]
+      const curr = selectedPoints[i]
+      const segmentDistance = getDistanceFromLatLonInKm(prev.lat, prev.lon, curr.lat, curr.lon)
+
+      if (cumulativeDistance + segmentDistance >= pointerKm) {
+        // Found the segment - calculate slope
+        if (prev.ele !== undefined && curr.ele !== undefined) {
+          const distDiff = segmentDistance * 1000 // Convert km to meters
+          const eleDiff = curr.ele - prev.ele
+          return distDiff > 0 ? (eleDiff / distDiff) : 0
+        }
+        return null
+      }
+
+      cumulativeDistance += segmentDistance
+    }
+    return null
+  }, [pointerKm, selectedPoints])
+
   const toggleFullscreen = () => {
     setIsFullscreen(!isFullscreen)
     // Ensure loading state is reset when toggling fullscreen
@@ -460,10 +487,14 @@ export function MapViewer({
               }}
             >
               <Tooltip permanent direction="top" offset={[0, -10]}>
-                <div className="text-xs">
-                  <div className="font-bold text-blue-600">{(startKm + (pointerKm || 0)).toFixed(2)} km</div>
+                <div className="text-xs text-center">
                   {pointerPoint.ele !== undefined && (
-                    <div className="font-semibold text-amber-500">{Math.round(pointerPoint.ele)}m</div>
+                    <div className="font-bold text-amber-500">{Math.round(pointerPoint.ele)}m</div>
+                  )}
+                  {pointerSlope !== null && (
+                    <div className={`font-semibold ${pointerSlope >= 0 ? 'text-red-500' : 'text-blue-500'}`}>
+                      {(pointerSlope * 100).toFixed(1)}%
+                    </div>
                   )}
                 </div>
               </Tooltip>

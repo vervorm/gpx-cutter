@@ -160,8 +160,9 @@ export function ElevationProfile({
   // Calculate pointer position and elevation
   const pointerX = pointerKm !== null && pointerKm !== undefined ? xScale(pointerKm) : null
 
-  // Find the elevation at the pointer position
+  // Find the elevation and slope at the pointer position
   let pointerElevation: number | null = null
+  let pointerSlope: number | null = null
   if (pointerKm !== null && pointerKm !== undefined) {
     // Find the closest point or interpolate between points
     let closestIndex = 0
@@ -182,6 +183,10 @@ export function ElevationProfile({
       const e2 = elevations[closestIndex + 1]
       const ratio = (pointerKm - d1) / (d2 - d1)
       pointerElevation = e1 + ratio * (e2 - e1)
+      // Calculate slope (elevation difference / distance in meters)
+      const distDiff = (d2 - d1) * 1000 // Convert km to meters
+      const eleDiff = e2 - e1
+      pointerSlope = distDiff > 0 ? (eleDiff / distDiff) : 0
     } else if (closestIndex > 0 && pointerKm < distances[closestIndex]) {
       const d1 = distances[closestIndex - 1]
       const d2 = distances[closestIndex]
@@ -189,8 +194,22 @@ export function ElevationProfile({
       const e2 = elevations[closestIndex]
       const ratio = (pointerKm - d1) / (d2 - d1)
       pointerElevation = e1 + ratio * (e2 - e1)
+      // Calculate slope
+      const distDiff = (d2 - d1) * 1000
+      const eleDiff = e2 - e1
+      pointerSlope = distDiff > 0 ? (eleDiff / distDiff) : 0
     } else {
       pointerElevation = elevations[closestIndex]
+      // Use slope from surrounding segment if available
+      if (closestIndex < distances.length - 1) {
+        const d1 = distances[closestIndex]
+        const d2 = distances[closestIndex + 1]
+        const e1 = elevations[closestIndex]
+        const e2 = elevations[closestIndex + 1]
+        const distDiff = (d2 - d1) * 1000
+        const eleDiff = e2 - e1
+        pointerSlope = distDiff > 0 ? (eleDiff / distDiff) : 0
+      }
     }
   }
 
@@ -300,21 +319,23 @@ export function ElevationProfile({
                 x={pointerX > width / 2 ? pointerX - 47.5 : pointerX + 47.5}
                 y={padding.top + 12}
                 textAnchor="middle"
-                fontSize="11"
+                fontSize="12"
                 fontWeight="bold"
-                fill="white"
-              >
-                {(startKm + pointerKm!).toFixed(2)} km
-              </text>
-              <text
-                x={pointerX > width / 2 ? pointerX - 47.5 : pointerX + 47.5}
-                y={padding.top + 28}
-                textAnchor="middle"
-                fontSize="11"
                 fill="#fbbf24"
               >
                 {Math.round(pointerElevation)}m
               </text>
+              {pointerSlope !== null && (
+                <text
+                  x={pointerX > width / 2 ? pointerX - 47.5 : pointerX + 47.5}
+                  y={padding.top + 28}
+                  textAnchor="middle"
+                  fontSize="11"
+                  fill={pointerSlope >= 0 ? '#ef4444' : '#3b82f6'}
+                >
+                  {(pointerSlope * 100).toFixed(1)}%
+                </text>
+              )}
             </g>
           </g>
         )}
