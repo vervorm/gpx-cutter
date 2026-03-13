@@ -9,6 +9,7 @@ import 'leaflet/dist/leaflet.css'
 interface RoutePoint {
   lat: number
   lon: number
+  ele?: number
 }
 
 interface MapViewerProps {
