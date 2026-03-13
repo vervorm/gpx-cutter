@@ -60,7 +60,7 @@ function findDistanceAlongRoute(lat: number, lon: number, routePoints: RoutePoin
 }
 
 /**
- * Find the lat/lon position at a given distance along the route
+ * Find the lat/lon/elevation position at a given distance along the route
  */
 function findPointAtDistance(distanceKm: number, routePoints: RoutePoint[]): RoutePoint | null {
   if (routePoints.length === 0) return null
@@ -75,10 +75,17 @@ function findPointAtDistance(distanceKm: number, routePoints: RoutePoint[]): Rou
     if (cumulativeDistance + segmentDistance >= distanceKm) {
       // Interpolate between prev and curr
       const ratio = (distanceKm - cumulativeDistance) / segmentDistance
-      return {
+      const point: RoutePoint = {
         lat: prev.lat + (curr.lat - prev.lat) * ratio,
         lon: prev.lon + (curr.lon - prev.lon) * ratio,
       }
+
+      // Interpolate elevation if available
+      if (prev.ele !== undefined && curr.ele !== undefined) {
+        point.ele = prev.ele + (curr.ele - prev.ele) * ratio
+      }
+
+      return point
     }
 
     cumulativeDistance += segmentDistance
@@ -454,7 +461,10 @@ export function MapViewer({
               <Popup>
                 <div className="text-sm">
                   <p className="font-semibold">{t.pointerMarker || 'Position'}</p>
-                  <p>{pointerKm?.toFixed(2)} km</p>
+                  <p className="font-medium text-blue-600">{(startKm + (pointerKm || 0)).toFixed(2)} km</p>
+                  {pointerPoint.ele !== undefined && (
+                    <p className="font-medium text-amber-500">{Math.round(pointerPoint.ele)}m</p>
+                  )}
                   {onPointerKmChange && <p className="text-xs text-gray-500 mt-1">{t.dragToAdjust}</p>}
                 </div>
               </Popup>
