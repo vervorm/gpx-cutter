@@ -342,10 +342,10 @@ export function MapViewer({
 
   const mapContent = (
     <div
-      className={`overflow-hidden shadow-lg relative ${
+      className={`overflow-hidden shadow-lg ${
         isFullscreen
-          ? 'fixed inset-0 md:inset-4 z-[9999] w-screen h-screen md:w-[calc(100vw-2rem)] md:h-[calc(100vh-2rem)] md:rounded-lg md:border-2 md:border-border'
-          : 'w-full h-full rounded-lg border-2 border-border'
+          ? 'fixed top-0 left-0 md:top-4 md:left-4 z-[9999] w-screen h-screen md:w-[calc(100vw-2rem)] md:h-[calc(100vh-2rem)] md:rounded-lg md:border-2 md:border-border'
+          : 'relative w-full h-full rounded-lg border-2 border-border'
       }`}
     >
       {/* Loading indicator */}
