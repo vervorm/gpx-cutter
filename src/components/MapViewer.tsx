@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useState } from 'react'
-import { createPortal } from 'react-dom'
 import { MapContainer, TileLayer, Polyline, Marker, Popup, useMap } from 'react-leaflet'
 import { LatLngBounds, LatLngExpression, DivIcon, DragEndEvent } from 'leaflet'
 import { Maximize2, Minimize2, MapPin } from 'lucide-react'
@@ -464,11 +463,6 @@ export function MapViewer({
         </MapContainer>
       </div>
   )
-
-  // Use portal for fullscreen to render from document root
-  if (isFullscreen && typeof window !== 'undefined') {
-    return createPortal(mapContent, document.body)
-  }
 
   return mapContent
 }
