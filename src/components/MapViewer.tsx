@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { MapContainer, TileLayer, Polyline, Marker, Popup, useMap } from 'react-leaflet'
+import { MapContainer, TileLayer, Polyline, Marker, Popup, Tooltip, useMap } from 'react-leaflet'
 import { LatLngBounds, LatLngExpression, DivIcon, DragEndEvent } from 'leaflet'
 import { Maximize2, Minimize2, MapPin } from 'lucide-react'
 import { renderToStaticMarkup } from 'react-dom/server'
@@ -418,7 +418,7 @@ export function MapViewer({
                 dragend: handleStartMarkerDrag,
               }}
             >
-              <Popup>
+              <Popup autoPan={false}>
                 <div className="text-sm">
                   <p className="font-semibold">{t.startMarker}</p>
                   <p>{startKm.toFixed(1)} km</p>
@@ -438,7 +438,7 @@ export function MapViewer({
                 dragend: handleEndMarkerDrag,
               }}
             >
-              <Popup>
+              <Popup autoPan={false}>
                 <div className="text-sm">
                   <p className="font-semibold">{t.endMarker}</p>
                   <p>{endKm?.toFixed(1)} km</p>
@@ -458,16 +458,14 @@ export function MapViewer({
                 dragend: handlePointerMarkerDrag,
               }}
             >
-              <Popup>
-                <div className="text-sm">
-                  <p className="font-semibold">{t.pointerMarker || 'Position'}</p>
-                  <p className="font-medium text-blue-600">{(startKm + (pointerKm || 0)).toFixed(2)} km</p>
+              <Tooltip permanent direction="top" offset={[0, -10]}>
+                <div className="text-xs">
+                  <div className="font-bold text-blue-600">{(startKm + (pointerKm || 0)).toFixed(2)} km</div>
                   {pointerPoint.ele !== undefined && (
-                    <p className="font-medium text-amber-500">{Math.round(pointerPoint.ele)}m</p>
+                    <div className="font-semibold text-amber-500">{Math.round(pointerPoint.ele)}m</div>
                   )}
-                  {onPointerKmChange && <p className="text-xs text-gray-500 mt-1">{t.dragToAdjust}</p>}
                 </div>
-              </Popup>
+              </Tooltip>
             </Marker>
           )}
         </MapContainer>
