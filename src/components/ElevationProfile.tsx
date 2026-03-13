@@ -122,10 +122,11 @@ export function ElevationProfile({
     if (!onPointerKmChange || !svgRef.current) return
 
     const rect = svgRef.current.getBoundingClientRect()
-    const x = clientX - rect.left
+    // Account for SVG scaling: map screen coordinates to SVG viewBox coordinates
+    const svgX = ((clientX - rect.left) / rect.width) * width
 
     // Convert x position to distance
-    const relativeX = Math.max(padding.left, Math.min(x, width - padding.right))
+    const relativeX = Math.max(padding.left, Math.min(svgX, width - padding.right))
     const distanceRatio = (relativeX - padding.left) / chartWidth
     const distanceInSegment = distanceRatio * totalDistance
 
@@ -142,8 +143,56 @@ export function ElevationProfile({
     }
   }
 
-  // Calculate pointer position
+  const handleTouchStart = (e: React.TouchEvent<SVGSVGElement>) => {
+    if (e.touches.length === 1) {
+      e.preventDefault()
+      handlePointerMove(e.touches[0].clientX)
+    }
+  }
+
+  const handleTouchMove = (e: React.TouchEvent<SVGSVGElement>) => {
+    if (e.touches.length === 1) {
+      e.preventDefault()
+      handlePointerMove(e.touches[0].clientX)
+    }
+  }
+
+  // Calculate pointer position and elevation
   const pointerX = pointerKm !== null && pointerKm !== undefined ? xScale(pointerKm) : null
+
+  // Find the elevation at the pointer position
+  let pointerElevation: number | null = null
+  if (pointerKm !== null && pointerKm !== undefined) {
+    // Find the closest point or interpolate between points
+    let closestIndex = 0
+    let minDiff = Math.abs(distances[0] - pointerKm)
+    for (let i = 1; i < distances.length; i++) {
+      const diff = Math.abs(distances[i] - pointerKm)
+      if (diff < minDiff) {
+        minDiff = diff
+        closestIndex = i
+      }
+    }
+
+    // Interpolate elevation between two closest points
+    if (closestIndex < distances.length - 1 && pointerKm > distances[closestIndex]) {
+      const d1 = distances[closestIndex]
+      const d2 = distances[closestIndex + 1]
+      const e1 = elevations[closestIndex]
+      const e2 = elevations[closestIndex + 1]
+      const ratio = (pointerKm - d1) / (d2 - d1)
+      pointerElevation = e1 + ratio * (e2 - e1)
+    } else if (closestIndex > 0 && pointerKm < distances[closestIndex]) {
+      const d1 = distances[closestIndex - 1]
+      const d2 = distances[closestIndex]
+      const e1 = elevations[closestIndex - 1]
+      const e2 = elevations[closestIndex]
+      const ratio = (pointerKm - d1) / (d2 - d1)
+      pointerElevation = e1 + ratio * (e2 - e1)
+    } else {
+      pointerElevation = elevations[closestIndex]
+    }
+  }
 
   return (
     <div className={className}>
@@ -194,7 +243,9 @@ export function ElevationProfile({
         preserveAspectRatio="xMidYMid meet"
         onClick={handleSvgClick}
         onMouseMove={handleSvgMouseMove}
-        className={onPointerKmChange ? 'cursor-pointer' : ''}
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        className={onPointerKmChange ? 'cursor-pointer touch-none' : ''}
       >
         {/* Grid lijnen */}
         {yLabels.map((label, i) => (
@@ -215,7 +266,7 @@ export function ElevationProfile({
         <path d={pathD} fill="none" stroke="#374151" strokeWidth="2" strokeLinejoin="round" />
 
         {/* Interactive pointer line */}
-        {pointerX !== null && (
+        {pointerX !== null && pointerElevation !== null && (
           <g>
             <line
               x1={pointerX}
@@ -228,13 +279,43 @@ export function ElevationProfile({
             />
             <circle
               cx={pointerX}
-              cy={padding.top}
+              cy={yScale(pointerElevation)}
               r="6"
               fill="#ef4444"
               stroke="white"
               strokeWidth="2"
               className="cursor-grab active:cursor-grabbing"
             />
+            {/* Elevation info tooltip */}
+            <g>
+              <rect
+                x={pointerX > width / 2 ? pointerX - 85 : pointerX + 10}
+                y={padding.top - 5}
+                width="75"
+                height="40"
+                fill="rgba(0, 0, 0, 0.8)"
+                rx="4"
+              />
+              <text
+                x={pointerX > width / 2 ? pointerX - 47.5 : pointerX + 47.5}
+                y={padding.top + 12}
+                textAnchor="middle"
+                fontSize="11"
+                fontWeight="bold"
+                fill="white"
+              >
+                {(startKm + pointerKm!).toFixed(2)} km
+              </text>
+              <text
+                x={pointerX > width / 2 ? pointerX - 47.5 : pointerX + 47.5}
+                y={padding.top + 28}
+                textAnchor="middle"
+                fontSize="11"
+                fill="#fbbf24"
+              >
+                {Math.round(pointerElevation)}m
+              </text>
+            </g>
           </g>
         )}
 
