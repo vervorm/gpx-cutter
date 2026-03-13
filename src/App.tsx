@@ -13,6 +13,8 @@ import { Language, getTranslations } from '@/lib/i18n'
 import { LanguageSelector } from '@/components/LanguageSelector'
 import { saveRoute, loadRoute, clearRoute } from '@/lib/route-cache'
 
+const APP_VERSION = '1.1.0'
+
 function App() {
   // Initialize language from localStorage or default to 'nl'
   const [language, setLanguage] = useState<Language>(() => {
@@ -32,6 +34,16 @@ function App() {
   const [toast, setToast] = useState({ show: false, message: '' })
   const [helpOpen, setHelpOpen] = useState(false)
   const [hasCachedRoute, setHasCachedRoute] = useState<string | null>(null)
+  // Interactive pointer position (km from start of selected segment)
+  const [pointerKm, setPointerKm] = useState<number | null>(null)
+  const [maxDistanceSetting, setMaxDistanceSetting] = useState<number>(() => {
+    const saved = localStorage.getItem('maxDistanceSetting')
+    return saved ? parseInt(saved, 10) : 250
+  })
+  const [maxDistanceInput, setMaxDistanceInput] = useState<string>(() => {
+    const saved = localStorage.getItem('maxDistanceSetting')
+    return saved || '250'
+  })
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   // Laad route automatisch bij opstarten als er iets in IndexedDB staat
@@ -63,6 +75,11 @@ function App() {
     setLanguage(lang)
     localStorage.setItem('language', lang)
   }
+
+  // Save max distance setting to localStorage
+  useEffect(() => {
+    localStorage.setItem('maxDistanceSetting', maxDistanceSetting.toString())
+  }, [maxDistanceSetting])
 
   const showToast = (message: string) => {
     setToast({ show: true, message })
@@ -239,14 +256,14 @@ function App() {
 
   const maxDistance = preview?.totalDistance || 0
   const roundedMaxDistance = Math.ceil(maxDistance)
-  const maxDistanceKM = Math.max(10, Math.floor(maxDistance - startFromKM))
+  const maxDistanceKM = Math.max(10, Math.min(maxDistanceSetting, Math.floor(maxDistance - startFromKM)))
 
   // Clamp distanceKM when startFromKM changes and leaves no room
   useEffect(() => {
     if (preview && distanceKM > maxDistanceKM) {
       setDistanceKM(Math.max(10, maxDistanceKM))
     }
-  }, [startFromKM, preview])
+  }, [startFromKM, preview, maxDistanceKM, distanceKM])
 
   // Save slider positions to IndexedDB when they change
   useEffect(() => {
@@ -449,47 +466,44 @@ function App() {
                       />
                     </div>
 
-                    <div className="p-3 bg-gradient-to-r from-green-50 to-blue-50 dark:from-green-950/20 dark:to-blue-950/20 rounded-lg border-2 border-primary/20">
-                      <p className="text-sm font-medium text-center">
-                        📍 {t.selectedSegment} <span className="text-primary font-bold">{startFromKM} km</span> → <span className="text-primary font-bold">{startFromKM + distanceKM} km</span>
-                      </p>
-                      {liveSegment && (
-                        <>
-                          <p className="text-xs text-center mt-1 text-muted-foreground">
-                            {liveSegment.pointCount} {t.points} · {liveSegment.distance.toFixed(2)} km
-                          </p>
-                          {liveSegment.elevation && (
-                            <p className="text-xs text-center mt-1 text-muted-foreground">
-                              ↗ {liveSegment.elevation.gain}m · ↘ {liveSegment.elevation.loss}m
-                            </p>
-                          )}
-                        </>
-                      )}
+                    <div className="pt-2 border-t border-orange-200/50">
+                      <div className="flex items-center justify-between gap-3">
+                        <Label htmlFor="maxDistance" className="text-xs text-muted-foreground">Max afstand (km)</Label>
+                        <input
+                          id="maxDistance"
+                          type="number"
+                          min={10}
+                          max={1000}
+                          step={10}
+                          value={maxDistanceInput}
+                          onFocus={(e) => e.target.select()}
+                          onChange={(e) => {
+                            setMaxDistanceInput(e.target.value)
+                          }}
+                          onBlur={(e) => {
+                            const value = parseInt(e.target.value, 10)
+                            if (!isNaN(value) && value >= 10 && value <= 1000) {
+                              setMaxDistanceSetting(value)
+                              setMaxDistanceInput(value.toString())
+                            } else {
+                              // Reset to current setting if invalid
+                              setMaxDistanceInput(maxDistanceSetting.toString())
+                            }
+                          }}
+                          className="w-20 px-2 py-1 text-sm border rounded focus:outline-none focus:ring-2 focus:ring-primary"
+                        />
+                      </div>
                     </div>
 
                     {/* Elevation Profile for selected segment */}
                     {liveSegment && liveSegment.selectedPoints.length > 0 && liveSegment.elevation && (
                       <div className="mt-3 p-3 bg-white dark:bg-gray-800 rounded-lg border-2 border-orange-200">
-                        <h4 className="text-sm font-semibold text-orange-900 dark:text-orange-100 mb-2">
-                          {t.elevationProfile}
-                        </h4>
                         <ElevationProfile
                           points={liveSegment.selectedPoints}
                           startKm={startFromKM}
-                          currentStartKm={startFromKM}
-                          currentDistanceKm={distanceKM}
-                          totalRouteDistanceKm={Math.floor(preview.totalDistance)}
-                          onStartKmChange={(km) => {
-                            const maxStart = Math.floor(preview.totalDistance - 10)
-                            const newStart = Math.max(0, Math.min(km, maxStart))
-                            setStartFromKM(newStart)
-                          }}
-                          onDistanceChange={(km) => {
-                            const maxDistance = Math.floor(preview.totalDistance - startFromKM)
-                            const newDistance = Math.max(10, Math.min(km, maxDistance))
-                            setDistanceKM(newDistance)
-                          }}
                           className="w-full"
+                          pointerKm={pointerKm}
+                          onPointerKmChange={setPointerKm}
                         />
                       </div>
                     )}
@@ -525,11 +539,14 @@ function App() {
                         const newDistance = Math.max(10, Math.min(km, maxDistance))
                         setDistanceKM(newDistance)
                       }}
+                      pointerKm={pointerKm}
+                      onPointerKmChange={setPointerKm}
                       translations={{
                         openFullscreen: t.openFullscreen,
                         closeFullscreen: t.closeFullscreen,
                         startMarker: t.startMarker,
                         endMarker: t.endMarker,
+                        pointerMarker: 'Positie',
                         noRouteData: t.noRouteData,
                         dragToAdjust: t.dragToAdjust,
                       }}
@@ -736,6 +753,9 @@ function App() {
                     <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 pt-2 border-t border-gray-300 dark:border-gray-600">
                       <Code2 className="w-4 h-4" />
                       <span>{t.aboutTechClaude}</span>
+                    </div>
+                    <div className="text-xs text-gray-500 dark:text-gray-500 pt-2 text-center">
+                      v{APP_VERSION}
                     </div>
                   </div>
                 </div>

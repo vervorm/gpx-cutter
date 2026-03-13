@@ -112,7 +112,7 @@ export const translations: Record<Language, Translations> = {
     totalPoints: "Aantal punten:",
     maxSelection: "Max selectie:",
 
-    step2Title: "Stap 2: Selecteer Segment",
+    step2Title: "Selecteer Segment",
     step2Description:
       "Gebruik de sliders om je segment te kiezen - de kaart toont het direct",
     startFromLabel: "Start vanaf (KM)",
@@ -211,7 +211,7 @@ export const translations: Record<Language, Translations> = {
     totalPoints: "Total points:",
     maxSelection: "Max selection:",
 
-    step2Title: "Step 2: Select Segment",
+    step2Title: "Select Segment",
     step2Description:
       "Use the sliders to choose your segment - the map updates immediately",
     startFromLabel: "Start from (KM)",
@@ -308,7 +308,7 @@ export const translations: Record<Language, Translations> = {
     totalPoints: "Points totaux:",
     maxSelection: "Sélection max:",
 
-    step2Title: "Étape 2: Sélectionner le Segment",
+    step2Title: "Sélectionner le Segment",
     step2Description:
       "Utilisez les curseurs pour choisir votre segment - la carte se met à jour immédiatement",
     startFromLabel: "Départ de (KM)",
@@ -407,7 +407,7 @@ export const translations: Record<Language, Translations> = {
     totalPoints: "Puntos totales:",
     maxSelection: "Selección máx:",
 
-    step2Title: "Paso 2: Seleccionar Segmento",
+    step2Title: "Seleccionar Segmento",
     step2Description:
       "Use los deslizadores para elegir su segmento - el mapa se actualiza inmediatamente",
     startFromLabel: "Comenzar desde (KM)",
@@ -506,7 +506,7 @@ export const translations: Record<Language, Translations> = {
     totalPoints: "Gesamtpunkte:",
     maxSelection: "Max. Auswahl:",
 
-    step2Title: "Schritt 2: Segment Auswählen",
+    step2Title: "Segment Auswählen",
     step2Description:
       "Verwenden Sie die Schieberegler, um Ihr Segment auszuwählen - die Karte wird sofort aktualisiert",
     startFromLabel: "Start ab (KM)",
@@ -606,7 +606,7 @@ export const translations: Record<Language, Translations> = {
     totalPoints: "Totalt antall punkter:",
     maxSelection: "Maks. valg:",
 
-    step2Title: "Trinn 2: Velg Segment",
+    step2Title: "Velg Segment",
     step2Description:
       "Bruk glidebrytere for å velge segment - kartet oppdateres umiddelbart",
     startFromLabel: "Start fra (KM)",
@@ -702,7 +702,7 @@ export const translations: Record<Language, Translations> = {
     totalPoints: "Pontos totais:",
     maxSelection: "Seleção máx:",
 
-    step2Title: "Passo 2: Selecionar Segmento",
+    step2Title: "Selecionar Segmento",
     step2Description:
       "Use os controles deslizantes para escolher seu segmento - o mapa atualiza imediatamente",
     startFromLabel: "Começar de (KM)",

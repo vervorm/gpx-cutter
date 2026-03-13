@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useMemo, useRef, useCallback } from 'react'
 import { RoutePoint, getDistanceFromLatLonInKm } from '@/lib/gpx-utils'
 import { IconSlider } from '@/components/ui/icon-slider'
 
@@ -11,6 +11,8 @@ interface ElevationProfileProps {
   totalRouteDistanceKm?: number
   onStartKmChange?: (km: number) => void
   onDistanceChange?: (km: number) => void
+  pointerKm?: number | null
+  onPointerKmChange?: (km: number | null) => void
 }
 
 export function ElevationProfile({
@@ -22,6 +24,8 @@ export function ElevationProfile({
   totalRouteDistanceKm = 1000,
   onStartKmChange,
   onDistanceChange,
+  pointerKm,
+  onPointerKmChange,
 }: ElevationProfileProps) {
   const profileData = useMemo(() => {
     const pointsWithEle = points.filter(p => p.ele !== undefined)
@@ -111,6 +115,36 @@ export function ElevationProfile({
   const maxStartKm = Math.max(0, totalRouteDistanceKm - currentDistanceKm - 1)
   const maxDistanceKm = Math.min(200, totalRouteDistanceKm - currentStartKm)
 
+  // Interactive pointer logic
+  const svgRef = useRef<SVGSVGElement>(null)
+
+  const handlePointerMove = useCallback((clientX: number) => {
+    if (!onPointerKmChange || !svgRef.current) return
+
+    const rect = svgRef.current.getBoundingClientRect()
+    const x = clientX - rect.left
+
+    // Convert x position to distance
+    const relativeX = Math.max(padding.left, Math.min(x, width - padding.right))
+    const distanceRatio = (relativeX - padding.left) / chartWidth
+    const distanceInSegment = distanceRatio * totalDistance
+
+    onPointerKmChange(distanceInSegment)
+  }, [onPointerKmChange, totalDistance, chartWidth, padding.left, padding.right, width])
+
+  const handleSvgClick = (e: React.MouseEvent<SVGSVGElement>) => {
+    handlePointerMove(e.clientX)
+  }
+
+  const handleSvgMouseMove = (e: React.MouseEvent<SVGSVGElement>) => {
+    if (e.buttons === 1) { // Left mouse button is pressed
+      handlePointerMove(e.clientX)
+    }
+  }
+
+  // Calculate pointer position
+  const pointerX = pointerKm !== null && pointerKm !== undefined ? xScale(pointerKm) : null
+
   return (
     <div className={className}>
       {/* IconSliders boven het profiel */}
@@ -153,10 +187,14 @@ export function ElevationProfile({
 
       {/* Puur visueel SVG hoogteprofiel */}
       <svg
+        ref={svgRef}
         width="100%"
         height="100%"
         viewBox={`0 0 ${width} ${height}`}
         preserveAspectRatio="xMidYMid meet"
+        onClick={handleSvgClick}
+        onMouseMove={handleSvgMouseMove}
+        className={onPointerKmChange ? 'cursor-pointer' : ''}
       >
         {/* Grid lijnen */}
         {yLabels.map((label, i) => (
@@ -175,6 +213,30 @@ export function ElevationProfile({
 
         {/* Hoogte lijn */}
         <path d={pathD} fill="none" stroke="#374151" strokeWidth="2" strokeLinejoin="round" />
+
+        {/* Interactive pointer line */}
+        {pointerX !== null && (
+          <g>
+            <line
+              x1={pointerX}
+              y1={padding.top}
+              x2={pointerX}
+              y2={height - padding.bottom}
+              stroke="#ef4444"
+              strokeWidth="2"
+              strokeDasharray="5,5"
+            />
+            <circle
+              cx={pointerX}
+              cy={padding.top}
+              r="6"
+              fill="#ef4444"
+              stroke="white"
+              strokeWidth="2"
+              className="cursor-grab active:cursor-grabbing"
+            />
+          </g>
+        )}
 
         {/* Y-as labels */}
         {yLabels.map((label, i) => (
