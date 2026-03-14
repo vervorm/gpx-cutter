@@ -9,6 +9,7 @@ export interface Translations {
   step1Title: string;
   uploadPrompt: string;
   tryExample: string;
+  deleteRoute: string;
 
   // Preview
   previewTitle: string;
@@ -107,6 +108,7 @@ export const translations: Record<Language, Translations> = {
     step1Title: "Stap 1: Route Laden",
     uploadPrompt: "Tik om GPX bestand te kiezen",
     tryExample: "Probeer voorbeeld",
+    deleteRoute: "Wis route",
 
     previewTitle: "Route Preview",
     routeName: "Route naam:",
@@ -207,6 +209,7 @@ export const translations: Record<Language, Translations> = {
     step1Title: "Step 1: Load Route",
     uploadPrompt: "Click to choose GPX file",
     tryExample: "Try example",
+    deleteRoute: "Delete route",
 
     previewTitle: "Route Preview",
     routeName: "Route name:",
@@ -306,6 +309,7 @@ export const translations: Record<Language, Translations> = {
     step1Title: "Étape 1: Charger l'Itinéraire",
     uploadPrompt: "Cliquez pour choisir un fichier GPX",
     tryExample: "Essayer l'exemple",
+    deleteRoute: "Supprimer l'itinéraire",
 
     previewTitle: "Aperçu de l'Itinéraire",
     routeName: "Nom de l'itinéraire:",
@@ -406,6 +410,7 @@ export const translations: Record<Language, Translations> = {
     step1Title: "Paso 1: Cargar Ruta",
     uploadPrompt: "Haz clic para elegir archivo GPX",
     tryExample: "Probar ejemplo",
+    deleteRoute: "Eliminar ruta",
 
     previewTitle: "Vista Previa de la Ruta",
     routeName: "Nombre de la ruta:",
@@ -506,6 +511,7 @@ export const translations: Record<Language, Translations> = {
     step1Title: "Schritt 1: Route Laden",
     uploadPrompt: "Klicken Sie, um GPX-Datei auszuwählen",
     tryExample: "Beispiel testen",
+    deleteRoute: "Route löschen",
 
     previewTitle: "Routenvorschau",
     routeName: "Routenname:",
@@ -607,6 +613,7 @@ export const translations: Record<Language, Translations> = {
     step1Title: "Trinn 1: Last Inn Rute",
     uploadPrompt: "Klikk for å velge GPX-fil",
     tryExample: "Prøv eksempel",
+    deleteRoute: "Slett rute",
 
     previewTitle: "Ruteforhåndsvisning",
     routeName: "Rutenavn:",
@@ -707,6 +714,7 @@ export const translations: Record<Language, Translations> = {
     step1Title: "Passo 1: Carregar Rota",
     uploadPrompt: "Clique para escolher arquivo GPX",
     tryExample: "Experimentar exemplo",
+    deleteRoute: "Excluir rota",
 
     previewTitle: "Pré-visualização da Rota",
     routeName: "Nome da rota:",

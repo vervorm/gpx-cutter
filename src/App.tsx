@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useMemo } from 'react'
-import { UploadCloud, FileUp, CheckCircle, Settings, Download, Eye, Map, HelpCircle, ExternalLink, Heart, Code2, Github, MoreVertical, Minus, Plus } from 'lucide-react'
+import { UploadCloud, FileUp, CheckCircle, Settings, Download, Eye, Map, HelpCircle, ExternalLink, Heart, Code2, Github, MoreVertical, Minus, Plus, Trash2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Label } from '@/components/ui/label'
@@ -174,8 +174,23 @@ function App() {
 
   const handleLoadExample = () => {
     setFile(null)
-    loadXMLString(EXAMPLE_GPX, 'Voorbeeld Route: Oostende - Calais')
-    saveRoute(EXAMPLE_GPX, 'Voorbeeld Route: Oostende - Calais').catch(() => {})
+    loadXMLString(EXAMPLE_GPX, 'Voorbeeld Route: Oostende - Antwerpen')
+    saveRoute(EXAMPLE_GPX, 'Voorbeeld Route: Oostende - Antwerpen').catch(() => {})
+  }
+
+  const handleDeleteRoute = () => {
+    // Reset all state
+    setFile(null)
+    setCurrentXML(null)
+    setPreview(null)
+    setAllSegments([])
+    setSelectedSegmentIndex(null)
+    setStartFromKM(0)
+    setDistanceKM(100)
+    // Clear cached route
+    clearRoute().catch(() => {})
+    setHasCachedRoute(null)
+    showToast('Route gewist')
   }
 
   const handlePreview = () => {
@@ -414,10 +429,15 @@ function App() {
                   <CheckCircle className="w-4 h-4 text-primary shrink-0" />
                   <span className="truncate font-medium">{hasCachedRoute || file?.name}</span>
                 </div>
-                <Button size="sm" variant="outline" onClick={() => fileInputRef.current?.click()}>
-                  <FileUp className="w-4 h-4" />
-                  Andere route
-                </Button>
+                <div className="flex gap-2">
+                  <Button size="sm" variant="outline" onClick={() => fileInputRef.current?.click()}>
+                    <FileUp className="w-4 h-4" />
+                    Andere route
+                  </Button>
+                  <Button size="sm" variant="ghost" onClick={handleDeleteRoute} title={t.deleteRoute}>
+                    <Trash2 className="w-4 h-4 text-destructive" />
+                  </Button>
+                </div>
               </div>
             )}
 
