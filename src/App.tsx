@@ -449,7 +449,7 @@ function App() {
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end" className="w-64">
-                          <div className="p-2 space-y-2">
+                          <div className="p-2 space-y-3">
                             <Label htmlFor="maxDistance" className="text-xs text-muted-foreground">
                               Max afstand (km)
                             </Label>
@@ -465,20 +465,37 @@ function App() {
                                 onChange={(e) => {
                                   setMaxDistanceInput(e.target.value)
                                 }}
-                                onBlur={(e) => {
-                                  const value = parseInt(e.target.value, 10)
-                                  if (!isNaN(value) && value >= 10 && value <= 1000) {
-                                    setMaxDistanceSetting(value)
-                                    setMaxDistanceInput(value.toString())
-                                  } else {
-                                    // Reset to current setting if invalid
-                                    setMaxDistanceInput(maxDistanceSetting.toString())
+                                onKeyDown={(e) => {
+                                  if (e.key === 'Enter') {
+                                    const value = parseInt(maxDistanceInput, 10)
+                                    if (!isNaN(value) && value >= 10 && value <= 1000) {
+                                      setMaxDistanceSetting(value)
+                                      setMaxDistanceInput(value.toString())
+                                    } else {
+                                      setMaxDistanceInput(maxDistanceSetting.toString())
+                                    }
+                                    e.currentTarget.blur()
                                   }
                                 }}
                                 className="flex-1 px-3 py-2 text-sm border rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
                               />
                               <span className="text-xs text-muted-foreground">km</span>
                             </div>
+                            <Button
+                              onClick={() => {
+                                const value = parseInt(maxDistanceInput, 10)
+                                if (!isNaN(value) && value >= 10 && value <= 1000) {
+                                  setMaxDistanceSetting(value)
+                                  setMaxDistanceInput(value.toString())
+                                } else {
+                                  setMaxDistanceInput(maxDistanceSetting.toString())
+                                }
+                              }}
+                              className="w-full"
+                              size="sm"
+                            >
+                              Pas aan
+                            </Button>
                           </div>
                         </DropdownMenuContent>
                       </DropdownMenu>
