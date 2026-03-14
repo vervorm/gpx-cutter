@@ -1,11 +1,16 @@
 import { useState, useRef, useEffect, useMemo } from 'react'
-import { UploadCloud, FileUp, CheckCircle, Settings, Download, Eye, Map, HelpCircle, ExternalLink, Heart, Code2, Github } from 'lucide-react'
+import { UploadCloud, FileUp, CheckCircle, Settings, Download, Eye, Map, HelpCircle, ExternalLink, Heart, Code2, Github, MoreVertical } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Label } from '@/components/ui/label'
 import { Toast } from '@/components/ui/toast'
 import { IconSlider } from '@/components/ui/icon-slider'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
 import { processGPX, analyzeGPX, type GPXPreview, type GPXProcessResult } from '@/lib/gpx-utils'
 import { MapViewer } from '@/components/MapViewer'
 import { ElevationProfile } from '@/components/ElevationProfile'
@@ -427,13 +432,57 @@ function App() {
                 {/* Settings Card */}
                 <Card className="border-orange-200 bg-orange-50/50 dark:bg-orange-950/20">
                   <CardHeader>
-                    <CardTitle className="flex items-center gap-2 text-orange-900 dark:text-orange-100">
-                      <Settings className="w-5 h-5" />
-                      {t.step2Title}
-                    </CardTitle>
-                    <CardDescription>
-                      {t.step2Description}
-                    </CardDescription>
+                    <div className="flex items-start justify-between">
+                      <div className="flex-1">
+                        <CardTitle className="flex items-center gap-2 text-orange-900 dark:text-orange-100">
+                          <Settings className="w-5 h-5" />
+                          {t.step2Title}
+                        </CardTitle>
+                        <CardDescription>
+                          {t.step2Description}
+                        </CardDescription>
+                      </div>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                            <MoreVertical className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" className="w-64">
+                          <div className="p-2 space-y-2">
+                            <Label htmlFor="maxDistance" className="text-xs text-muted-foreground">
+                              Max afstand (km)
+                            </Label>
+                            <div className="flex items-center gap-2">
+                              <input
+                                id="maxDistance"
+                                type="number"
+                                min={10}
+                                max={1000}
+                                step={10}
+                                value={maxDistanceInput}
+                                onFocus={(e) => e.target.select()}
+                                onChange={(e) => {
+                                  setMaxDistanceInput(e.target.value)
+                                }}
+                                onBlur={(e) => {
+                                  const value = parseInt(e.target.value, 10)
+                                  if (!isNaN(value) && value >= 10 && value <= 1000) {
+                                    setMaxDistanceSetting(value)
+                                    setMaxDistanceInput(value.toString())
+                                  } else {
+                                    // Reset to current setting if invalid
+                                    setMaxDistanceInput(maxDistanceSetting.toString())
+                                  }
+                                }}
+                                className="flex-1 px-3 py-2 text-sm border rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+                              />
+                              <span className="text-xs text-muted-foreground">km</span>
+                            </div>
+                          </div>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </div>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <div className="space-y-2">
@@ -464,35 +513,6 @@ function App() {
                         value={distanceKM}
                         onValueChange={setDistanceKM}
                       />
-                    </div>
-
-                    <div className="pt-2 border-t border-orange-200/50">
-                      <div className="flex items-center justify-between gap-3">
-                        <Label htmlFor="maxDistance" className="text-xs text-muted-foreground">Max afstand (km)</Label>
-                        <input
-                          id="maxDistance"
-                          type="number"
-                          min={10}
-                          max={1000}
-                          step={10}
-                          value={maxDistanceInput}
-                          onFocus={(e) => e.target.select()}
-                          onChange={(e) => {
-                            setMaxDistanceInput(e.target.value)
-                          }}
-                          onBlur={(e) => {
-                            const value = parseInt(e.target.value, 10)
-                            if (!isNaN(value) && value >= 10 && value <= 1000) {
-                              setMaxDistanceSetting(value)
-                              setMaxDistanceInput(value.toString())
-                            } else {
-                              // Reset to current setting if invalid
-                              setMaxDistanceInput(maxDistanceSetting.toString())
-                            }
-                          }}
-                          className="w-20 px-2 py-1 text-sm border rounded focus:outline-none focus:ring-2 focus:ring-primary"
-                        />
-                      </div>
                     </div>
 
                     {/* Elevation Profile for selected segment */}
