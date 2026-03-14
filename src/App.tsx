@@ -49,6 +49,7 @@ function App() {
     const saved = localStorage.getItem('maxDistanceSetting')
     return saved || '250'
   })
+  const [settingsOpen, setSettingsOpen] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   // Laad route automatisch bij opstarten als er iets in IndexedDB staat
@@ -442,7 +443,7 @@ function App() {
                           {t.step2Description}
                         </CardDescription>
                       </div>
-                      <DropdownMenu>
+                      <DropdownMenu open={settingsOpen} onOpenChange={setSettingsOpen}>
                         <DropdownMenuTrigger asChild>
                           <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
                             <MoreVertical className="h-4 w-4" />
@@ -474,7 +475,7 @@ function App() {
                                     } else {
                                       setMaxDistanceInput(maxDistanceSetting.toString())
                                     }
-                                    e.currentTarget.blur()
+                                    setSettingsOpen(false)
                                   }
                                 }}
                                 className="flex-1 px-3 py-2 text-sm border rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
@@ -490,6 +491,7 @@ function App() {
                                 } else {
                                   setMaxDistanceInput(maxDistanceSetting.toString())
                                 }
+                                setSettingsOpen(false)
                               }}
                               className="w-full"
                               size="sm"
