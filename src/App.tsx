@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useMemo } from 'react'
-import { UploadCloud, FileUp, CheckCircle, Settings, Download, Eye, Map, HelpCircle, ExternalLink, Heart, Code2, Github, MoreVertical } from 'lucide-react'
+import { UploadCloud, FileUp, CheckCircle, Settings, Download, Eye, Map, HelpCircle, ExternalLink, Heart, Code2, Github, MoreVertical, Minus, Plus } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Label } from '@/components/ui/label'
@@ -450,38 +450,45 @@ function App() {
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end" className="w-64">
-                          <div className="p-2 space-y-3">
-                            <Label htmlFor="maxDistance" className="text-xs text-muted-foreground">
-                              Max afstand (km)
+                          <div className="p-3 space-y-3">
+                            <Label htmlFor="maxDistance" className="text-sm font-semibold">
+                              Max afstand
                             </Label>
-                            <div className="flex items-center gap-2">
-                              <input
-                                id="maxDistance"
-                                type="number"
-                                min={10}
-                                max={1000}
-                                step={10}
-                                value={maxDistanceInput}
-                                onFocus={(e) => e.target.select()}
-                                onChange={(e) => {
-                                  setMaxDistanceInput(e.target.value)
+
+                            {/* Plus/Minus Spinner */}
+                            <div className="flex items-center justify-center gap-3 bg-muted/50 rounded-full p-2">
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-10 w-10 rounded-full hover:bg-background"
+                                onClick={() => {
+                                  const currentValue = parseInt(maxDistanceInput, 10)
+                                  const newValue = Math.max(10, currentValue - 10)
+                                  setMaxDistanceInput(newValue.toString())
                                 }}
-                                onKeyDown={(e) => {
-                                  if (e.key === 'Enter') {
-                                    const value = parseInt(maxDistanceInput, 10)
-                                    if (!isNaN(value) && value >= 10 && value <= 1000) {
-                                      setMaxDistanceSetting(value)
-                                      setMaxDistanceInput(value.toString())
-                                    } else {
-                                      setMaxDistanceInput(maxDistanceSetting.toString())
-                                    }
-                                    setSettingsOpen(false)
-                                  }
+                              >
+                                <Minus className="h-4 w-4" />
+                              </Button>
+
+                              <div className="flex items-center gap-1 min-w-[80px] justify-center">
+                                <span className="text-2xl font-bold">{maxDistanceInput}</span>
+                                <span className="text-sm text-muted-foreground">km</span>
+                              </div>
+
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-10 w-10 rounded-full hover:bg-background"
+                                onClick={() => {
+                                  const currentValue = parseInt(maxDistanceInput, 10)
+                                  const newValue = Math.min(1000, currentValue + 10)
+                                  setMaxDistanceInput(newValue.toString())
                                 }}
-                                className="flex-1 px-3 py-2 text-sm border rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
-                              />
-                              <span className="text-xs text-muted-foreground">km</span>
+                              >
+                                <Plus className="h-4 w-4" />
+                              </Button>
                             </div>
+
                             <Button
                               onClick={() => {
                                 const value = parseInt(maxDistanceInput, 10)
