@@ -152,14 +152,14 @@ export const translations: Record<Language, Translations> = {
 
     howItWorksTitle: "Hoe werkt dit?",
     howItWorksStep1:
-      "Upload je GPX bestand van je GPS apparaat, Komoot, Strava of andere app.",
+      "Upload je GPX bestand. De route wordt automatisch geanalyseerd en getoond met kaart én hoogteprofiel.",
     howItWorksStep2:
-      "De route wordt automatisch geanalyseerd en op de kaart getoond.",
+      "Beweeg over het hoogteprofiel of kaart om hoogte en inclinatie te zien. Sleep de marker om je segment aan te passen.",
     howItWorksStep3:
-      "Gebruik de sliders om je gewenste segment te kiezen - zie het direct op de kaart!",
-    howItWorksStep4: 'Klik op "Genereer Segmenten" om meerdere delen te maken.',
+      "Gebruik de sliders of sleep de start/einde markers op de kaart. Pas max afstand aan via het instellingen menu (⋮).",
+    howItWorksStep4: 'Klik "Genereer Segmenten" om je route in 2 of 3 delen te splitsen.',
     howItWorksStep5:
-      "Klik op een segment om het als GPX bestand te downloaden.",
+      "Download elk segment als GPX bestand - klaar voor je GPS apparaat!",
 
     aboutTitle: "Over dit project",
     aboutWhyTitle: "Waarom deze tool?",
@@ -251,13 +251,14 @@ export const translations: Record<Language, Translations> = {
 
     howItWorksTitle: "How does it work?",
     howItWorksStep1:
-      "Upload your GPX file from your GPS device, Komoot, Strava or other app.",
+      "Upload your GPX file. The route is automatically analyzed and displayed with map and elevation profile.",
     howItWorksStep2:
-      "The route is automatically analyzed and displayed on the map.",
+      "Hover over the elevation profile or map to see elevation and slope. Drag the marker to adjust your segment.",
     howItWorksStep3:
-      "Use the sliders to choose your desired segment - see it immediately on the map!",
-    howItWorksStep4: 'Click "Generate Segments" to create multiple parts.',
-    howItWorksStep5: "Click on a segment to download it as a GPX file.",
+      "Use the sliders or drag start/end markers on the map. Adjust max distance via the settings menu (⋮).",
+    howItWorksStep4: 'Click "Generate Segments" to split your route into 2 or 3 parts.',
+    howItWorksStep5:
+      "Download each segment as a GPX file - ready for your GPS device!",
 
     aboutTitle: "About this project",
     aboutWhyTitle: "Why this tool?",
@@ -348,15 +349,15 @@ export const translations: Record<Language, Translations> = {
 
     howItWorksTitle: "Comment ça marche ?",
     howItWorksStep1:
-      "Téléchargez votre fichier GPX depuis votre appareil GPS, Komoot, Strava ou autre application.",
+      "Téléchargez votre fichier GPX. L'itinéraire est automatiquement analysé et affiché avec carte et profil d'altitude.",
     howItWorksStep2:
-      "L'itinéraire est automatiquement analysé et affiché sur la carte.",
+      "Survolez le profil d'altitude ou la carte pour voir l'altitude et la pente. Déplacez le marqueur pour ajuster votre segment.",
     howItWorksStep3:
-      "Utilisez les curseurs pour choisir votre segment - voyez-le immédiatement sur la carte !",
+      "Utilisez les curseurs ou déplacez les marqueurs de début/fin sur la carte. Ajustez la distance max via le menu des paramètres (⋮).",
     howItWorksStep4:
-      'Cliquez sur "Générer des Segments" pour créer plusieurs parties.',
+      'Cliquez sur "Générer des Segments" pour diviser votre itinéraire en 2 ou 3 parties.',
     howItWorksStep5:
-      "Cliquez sur un segment pour le télécharger en tant que fichier GPX.",
+      "Téléchargez chaque segment en tant que fichier GPX - prêt pour votre appareil GPS !",
 
     aboutTitle: "À propos de ce projet",
     aboutWhyTitle: "Pourquoi cet outil ?",
@@ -447,15 +448,15 @@ export const translations: Record<Language, Translations> = {
 
     howItWorksTitle: "¿Cómo funciona?",
     howItWorksStep1:
-      "Sube tu archivo GPX desde tu dispositivo GPS, Komoot, Strava u otra aplicación.",
+      "Sube tu archivo GPX. La ruta se analiza automáticamente y se muestra con mapa y perfil de altitud.",
     howItWorksStep2:
-      "La ruta se analiza automáticamente y se muestra en el mapa.",
+      "Pasa el cursor sobre el perfil de altitud o el mapa para ver la altitud y la pendiente. Arrastra el marcador para ajustar tu segmento.",
     howItWorksStep3:
-      "¡Usa los deslizadores para elegir tu segmento - vélo inmediatamente en el mapa!",
+      "Usa los deslizadores o arrastra los marcadores de inicio/fin en el mapa. Ajusta la distancia máxima a través del menú de configuración (⋮).",
     howItWorksStep4:
-      'Haz clic en "Generar Segmentos" para crear varias partes.',
+      'Haz clic en "Generar Segmentos" para dividir tu ruta en 2 o 3 partes.',
     howItWorksStep5:
-      "Haz clic en un segmento para descargarlo como archivo GPX.",
+      "¡Descarga cada segmento como archivo GPX - listo para tu dispositivo GPS!",
 
     aboutTitle: "Sobre este proyecto",
     aboutWhyTitle: "¿Por qué esta herramienta?",
@@ -546,15 +547,15 @@ export const translations: Record<Language, Translations> = {
 
     howItWorksTitle: "Wie funktioniert es?",
     howItWorksStep1:
-      "Laden Sie Ihre GPX-Datei von Ihrem GPS-Gerät, Komoot, Strava oder einer anderen App hoch.",
+      "Laden Sie Ihre GPX-Datei hoch. Die Route wird automatisch analysiert und mit Karte und Höhenprofil angezeigt.",
     howItWorksStep2:
-      "Die Route wird automatisch analysiert und auf der Karte angezeigt.",
+      "Fahren Sie mit der Maus über das Höhenprofil oder die Karte, um Höhe und Steigung zu sehen. Ziehen Sie den Marker, um Ihr Segment anzupassen.",
     howItWorksStep3:
-      "Verwenden Sie die Schieberegler, um Ihr Segment zu wählen - sehen Sie es sofort auf der Karte!",
+      "Verwenden Sie die Schieberegler oder ziehen Sie Start-/Endmarker auf der Karte. Passen Sie die max. Distanz über das Einstellungsmenü (⋮) an.",
     howItWorksStep4:
-      'Klicken Sie auf "Segmente Generieren", um mehrere Teile zu erstellen.',
+      'Klicken Sie auf "Segmente Generieren", um Ihre Route in 2 oder 3 Teile zu teilen.',
     howItWorksStep5:
-      "Klicken Sie auf ein Segment, um es als GPX-Datei herunterzuladen.",
+      "Laden Sie jedes Segment als GPX-Datei herunter - bereit für Ihr GPS-Gerät!",
 
     aboutTitle: "Über dieses Projekt",
     aboutWhyTitle: "Warum dieses Tool?",
@@ -646,12 +647,15 @@ export const translations: Record<Language, Translations> = {
 
     howItWorksTitle: "Hvordan fungerer det?",
     howItWorksStep1:
-      "Last opp din GPX-fil fra GPS-enheten, Komoot, Strava eller annen app.",
-    howItWorksStep2: "Ruten analyseres automatisk og vises på kartet.",
+      "Last opp din GPX-fil. Ruten analyseres automatisk og vises med kart og høydeprofil.",
+    howItWorksStep2:
+      "Hold musepekeren over høydeprofilen eller kartet for å se høyde og stigning. Dra markøren for å justere segmentet ditt.",
     howItWorksStep3:
-      "Bruk glidebrytere for å velge ditt segment - se det umiddelbart på kartet!",
-    howItWorksStep4: 'Klikk på "Generer Segmenter" for å lage flere deler.',
-    howItWorksStep5: "Klikk på et segment for å laste det ned som en GPX-fil.",
+      "Bruk glidebrytere eller dra start-/sluttmarkører på kartet. Juster maks avstand via innstillingsmenyen (⋮).",
+    howItWorksStep4:
+      'Klikk på "Generer Segmenter" for å dele ruten din i 2 eller 3 deler.',
+    howItWorksStep5:
+      "Last ned hvert segment som en GPX-fil - klar for GPS-enheten din!",
 
     aboutTitle: "Om dette prosjektet",
     aboutWhyTitle: "Hvorfor dette verktøyet?",
@@ -742,12 +746,15 @@ export const translations: Record<Language, Translations> = {
 
     howItWorksTitle: "Como funciona?",
     howItWorksStep1:
-      "Carregue seu arquivo GPX do seu dispositivo GPS, Komoot, Strava ou outro aplicativo.",
-    howItWorksStep2: "A rota é automaticamente analisada e exibida no mapa.",
+      "Carregue seu arquivo GPX. A rota é automaticamente analisada e exibida com mapa e perfil de elevação.",
+    howItWorksStep2:
+      "Passe o cursor sobre o perfil de elevação ou mapa para ver elevação e inclinação. Arraste o marcador para ajustar seu segmento.",
     howItWorksStep3:
-      "Use os controles deslizantes para escolher seu segmento - veja-o imediatamente no mapa!",
-    howItWorksStep4: 'Clique em "Gerar Segmentos" para criar várias partes.',
-    howItWorksStep5: "Clique em um segmento para baixá-lo como arquivo GPX.",
+      "Use os controles deslizantes ou arraste marcadores de início/fim no mapa. Ajuste a distância máxima através do menu de configurações (⋮).",
+    howItWorksStep4:
+      'Clique em "Gerar Segmentos" para dividir sua rota em 2 ou 3 partes.',
+    howItWorksStep5:
+      "Baixe cada segmento como arquivo GPX - pronto para seu dispositivo GPS!",
 
     aboutTitle: "Sobre este projeto",
     aboutWhyTitle: "Por que esta ferramenta?",
