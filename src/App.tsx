@@ -7,10 +7,12 @@ import { Toast } from '@/components/ui/toast'
 import { IconSlider } from '@/components/ui/icon-slider'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog'
 import { processGPX, analyzeGPX, type GPXPreview, type GPXProcessResult } from '@/lib/gpx-utils'
 import { MapViewer } from '@/components/MapViewer'
 import { ElevationProfile } from '@/components/ElevationProfile'
@@ -443,49 +445,48 @@ function App() {
                           {t.step2Description}
                         </CardDescription>
                       </div>
-                      <DropdownMenu open={settingsOpen} onOpenChange={setSettingsOpen}>
-                        <DropdownMenuTrigger asChild>
+                      <Dialog open={settingsOpen} onOpenChange={setSettingsOpen}>
+                        <DialogTrigger asChild>
                           <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
                             <MoreVertical className="h-4 w-4" />
                           </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="w-64">
-                          <div className="p-3 space-y-3">
-                            <Label htmlFor="maxDistance" className="text-sm font-semibold">
-                              Max afstand
-                            </Label>
-
+                        </DialogTrigger>
+                        <DialogContent className="sm:max-w-md">
+                          <DialogHeader>
+                            <DialogTitle>Max afstand instellen</DialogTitle>
+                          </DialogHeader>
+                          <div className="space-y-6 py-4">
                             {/* Plus/Minus Spinner */}
-                            <div className="flex items-center justify-center gap-3 bg-muted/50 rounded-full p-2">
+                            <div className="flex items-center justify-center gap-4 bg-muted/50 rounded-full p-3">
                               <Button
                                 variant="ghost"
                                 size="icon"
-                                className="h-10 w-10 rounded-full hover:bg-background"
+                                className="h-12 w-12 rounded-full hover:bg-background"
                                 onClick={() => {
                                   const currentValue = parseInt(maxDistanceInput, 10)
                                   const newValue = Math.max(10, currentValue - 10)
                                   setMaxDistanceInput(newValue.toString())
                                 }}
                               >
-                                <Minus className="h-4 w-4" />
+                                <Minus className="h-5 w-5" />
                               </Button>
 
-                              <div className="flex items-center gap-1 min-w-[80px] justify-center">
-                                <span className="text-2xl font-bold">{maxDistanceInput}</span>
-                                <span className="text-sm text-muted-foreground">km</span>
+                              <div className="flex items-center gap-2 min-w-[100px] justify-center">
+                                <span className="text-3xl font-bold">{maxDistanceInput}</span>
+                                <span className="text-lg text-muted-foreground">km</span>
                               </div>
 
                               <Button
                                 variant="ghost"
                                 size="icon"
-                                className="h-10 w-10 rounded-full hover:bg-background"
+                                className="h-12 w-12 rounded-full hover:bg-background"
                                 onClick={() => {
                                   const currentValue = parseInt(maxDistanceInput, 10)
                                   const newValue = Math.min(1000, currentValue + 10)
                                   setMaxDistanceInput(newValue.toString())
                                 }}
                               >
-                                <Plus className="h-4 w-4" />
+                                <Plus className="h-5 w-5" />
                               </Button>
                             </div>
 
@@ -501,13 +502,12 @@ function App() {
                                 setSettingsOpen(false)
                               }}
                               className="w-full"
-                              size="sm"
                             >
                               Pas aan
                             </Button>
                           </div>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
+                        </DialogContent>
+                      </Dialog>
                     </div>
                   </CardHeader>
                   <CardContent className="space-y-4">
