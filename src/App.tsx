@@ -19,6 +19,7 @@ import { ElevationProfile } from '@/components/ElevationProfile'
 import { Language, getTranslations } from '@/lib/i18n'
 import { LanguageSelector } from '@/components/LanguageSelector'
 import { saveRoute, loadRoute, clearRoute } from '@/lib/route-cache'
+import { EXAMPLE_GPX } from '@/data/example-route'
 
 const APP_VERSION = '1.1.0'
 
@@ -169,6 +170,12 @@ function App() {
     setPreview(null)
     setAllSegments([])
     setSelectedSegmentIndex(null)
+  }
+
+  const handleLoadExample = () => {
+    setFile(null)
+    loadXMLString(EXAMPLE_GPX, 'Voorbeeld Route: Oostende - Calais')
+    saveRoute(EXAMPLE_GPX, 'Voorbeeld Route: Oostende - Calais').catch(() => {})
   }
 
   const handlePreview = () => {
@@ -365,12 +372,29 @@ function App() {
                     </div>
                   )}
 
-                  <div
-                    className="relative border-2 border-dashed border-border rounded-xl p-8 text-center hover:bg-accent/50 transition-colors cursor-pointer"
-                    onClick={() => fileInputRef.current?.click()}
-                  >
-                    <FileUp className="w-8 h-8 mx-auto text-muted-foreground mb-2" />
-                    <p className="text-sm text-muted-foreground">{t.uploadPrompt}</p>
+                  <div className="space-y-3">
+                    <div
+                      className="relative border-2 border-dashed border-border rounded-xl p-8 text-center hover:bg-accent/50 transition-colors cursor-pointer"
+                      onClick={() => fileInputRef.current?.click()}
+                    >
+                      <FileUp className="w-8 h-8 mx-auto text-muted-foreground mb-2" />
+                      <p className="text-sm text-muted-foreground">{t.uploadPrompt}</p>
+                    </div>
+
+                    <div className="flex items-center gap-3">
+                      <div className="flex-1 border-t border-border"></div>
+                      <span className="text-xs text-muted-foreground uppercase">of</span>
+                      <div className="flex-1 border-t border-border"></div>
+                    </div>
+
+                    <Button
+                      onClick={handleLoadExample}
+                      variant="outline"
+                      className="w-full"
+                    >
+                      <Eye className="w-4 h-4 mr-2" />
+                      {t.tryExample}
+                    </Button>
                   </div>
 
                   {file && (
