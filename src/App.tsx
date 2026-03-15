@@ -473,88 +473,124 @@ function App() {
               </Card>
             )}
 
-            {/* Step 2: Settings and Map - Side by side on desktop */}
+            {/*
+              ============================================================
+              STEP 2: UNIFIED CARD - id: unified-settings-map-segments-card
+              ============================================================
+              Dit is de volledig gecombineerde card die ALLE onderdelen bevat:
+              1. Segment selectie sliders (start positie en afstand)
+              2. De interactieve kaart met route visualisatie
+              3. Het hoogteprofiel onder de kaart
+              4. De "Genereer segmenten" knop
+              5. Het grid met alle gegenereerde segmenten
+
+              Voorheen waren dit 2 aparte cards (Settings en Map), nu samengevoegd
+            */}
             {preview && (
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                {/* Settings Card */}
-                <Card className="border-orange-200 bg-orange-50/50 dark:bg-orange-950/20">
-                  <CardHeader>
-                    <div className="flex items-start justify-between">
-                      <div className="flex-1">
-                        <CardTitle className="flex items-center gap-2 text-orange-900 dark:text-orange-100">
-                          <Settings className="w-5 h-5" />
-                          {t.step2Title}
-                        </CardTitle>
-                        <CardDescription>
-                          {t.step2Description}
-                        </CardDescription>
-                      </div>
-                      <Dialog open={settingsOpen} onOpenChange={setSettingsOpen}>
-                        <DialogTrigger asChild>
-                          <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                            <MoreVertical className="h-4 w-4" />
-                          </Button>
-                        </DialogTrigger>
-                        <DialogContent className="sm:max-w-md">
-                          <DialogHeader>
-                            <DialogTitle>Max afstand instellen</DialogTitle>
-                          </DialogHeader>
-                          <div className="space-y-6 py-4">
-                            {/* Plus/Minus Spinner */}
-                            <div className="flex items-center justify-center gap-4 bg-muted/50 rounded-full p-3">
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                className="h-12 w-12 rounded-full hover:bg-background"
-                                onClick={() => {
-                                  const currentValue = parseInt(maxDistanceInput, 10)
-                                  const newValue = Math.max(10, currentValue - 10)
-                                  setMaxDistanceInput(newValue.toString())
-                                }}
-                              >
-                                <Minus className="h-5 w-5" />
-                              </Button>
+              <Card
+                id="unified-settings-map-segments-card"
+                className="border-amber-200 bg-amber-50/50 dark:bg-amber-950/20"
+              >
+                <CardHeader>
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1">
+                      <CardTitle className="flex items-center gap-2 text-amber-900 dark:text-amber-100">
+                        <Map className="w-5 h-5" />
+                        {t.mapTitle}
+                      </CardTitle>
+                      <CardDescription>
+                        {t.mapDescription}
+                      </CardDescription>
+                    </div>
+                    {/*
+                      Settings dialog voor max afstand aanpassen
+                      - Bereikbaar via MoreVertical icon
+                      - Bevat plus/minus spinner voor eenvoudige aanpassing
+                    */}
+                    <Dialog open={settingsOpen} onOpenChange={setSettingsOpen}>
+                      <DialogTrigger asChild>
+                        <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                          <MoreVertical className="h-4 w-4" />
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent className="sm:max-w-md">
+                        <DialogHeader>
+                          <DialogTitle>Max afstand instellen</DialogTitle>
+                        </DialogHeader>
+                        <div className="space-y-6 py-4">
+                          {/* Plus/Minus Spinner voor max afstand */}
+                          <div className="flex items-center justify-center gap-4 bg-muted/50 rounded-full p-3">
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-12 w-12 rounded-full hover:bg-background"
+                              onClick={() => {
+                                const currentValue = parseInt(maxDistanceInput, 10)
+                                const newValue = Math.max(10, currentValue - 10)
+                                setMaxDistanceInput(newValue.toString())
+                              }}
+                            >
+                              <Minus className="h-5 w-5" />
+                            </Button>
 
-                              <div className="flex items-center gap-2 min-w-[100px] justify-center">
-                                <span className="text-3xl font-bold">{maxDistanceInput}</span>
-                                <span className="text-lg text-muted-foreground">km</span>
-                              </div>
-
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                className="h-12 w-12 rounded-full hover:bg-background"
-                                onClick={() => {
-                                  const currentValue = parseInt(maxDistanceInput, 10)
-                                  const newValue = Math.min(1000, currentValue + 10)
-                                  setMaxDistanceInput(newValue.toString())
-                                }}
-                              >
-                                <Plus className="h-5 w-5" />
-                              </Button>
+                            <div className="flex items-center gap-2 min-w-[100px] justify-center">
+                              <span className="text-3xl font-bold">{maxDistanceInput}</span>
+                              <span className="text-lg text-muted-foreground">km</span>
                             </div>
 
                             <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-12 w-12 rounded-full hover:bg-background"
                               onClick={() => {
-                                const value = parseInt(maxDistanceInput, 10)
-                                if (!isNaN(value) && value >= 10 && value <= 1000) {
-                                  setMaxDistanceSetting(value)
-                                  setMaxDistanceInput(value.toString())
-                                } else {
-                                  setMaxDistanceInput(maxDistanceSetting.toString())
-                                }
-                                setSettingsOpen(false)
+                                const currentValue = parseInt(maxDistanceInput, 10)
+                                const newValue = Math.min(1000, currentValue + 10)
+                                setMaxDistanceInput(newValue.toString())
                               }}
-                              className="w-full"
                             >
-                              Pas aan
+                              <Plus className="h-5 h-5" />
                             </Button>
                           </div>
-                        </DialogContent>
-                      </Dialog>
-                    </div>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
+
+                          <Button
+                            onClick={() => {
+                              const value = parseInt(maxDistanceInput, 10)
+                              if (!isNaN(value) && value >= 10 && value <= 1000) {
+                                setMaxDistanceSetting(value)
+                                setMaxDistanceInput(value.toString())
+                              } else {
+                                setMaxDistanceInput(maxDistanceSetting.toString())
+                              }
+                              setSettingsOpen(false)
+                            }}
+                            className="w-full"
+                          >
+                            Pas aan
+                          </Button>
+                        </div>
+                      </DialogContent>
+                    </Dialog>
+                  </div>
+                </CardHeader>
+
+                {/*
+                  CardContent met vertical spacing tussen alle onderdelen
+                  space-y-4 zorgt voor 1rem (16px) ruimte tussen child elementen
+                */}
+                <CardContent className="space-y-4">
+
+                  {/*
+                    ============================================================
+                    SEGMENT SELECTIE SLIDERS - id: segment-selection-sliders
+                    ============================================================
+                    Twee sliders voor het aanpassen van het geselecteerde segment:
+                    1. Start positie slider (0 tot max-10 km)
+                    2. Afstand slider (10 tot max beschikbare afstand)
+
+                    Deze sliders synchroniseren met de markers op de kaart
+                  */}
+                  <div id="segment-selection-sliders" className="space-y-4">
+                    {/* Start positie slider */}
                     <div className="space-y-2">
                       <div className="flex justify-between items-center">
                         <Label htmlFor="startFromKM" className="text-sm">{t.startFromLabel}</Label>
@@ -570,6 +606,7 @@ function App() {
                       />
                     </div>
 
+                    {/* Afstand slider */}
                     <div className="space-y-2">
                       <div className="flex justify-between items-center">
                         <Label htmlFor="distanceKM" className="text-sm">{t.distanceLabel}</Label>
@@ -584,109 +621,75 @@ function App() {
                         onValueChange={setDistanceKM}
                       />
                     </div>
-
-                  </CardContent>
-                </Card>
-
-                {/*
-                  ============================================================
-                  MAP CARD - id: map-and-segments-card
-                  ============================================================
-                  Dit is de gecombineerde kaart die de volgende onderdelen bevat:
-                  1. De interactieve kaart met route visualisatie
-                  2. Het hoogteprofiel onder de kaart
-                  3. De "Genereer segmenten" knop
-                  4. Het grid met alle gegenereerde segmenten
-
-                  Deze card blijft "sticky" op desktop (lg:sticky lg:top-4)
-                */}
-                <Card
-                  id="map-and-segments-card"
-                  className="border-amber-200 bg-amber-50/50 dark:bg-amber-950/20 h-fit lg:sticky lg:top-4"
-                >
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2 text-amber-900 dark:text-amber-100">
-                      <Map className="w-5 h-5" />
-                      {t.mapTitle}
-                    </CardTitle>
-                    <CardDescription>
-                      {t.mapDescription}
-                    </CardDescription>
-                  </CardHeader>
+                  </div>
 
                   {/*
-                    CardContent met vertical spacing tussen alle onderdelen
-                    space-y-4 zorgt voor 1rem (16px) ruimte tussen child elementen
+                    ============================================================
+                    MAP VIEWER CONTAINER - id: map-viewer-container
+                    ============================================================
+                    Container voor de interactieve kaart met responsive heights:
+                    - Mobile: 400px
+                    - Tablet (md): 500px
+                    - Desktop (lg): 600px
                   */}
-                  <CardContent className="space-y-4">
-
+                  <div
+                    id="map-viewer-container"
+                    className="h-[400px] md:h-[500px] lg:h-[600px]"
+                  >
                     {/*
-                      ============================================================
-                      MAP VIEWER CONTAINER - id: map-viewer-container
-                      ============================================================
-                      Container voor de interactieve kaart met responsive heights:
-                      - Mobile: 400px
-                      - Tablet (md): 500px
-                      - Desktop (lg): 600px
+                      MapViewer component toont de route op een Leaflet kaart
+                      - allPoints: alle punten van de originele route
+                      - selectedPoints: geselecteerde punten voor het huidige segment
+                      - startKm/endKm: start en eind positie van het segment
+                      - onStartKmChange/onDistanceChange: callbacks voor het aanpassen van segment via markers
+                      - pointerKm: positie van de pointer op het hoogteprofiel (sync met kaart)
+                      - elevationProfile: het hoogteprofiel element dat in fullscreen getoond wordt
                     */}
-                    <div
-                      id="map-viewer-container"
-                      className="h-[400px] md:h-[500px] lg:h-[600px]"
-                    >
-                      {/*
-                        MapViewer component toont de route op een Leaflet kaart
-                        - allPoints: alle punten van de originele route
-                        - selectedPoints: geselecteerde punten voor het huidige segment
-                        - startKm/endKm: start en eind positie van het segment
-                        - onStartKmChange/onDistanceChange: callbacks voor het aanpassen van segment via markers
-                        - pointerKm: positie van de pointer op het hoogteprofiel (sync met kaart)
-                        - elevationProfile: het hoogteprofiel element dat in fullscreen getoond wordt
-                      */}
-                      <MapViewer
-                        allPoints={preview.allPoints}
-                        selectedPoints={liveSegment?.selectedPoints}
-                        startKm={startFromKM}
-                        endKm={startFromKM + distanceKM}
-                        onStartKmChange={(km) => {
-                          // Voorkom dat start positie verder gaat dan totale afstand - 10km
-                          // We hebben minimaal 10km nodig voor een segment
-                          const maxStart = Math.floor(preview.totalDistance - 10)
-                          const newStart = Math.max(0, Math.min(km, maxStart))
-                          setStartFromKM(newStart)
-                        }}
-                        onDistanceChange={(km) => {
-                          // Voorkom dat afstand groter is dan beschikbare afstand vanaf start punt
-                          const maxDistance = Math.floor(preview.totalDistance - startFromKM)
-                          const newDistance = Math.max(10, Math.min(km, maxDistance))
-                          setDistanceKM(newDistance)
-                        }}
-                        pointerKm={pointerKm}
-                        onPointerKmChange={setPointerKm}
-                        elevationProfile={
-                          // Conditionally render het hoogteprofiel als er een segment is met elevation data
-                          liveSegment && liveSegment.selectedPoints.length > 0 && liveSegment.elevation ? (
-                            <div className="p-3 bg-white dark:bg-gray-800 rounded-lg border-2 border-amber-200">
-                              <ElevationProfile
-                                points={liveSegment.selectedPoints}
-                                startKm={startFromKM}
-                                className="w-full"
-                                pointerKm={pointerKm}
-                                onPointerKmChange={setPointerKm}
-                              />
-                            </div>
-                          ) : undefined
-                        }
-                        translations={{
-                          openFullscreen: t.openFullscreen,
-                          closeFullscreen: t.closeFullscreen,
-                          startMarker: t.startMarker,
-                          endMarker: t.endMarker,
-                          pointerMarker: 'Positie',
-                          noRouteData: t.noRouteData,
-                          dragToAdjust: t.dragToAdjust,
-                        }}
-                      />
-                    </div>
+                    <MapViewer
+                      allPoints={preview.allPoints}
+                      selectedPoints={liveSegment?.selectedPoints}
+                      startKm={startFromKM}
+                      endKm={startFromKM + distanceKM}
+                      onStartKmChange={(km) => {
+                        // Voorkom dat start positie verder gaat dan totale afstand - 10km
+                        // We hebben minimaal 10km nodig voor een segment
+                        const maxStart = Math.floor(preview.totalDistance - 10)
+                        const newStart = Math.max(0, Math.min(km, maxStart))
+                        setStartFromKM(newStart)
+                      }}
+                      onDistanceChange={(km) => {
+                        // Voorkom dat afstand groter is dan beschikbare afstand vanaf start punt
+                        const maxDistance = Math.floor(preview.totalDistance - startFromKM)
+                        const newDistance = Math.max(10, Math.min(km, maxDistance))
+                        setDistanceKM(newDistance)
+                      }}
+                      pointerKm={pointerKm}
+                      onPointerKmChange={setPointerKm}
+                      elevationProfile={
+                        // Conditionally render het hoogteprofiel als er een segment is met elevation data
+                        liveSegment && liveSegment.selectedPoints.length > 0 && liveSegment.elevation ? (
+                          <div className="p-3 bg-white dark:bg-gray-800 rounded-lg border-2 border-amber-200">
+                            <ElevationProfile
+                              points={liveSegment.selectedPoints}
+                              startKm={startFromKM}
+                              className="w-full"
+                              pointerKm={pointerKm}
+                              onPointerKmChange={setPointerKm}
+                            />
+                          </div>
+                        ) : undefined
+                      }
+                      translations={{
+                        openFullscreen: t.openFullscreen,
+                        closeFullscreen: t.closeFullscreen,
+                        startMarker: t.startMarker,
+                        endMarker: t.endMarker,
+                        pointerMarker: 'Positie',
+                        noRouteData: t.noRouteData,
+                        dragToAdjust: t.dragToAdjust,
+                      }}
+                    />
+                  </div>
 
                     {/*
                       ============================================================
@@ -812,7 +815,6 @@ function App() {
                     )}
                   </CardContent>
                 </Card>
-              </div>
             )}
 
             {/* Help Section */}
