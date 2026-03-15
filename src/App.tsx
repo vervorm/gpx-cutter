@@ -1,17 +1,25 @@
 import { useState, useRef, useEffect, useMemo } from 'react'
-import { UploadCloud, FileUp, CheckCircle, Settings, Download, Eye, Map, HelpCircle, ExternalLink, Heart, Code2, Github } from 'lucide-react'
+import { UploadCloud, FileUp, CheckCircle, Settings, Download, Eye, Map, HelpCircle, ExternalLink, Heart, Code2, Github, MoreVertical, Minus, Plus, Trash2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Label } from '@/components/ui/label'
 import { Toast } from '@/components/ui/toast'
 import { IconSlider } from '@/components/ui/icon-slider'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog'
 import { processGPX, analyzeGPX, type GPXPreview, type GPXProcessResult } from '@/lib/gpx-utils'
 import { MapViewer } from '@/components/MapViewer'
 import { ElevationProfile } from '@/components/ElevationProfile'
 import { Language, getTranslations } from '@/lib/i18n'
 import { LanguageSelector } from '@/components/LanguageSelector'
 import { saveRoute, loadRoute, clearRoute } from '@/lib/route-cache'
+import { EXAMPLE_GPX } from '@/data/example-route'
 
 const APP_VERSION = '1.1.0'
 
@@ -44,6 +52,7 @@ function App() {
     const saved = localStorage.getItem('maxDistanceSetting')
     return saved || '250'
   })
+  const [settingsOpen, setSettingsOpen] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   // Laad route automatisch bij opstarten als er iets in IndexedDB staat
@@ -161,6 +170,27 @@ function App() {
     setPreview(null)
     setAllSegments([])
     setSelectedSegmentIndex(null)
+  }
+
+  const handleLoadExample = () => {
+    setFile(null)
+    loadXMLString(EXAMPLE_GPX, 'Voorbeeld Route: Oostende - Antwerpen')
+    saveRoute(EXAMPLE_GPX, 'Voorbeeld Route: Oostende - Antwerpen').catch(() => {})
+  }
+
+  const handleDeleteRoute = () => {
+    // Reset all state
+    setFile(null)
+    setCurrentXML(null)
+    setPreview(null)
+    setAllSegments([])
+    setSelectedSegmentIndex(null)
+    setStartFromKM(0)
+    setDistanceKM(100)
+    // Clear cached route
+    clearRoute().catch(() => {})
+    setHasCachedRoute(null)
+    showToast('Route gewist')
   }
 
   const handlePreview = () => {
@@ -357,12 +387,29 @@ function App() {
                     </div>
                   )}
 
-                  <div
-                    className="relative border-2 border-dashed border-border rounded-xl p-8 text-center hover:bg-accent/50 transition-colors cursor-pointer"
-                    onClick={() => fileInputRef.current?.click()}
-                  >
-                    <FileUp className="w-8 h-8 mx-auto text-muted-foreground mb-2" />
-                    <p className="text-sm text-muted-foreground">{t.uploadPrompt}</p>
+                  <div className="space-y-3">
+                    <div
+                      className="relative border-2 border-dashed border-border rounded-xl p-8 text-center hover:bg-accent/50 transition-colors cursor-pointer"
+                      onClick={() => fileInputRef.current?.click()}
+                    >
+                      <FileUp className="w-8 h-8 mx-auto text-muted-foreground mb-2" />
+                      <p className="text-sm text-muted-foreground">{t.uploadPrompt}</p>
+                    </div>
+
+                    <div className="flex items-center gap-3">
+                      <div className="flex-1 border-t border-border"></div>
+                      <span className="text-xs text-muted-foreground uppercase">of</span>
+                      <div className="flex-1 border-t border-border"></div>
+                    </div>
+
+                    <Button
+                      onClick={handleLoadExample}
+                      variant="outline"
+                      className="w-full"
+                    >
+                      <Eye className="w-4 h-4 mr-2" />
+                      {t.tryExample}
+                    </Button>
                   </div>
 
                   {file && (
@@ -382,10 +429,15 @@ function App() {
                   <CheckCircle className="w-4 h-4 text-primary shrink-0" />
                   <span className="truncate font-medium">{hasCachedRoute || file?.name}</span>
                 </div>
-                <Button size="sm" variant="outline" onClick={() => fileInputRef.current?.click()}>
-                  <FileUp className="w-4 h-4" />
-                  Andere route
-                </Button>
+                <div className="flex gap-2">
+                  <Button size="sm" variant="outline" onClick={() => fileInputRef.current?.click()}>
+                    <FileUp className="w-4 h-4" />
+                    Andere route
+                  </Button>
+                  <Button size="sm" variant="ghost" onClick={handleDeleteRoute} title={t.deleteRoute}>
+                    <Trash2 className="w-4 h-4 text-destructive" />
+                  </Button>
+                </div>
               </div>
             )}
 
@@ -427,13 +479,80 @@ function App() {
                 {/* Settings Card */}
                 <Card className="border-orange-200 bg-orange-50/50 dark:bg-orange-950/20">
                   <CardHeader>
-                    <CardTitle className="flex items-center gap-2 text-orange-900 dark:text-orange-100">
-                      <Settings className="w-5 h-5" />
-                      {t.step2Title}
-                    </CardTitle>
-                    <CardDescription>
-                      {t.step2Description}
-                    </CardDescription>
+                    <div className="flex items-start justify-between">
+                      <div className="flex-1">
+                        <CardTitle className="flex items-center gap-2 text-orange-900 dark:text-orange-100">
+                          <Settings className="w-5 h-5" />
+                          {t.step2Title}
+                        </CardTitle>
+                        <CardDescription>
+                          {t.step2Description}
+                        </CardDescription>
+                      </div>
+                      <Dialog open={settingsOpen} onOpenChange={setSettingsOpen}>
+                        <DialogTrigger asChild>
+                          <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                            <MoreVertical className="h-4 w-4" />
+                          </Button>
+                        </DialogTrigger>
+                        <DialogContent className="sm:max-w-md">
+                          <DialogHeader>
+                            <DialogTitle>Max afstand instellen</DialogTitle>
+                          </DialogHeader>
+                          <div className="space-y-6 py-4">
+                            {/* Plus/Minus Spinner */}
+                            <div className="flex items-center justify-center gap-4 bg-muted/50 rounded-full p-3">
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-12 w-12 rounded-full hover:bg-background"
+                                onClick={() => {
+                                  const currentValue = parseInt(maxDistanceInput, 10)
+                                  const newValue = Math.max(10, currentValue - 10)
+                                  setMaxDistanceInput(newValue.toString())
+                                }}
+                              >
+                                <Minus className="h-5 w-5" />
+                              </Button>
+
+                              <div className="flex items-center gap-2 min-w-[100px] justify-center">
+                                <span className="text-3xl font-bold">{maxDistanceInput}</span>
+                                <span className="text-lg text-muted-foreground">km</span>
+                              </div>
+
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-12 w-12 rounded-full hover:bg-background"
+                                onClick={() => {
+                                  const currentValue = parseInt(maxDistanceInput, 10)
+                                  const newValue = Math.min(1000, currentValue + 10)
+                                  setMaxDistanceInput(newValue.toString())
+                                }}
+                              >
+                                <Plus className="h-5 w-5" />
+                              </Button>
+                            </div>
+
+                            <Button
+                              onClick={() => {
+                                const value = parseInt(maxDistanceInput, 10)
+                                if (!isNaN(value) && value >= 10 && value <= 1000) {
+                                  setMaxDistanceSetting(value)
+                                  setMaxDistanceInput(value.toString())
+                                } else {
+                                  setMaxDistanceInput(maxDistanceSetting.toString())
+                                }
+                                setSettingsOpen(false)
+                              }}
+                              className="w-full"
+                            >
+                              Pas aan
+                            </Button>
+                          </div>
+                        </DialogContent>
+                      </Dialog>
+                    </div>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <div className="space-y-2">
@@ -464,35 +583,6 @@ function App() {
                         value={distanceKM}
                         onValueChange={setDistanceKM}
                       />
-                    </div>
-
-                    <div className="pt-2 border-t border-orange-200/50">
-                      <div className="flex items-center justify-between gap-3">
-                        <Label htmlFor="maxDistance" className="text-xs text-muted-foreground">Max afstand (km)</Label>
-                        <input
-                          id="maxDistance"
-                          type="number"
-                          min={10}
-                          max={1000}
-                          step={10}
-                          value={maxDistanceInput}
-                          onFocus={(e) => e.target.select()}
-                          onChange={(e) => {
-                            setMaxDistanceInput(e.target.value)
-                          }}
-                          onBlur={(e) => {
-                            const value = parseInt(e.target.value, 10)
-                            if (!isNaN(value) && value >= 10 && value <= 1000) {
-                              setMaxDistanceSetting(value)
-                              setMaxDistanceInput(value.toString())
-                            } else {
-                              // Reset to current setting if invalid
-                              setMaxDistanceInput(maxDistanceSetting.toString())
-                            }
-                          }}
-                          className="w-20 px-2 py-1 text-sm border rounded focus:outline-none focus:ring-2 focus:ring-primary"
-                        />
-                      </div>
                     </div>
 
                     {/* Elevation Profile for selected segment */}

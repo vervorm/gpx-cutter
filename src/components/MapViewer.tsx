@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { createPortal } from 'react-dom'
-import { MapContainer, TileLayer, Polyline, Marker, Popup, useMap } from 'react-leaflet'
+import { MapContainer, TileLayer, Polyline, Marker, Popup, Tooltip, useMap } from 'react-leaflet'
 import { LatLngBounds, LatLngExpression, DivIcon, DragEndEvent } from 'leaflet'
 import { Maximize2, Minimize2, MapPin } from 'lucide-react'
 import { renderToStaticMarkup } from 'react-dom/server'
@@ -10,6 +9,7 @@ import 'leaflet/dist/leaflet.css'
 interface RoutePoint {
   lat: number
   lon: number
+  ele?: number
 }
 
 interface MapViewerProps {
@@ -61,7 +61,7 @@ function findDistanceAlongRoute(lat: number, lon: number, routePoints: RoutePoin
 }
 
 /**
- * Find the lat/lon position at a given distance along the route
+ * Find the lat/lon/elevation position at a given distance along the route
  */
 function findPointAtDistance(distanceKm: number, routePoints: RoutePoint[]): RoutePoint | null {
   if (routePoints.length === 0) return null
@@ -76,10 +76,17 @@ function findPointAtDistance(distanceKm: number, routePoints: RoutePoint[]): Rou
     if (cumulativeDistance + segmentDistance >= distanceKm) {
       // Interpolate between prev and curr
       const ratio = (distanceKm - cumulativeDistance) / segmentDistance
-      return {
+      const point: RoutePoint = {
         lat: prev.lat + (curr.lat - prev.lat) * ratio,
         lon: prev.lon + (curr.lon - prev.lon) * ratio,
       }
+
+      // Interpolate elevation if available
+      if (prev.ele !== undefined && curr.ele !== undefined) {
+        point.ele = prev.ele + (curr.ele - prev.ele) * ratio
+      }
+
+      return point
     }
 
     cumulativeDistance += segmentDistance
@@ -274,6 +281,33 @@ export function MapViewer({
     return findPointAtDistance(pointerKm, selectedPoints)
   }, [pointerKm, selectedPoints])
 
+  // Calculate slope at pointer position
+  const pointerSlope = useMemo(() => {
+    if (pointerKm === null || pointerKm === undefined || !selectedPoints || selectedPoints.length === 0) {
+      return null
+    }
+
+    let cumulativeDistance = 0
+    for (let i = 1; i < selectedPoints.length; i++) {
+      const prev = selectedPoints[i - 1]
+      const curr = selectedPoints[i]
+      const segmentDistance = getDistanceFromLatLonInKm(prev.lat, prev.lon, curr.lat, curr.lon)
+
+      if (cumulativeDistance + segmentDistance >= pointerKm) {
+        // Found the segment - calculate slope
+        if (prev.ele !== undefined && curr.ele !== undefined) {
+          const distDiff = segmentDistance * 1000 // Convert km to meters
+          const eleDiff = curr.ele - prev.ele
+          return distDiff > 0 ? (eleDiff / distDiff) : 0
+        }
+        return null
+      }
+
+      cumulativeDistance += segmentDistance
+    }
+    return null
+  }, [pointerKm, selectedPoints])
+
   const toggleFullscreen = () => {
     setIsFullscreen(!isFullscreen)
     // Ensure loading state is reset when toggling fullscreen
@@ -343,10 +377,10 @@ export function MapViewer({
 
   const mapContent = (
     <div
-      className={`overflow-hidden shadow-lg relative ${
+      className={`overflow-hidden shadow-lg ${
         isFullscreen
-          ? 'fixed inset-0 md:inset-4 z-[9999] w-screen h-screen md:w-[calc(100vw-2rem)] md:h-[calc(100vh-2rem)] md:rounded-lg md:border-2 md:border-border'
-          : 'w-full h-full rounded-lg border-2 border-border'
+          ? 'fixed top-0 left-0 md:top-4 md:left-4 z-[9999] w-screen h-screen md:w-[calc(100vw-2rem)] md:h-[calc(100vh-2rem)] md:rounded-lg md:border-2 md:border-border'
+          : 'relative w-full h-full rounded-lg border-2 border-border'
       }`}
     >
       {/* Loading indicator */}
@@ -412,7 +446,7 @@ export function MapViewer({
                 dragend: handleStartMarkerDrag,
               }}
             >
-              <Popup>
+              <Popup autoPan={false}>
                 <div className="text-sm">
                   <p className="font-semibold">{t.startMarker}</p>
                   <p>{startKm.toFixed(1)} km</p>
@@ -432,7 +466,7 @@ export function MapViewer({
                 dragend: handleEndMarkerDrag,
               }}
             >
-              <Popup>
+              <Popup autoPan={false}>
                 <div className="text-sm">
                   <p className="font-semibold">{t.endMarker}</p>
                   <p>{endKm?.toFixed(1)} km</p>
@@ -452,23 +486,23 @@ export function MapViewer({
                 dragend: handlePointerMarkerDrag,
               }}
             >
-              <Popup>
-                <div className="text-sm">
-                  <p className="font-semibold">{t.pointerMarker || 'Position'}</p>
-                  <p>{pointerKm?.toFixed(2)} km</p>
-                  {onPointerKmChange && <p className="text-xs text-gray-500 mt-1">{t.dragToAdjust}</p>}
+              <Tooltip permanent direction="top" offset={[0, -10]}>
+                <div className="text-xs text-center">
+                  {pointerPoint.ele !== undefined && (
+                    <div className="font-bold text-amber-500">{Math.round(pointerPoint.ele)}m</div>
+                  )}
+                  {pointerSlope !== null && (
+                    <div className={`font-semibold ${pointerSlope >= 0 ? 'text-red-500' : 'text-blue-500'}`}>
+                      {(pointerSlope * 100).toFixed(1)}%
+                    </div>
+                  )}
                 </div>
-              </Popup>
+              </Tooltip>
             </Marker>
           )}
         </MapContainer>
       </div>
   )
-
-  // Use portal for fullscreen to render from document root
-  if (isFullscreen && typeof window !== 'undefined') {
-    return createPortal(mapContent, document.body)
-  }
 
   return mapContent
 }
