@@ -21,6 +21,7 @@ interface MapViewerProps {
   onDistanceChange?: (km: number) => void
   pointerKm?: number | null
   onPointerKmChange?: (km: number | null) => void
+  elevationProfile?: React.ReactNode
   translations?: {
     openFullscreen: string
     closeFullscreen: string
@@ -171,6 +172,7 @@ export function MapViewer({
   onDistanceChange,
   pointerKm,
   onPointerKmChange,
+  elevationProfile,
   translations
 }: MapViewerProps) {
   const [isFullscreen, setIsFullscreen] = useState(false)
@@ -379,7 +381,7 @@ export function MapViewer({
     <div
       className={`overflow-hidden shadow-lg ${
         isFullscreen
-          ? 'fixed top-0 left-0 md:top-4 md:left-4 z-[9999] w-screen h-screen md:w-[calc(100vw-2rem)] md:h-[calc(100vh-2rem)] md:rounded-lg md:border-2 md:border-border'
+          ? 'relative w-full h-full rounded-lg border-2 border-border'
           : 'relative w-full h-full rounded-lg border-2 border-border'
       }`}
     >
@@ -504,5 +506,31 @@ export function MapViewer({
       </div>
   )
 
+  // If fullscreen and elevation profile is provided, wrap both in a flex container
+  if (isFullscreen && elevationProfile) {
+    return (
+      <div className="fixed top-0 left-0 md:top-4 md:left-4 z-[9999] w-screen h-screen md:w-[calc(100vw-2rem)] md:h-[calc(100vh-2rem)] md:rounded-lg overflow-hidden bg-background">
+        <div className="flex flex-col h-full gap-4 p-4">
+          <div className="flex-1 min-h-0">
+            {mapContent}
+          </div>
+          <div className="h-48 overflow-y-auto">
+            {elevationProfile}
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // If fullscreen without elevation profile, just use fullscreen styling on the map
+  if (isFullscreen) {
+    return (
+      <div className="fixed top-0 left-0 md:top-4 md:left-4 z-[9999] w-screen h-screen md:w-[calc(100vw-2rem)] md:h-[calc(100vh-2rem)] md:rounded-lg overflow-hidden">
+        {mapContent}
+      </div>
+    )
+  }
+
+  // Normal mode
   return mapContent
 }

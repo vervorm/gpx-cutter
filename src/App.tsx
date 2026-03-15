@@ -585,18 +585,6 @@ function App() {
                       />
                     </div>
 
-                    {/* Elevation Profile for selected segment */}
-                    {liveSegment && liveSegment.selectedPoints.length > 0 && liveSegment.elevation && (
-                      <div className="mt-3 p-3 bg-white dark:bg-gray-800 rounded-lg border-2 border-orange-200">
-                        <ElevationProfile
-                          points={liveSegment.selectedPoints}
-                          startKm={startFromKM}
-                          className="w-full"
-                          pointerKm={pointerKm}
-                          onPointerKmChange={setPointerKm}
-                        />
-                      </div>
-                    )}
                   </CardContent>
                 </Card>
 
@@ -611,101 +599,126 @@ function App() {
                       {t.mapDescription}
                     </CardDescription>
                   </CardHeader>
-                  <CardContent className="h-[400px] md:h-[500px] lg:h-[600px]">
-                    <MapViewer
-                      allPoints={preview.allPoints}
-                      selectedPoints={liveSegment?.selectedPoints}
-                      startKm={startFromKM}
-                      endKm={startFromKM + distanceKM}
-                      onStartKmChange={(km) => {
-                        // Ensure the new start position doesn't exceed the total distance
-                        const maxStart = Math.floor(preview.totalDistance - 10) // Leave at least 10km for segment
-                        const newStart = Math.max(0, Math.min(km, maxStart))
-                        setStartFromKM(newStart)
-                      }}
-                      onDistanceChange={(km) => {
-                        // Ensure distance doesn't exceed available distance from start point
-                        const maxDistance = Math.floor(preview.totalDistance - startFromKM)
-                        const newDistance = Math.max(10, Math.min(km, maxDistance))
-                        setDistanceKM(newDistance)
-                      }}
-                      pointerKm={pointerKm}
-                      onPointerKmChange={setPointerKm}
-                      translations={{
-                        openFullscreen: t.openFullscreen,
-                        closeFullscreen: t.closeFullscreen,
-                        startMarker: t.startMarker,
-                        endMarker: t.endMarker,
-                        pointerMarker: 'Positie',
-                        noRouteData: t.noRouteData,
-                        dragToAdjust: t.dragToAdjust,
-                      }}
-                    />
+                  <CardContent className="space-y-4">
+                    {/* Map */}
+                    <div className="h-[400px] md:h-[500px] lg:h-[600px]">
+                      <MapViewer
+                        allPoints={preview.allPoints}
+                        selectedPoints={liveSegment?.selectedPoints}
+                        startKm={startFromKM}
+                        endKm={startFromKM + distanceKM}
+                        onStartKmChange={(km) => {
+                          // Ensure the new start position doesn't exceed the total distance
+                          const maxStart = Math.floor(preview.totalDistance - 10) // Leave at least 10km for segment
+                          const newStart = Math.max(0, Math.min(km, maxStart))
+                          setStartFromKM(newStart)
+                        }}
+                        onDistanceChange={(km) => {
+                          // Ensure distance doesn't exceed available distance from start point
+                          const maxDistance = Math.floor(preview.totalDistance - startFromKM)
+                          const newDistance = Math.max(10, Math.min(km, maxDistance))
+                          setDistanceKM(newDistance)
+                        }}
+                        pointerKm={pointerKm}
+                        onPointerKmChange={setPointerKm}
+                        elevationProfile={
+                          liveSegment && liveSegment.selectedPoints.length > 0 && liveSegment.elevation ? (
+                            <div className="p-3 bg-white dark:bg-gray-800 rounded-lg border-2 border-amber-200">
+                              <ElevationProfile
+                                points={liveSegment.selectedPoints}
+                                startKm={startFromKM}
+                                className="w-full"
+                                pointerKm={pointerKm}
+                                onPointerKmChange={setPointerKm}
+                              />
+                            </div>
+                          ) : undefined
+                        }
+                        translations={{
+                          openFullscreen: t.openFullscreen,
+                          closeFullscreen: t.closeFullscreen,
+                          startMarker: t.startMarker,
+                          endMarker: t.endMarker,
+                          pointerMarker: 'Positie',
+                          noRouteData: t.noRouteData,
+                          dragToAdjust: t.dragToAdjust,
+                        }}
+                      />
+                    </div>
+
+                    {/* Elevation Profile below map */}
+                    {liveSegment && liveSegment.selectedPoints.length > 0 && liveSegment.elevation && (
+                      <div className="p-3 bg-white dark:bg-gray-800 rounded-lg border-2 border-amber-200">
+                        <ElevationProfile
+                          points={liveSegment.selectedPoints}
+                          startKm={startFromKM}
+                          className="w-full"
+                          pointerKm={pointerKm}
+                          onPointerKmChange={setPointerKm}
+                        />
+                      </div>
+                    )}
+
+                    {/* Generate All Segments Button */}
+                    {preview && (
+                      <Button
+                        onClick={generateAllSegments}
+                        className="w-full h-12 text-base bg-amber-600 hover:bg-amber-700"
+                        size="lg"
+                      >
+                        <Settings className="w-5 h-5" />
+                        {startFromKM === 0 ? t.generate2Segments : t.generate3Segments}
+                      </Button>
+                    )}
+
+                    {/* All Segments Grid */}
+                    {allSegments.length > 0 && (
+                      <div>
+                        <div className="mb-3">
+                          <h3 className="font-semibold text-green-900 dark:text-green-100">
+                            {t.allSegmentsTitle} ({allSegments.length})
+                          </h3>
+                          <p className="text-sm text-muted-foreground">{t.allSegmentsDescription}</p>
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                          {allSegments.map((segment, index) => (
+                            <button
+                              key={index}
+                              onClick={() => handleDownload(segment)}
+                              onMouseEnter={() => setSelectedSegmentIndex(index)}
+                              onMouseLeave={() => setSelectedSegmentIndex(null)}
+                              className={`p-4 rounded-lg border-2 transition-all text-left ${selectedSegmentIndex === index
+                                ? 'border-green-500 bg-green-100 dark:bg-green-900/50 shadow-lg scale-105'
+                                : 'border-green-200 bg-white dark:bg-green-950/20 hover:border-green-400'
+                                }`}
+                            >
+                              <div className="flex items-center justify-between mb-2">
+                                <span className="font-semibold text-green-900 dark:text-green-100">
+                                  {t.segment} {index + 1}
+                                </span>
+                                <Download className="w-4 h-4 text-green-600" />
+                              </div>
+                              <div className="text-sm space-y-1">
+                                <p className="text-muted-foreground">
+                                  {segment.startKm.toFixed(1)} - {segment.endKm.toFixed(1)} km
+                                </p>
+                                <p className="font-medium">
+                                  {segment.distance.toFixed(2)} km · {segment.pointCount} {t.points}
+                                </p>
+                                {segment.elevation && (
+                                  <p className="text-xs text-muted-foreground">
+                                    ↗ {segment.elevation.gain}m · ↘ {segment.elevation.loss}m
+                                  </p>
+                                )}
+                              </div>
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    )}
                   </CardContent>
                 </Card>
               </div>
-            )}
-
-            {/* Generate All Segments Button */}
-            {preview && (
-              <Button
-                onClick={generateAllSegments}
-                className="w-full h-12 text-base bg-amber-600 hover:bg-amber-700"
-                size="lg"
-              >
-                <Settings className="w-5 h-5" />
-                {startFromKM === 0 ? t.generate2Segments : t.generate3Segments}
-              </Button>
-            )}
-
-            {/* All Segments Grid */}
-            {allSegments.length > 0 && (
-              <Card className="border-green-200 bg-green-50/50 dark:bg-green-950/20">
-                <CardHeader>
-                  <CardTitle className="text-green-900 dark:text-green-100">
-                    {t.allSegmentsTitle} ({allSegments.length})
-                  </CardTitle>
-                  <CardDescription>
-                    {t.allSegmentsDescription}
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    {allSegments.map((segment, index) => (
-                      <button
-                        key={index}
-                        onClick={() => handleDownload(segment)}
-                        onMouseEnter={() => setSelectedSegmentIndex(index)}
-                        onMouseLeave={() => setSelectedSegmentIndex(null)}
-                        className={`p-4 rounded-lg border-2 transition-all text-left ${selectedSegmentIndex === index
-                          ? 'border-green-500 bg-green-100 dark:bg-green-900/50 shadow-lg scale-105'
-                          : 'border-green-200 bg-white dark:bg-green-950/20 hover:border-green-400'
-                          }`}
-                      >
-                        <div className="flex items-center justify-between mb-2">
-                          <span className="font-semibold text-green-900 dark:text-green-100">
-                            {t.segment} {index + 1}
-                          </span>
-                          <Download className="w-4 h-4 text-green-600" />
-                        </div>
-                        <div className="text-sm space-y-1">
-                          <p className="text-muted-foreground">
-                            {segment.startKm.toFixed(1)} - {segment.endKm.toFixed(1)} km
-                          </p>
-                          <p className="font-medium">
-                            {segment.distance.toFixed(2)} km · {segment.pointCount} {t.points}
-                          </p>
-                          {segment.elevation && (
-                            <p className="text-xs text-muted-foreground">
-                              ↗ {segment.elevation.gain}m · ↘ {segment.elevation.loss}m
-                            </p>
-                          )}
-                        </div>
-                      </button>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
             )}
 
             {/* Help Section */}
