@@ -588,8 +588,22 @@ function App() {
                   </CardContent>
                 </Card>
 
-                {/* Map Card */}
-                <Card className="border-amber-200 bg-amber-50/50 dark:bg-amber-950/20 h-fit lg:sticky lg:top-4">
+                {/*
+                  ============================================================
+                  MAP CARD - id: map-and-segments-card
+                  ============================================================
+                  Dit is de gecombineerde kaart die de volgende onderdelen bevat:
+                  1. De interactieve kaart met route visualisatie
+                  2. Het hoogteprofiel onder de kaart
+                  3. De "Genereer segmenten" knop
+                  4. Het grid met alle gegenereerde segmenten
+
+                  Deze card blijft "sticky" op desktop (lg:sticky lg:top-4)
+                */}
+                <Card
+                  id="map-and-segments-card"
+                  className="border-amber-200 bg-amber-50/50 dark:bg-amber-950/20 h-fit lg:sticky lg:top-4"
+                >
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2 text-amber-900 dark:text-amber-100">
                       <Map className="w-5 h-5" />
@@ -599,22 +613,49 @@ function App() {
                       {t.mapDescription}
                     </CardDescription>
                   </CardHeader>
+
+                  {/*
+                    CardContent met vertical spacing tussen alle onderdelen
+                    space-y-4 zorgt voor 1rem (16px) ruimte tussen child elementen
+                  */}
                   <CardContent className="space-y-4">
-                    {/* Map */}
-                    <div className="h-[400px] md:h-[500px] lg:h-[600px]">
+
+                    {/*
+                      ============================================================
+                      MAP VIEWER CONTAINER - id: map-viewer-container
+                      ============================================================
+                      Container voor de interactieve kaart met responsive heights:
+                      - Mobile: 400px
+                      - Tablet (md): 500px
+                      - Desktop (lg): 600px
+                    */}
+                    <div
+                      id="map-viewer-container"
+                      className="h-[400px] md:h-[500px] lg:h-[600px]"
+                    >
+                      {/*
+                        MapViewer component toont de route op een Leaflet kaart
+                        - allPoints: alle punten van de originele route
+                        - selectedPoints: geselecteerde punten voor het huidige segment
+                        - startKm/endKm: start en eind positie van het segment
+                        - onStartKmChange/onDistanceChange: callbacks voor het aanpassen van segment via markers
+                        - pointerKm: positie van de pointer op het hoogteprofiel (sync met kaart)
+                        - elevationProfile: het hoogteprofiel element dat in fullscreen getoond wordt
+                      */}
                       <MapViewer
                         allPoints={preview.allPoints}
                         selectedPoints={liveSegment?.selectedPoints}
                         startKm={startFromKM}
                         endKm={startFromKM + distanceKM}
                         onStartKmChange={(km) => {
-                          // Ensure the new start position doesn't exceed the total distance
-                          const maxStart = Math.floor(preview.totalDistance - 10) // Leave at least 10km for segment
+                          // Voorkom dat start positie verder gaat dan totale afstand - 10km
+                          // We hebben minimaal 10km nodig voor een segment
+                          const maxStart = Math.floor(preview.totalDistance - 10)
                           const newStart = Math.max(0, Math.min(km, maxStart))
                           setStartFromKM(newStart)
                         }}
                         onDistanceChange={(km) => {
-                          // Ensure distance doesn't exceed available distance from start point
+                          // Voorkom dat afstand groter is dan beschikbare afstand vanaf start punt
                           const maxDistance = Math.floor(preview.totalDistance - startFromKM)
                           const newDistance = Math.max(10, Math.min(km, maxDistance))
                           setDistanceKM(newDistance)
@@ -622,6 +663,7 @@ function App() {
                         pointerKm={pointerKm}
                         onPointerKmChange={setPointerKm}
                         elevationProfile={
+                          // Conditionally render het hoogteprofiel als er een segment is met elevation data
                           liveSegment && liveSegment.selectedPoints.length > 0 && liveSegment.elevation ? (
                             <div className="p-3 bg-white dark:bg-gray-800 rounded-lg border-2 border-amber-200">
                               <ElevationProfile
@@ -646,9 +688,30 @@ function App() {
                       />
                     </div>
 
-                    {/* Elevation Profile below map */}
+                    {/*
+                      ============================================================
+                      ELEVATION PROFILE - id: elevation-profile-section
+                      ============================================================
+                      Het hoogteprofiel wordt hier ONDER de kaart getoond in normale modus.
+                      In fullscreen modus wordt dit ook getoond via de elevationProfile prop.
+
+                      Voorwaarden om te tonen:
+                      1. Er moet een live segment zijn
+                      2. Het segment moet punten bevatten
+                      3. Het segment moet elevation data bevatten
+                    */}
                     {liveSegment && liveSegment.selectedPoints.length > 0 && liveSegment.elevation && (
-                      <div className="p-3 bg-white dark:bg-gray-800 rounded-lg border-2 border-amber-200">
+                      <div
+                        id="elevation-profile-section"
+                        className="p-3 bg-white dark:bg-gray-800 rounded-lg border-2 border-amber-200"
+                      >
+                        {/*
+                          ElevationProfile component visualiseert hoogte data als een grafiek
+                          - Toont hoogte (elevation) op Y-as
+                          - Toont afstand op X-as
+                          - Interactief: hover/click om pointer positie te wijzigen
+                          - Pointer sync met de kaart via pointerKm state
+                        */}
                         <ElevationProfile
                           points={liveSegment.selectedPoints}
                           startKm={startFromKM}
@@ -659,9 +722,17 @@ function App() {
                       </div>
                     )}
 
-                    {/* Generate All Segments Button */}
+                    {/*
+                      ============================================================
+                      GENERATE SEGMENTS BUTTON - id: generate-segments-button
+                      ============================================================
+                      Knop om automatisch 2 of 3 segmenten te genereren op basis van:
+                      - Als startFromKM === 0: genereert 2 segmenten (eerste helft + tweede helft)
+                      - Als startFromKM > 0: genereert 3 segmenten (voor start, tussen start-eind, na eind)
+                    */}
                     {preview && (
                       <Button
+                        id="generate-segments-button"
                         onClick={generateAllSegments}
                         className="w-full h-12 text-base bg-amber-600 hover:bg-amber-700"
                         size="lg"
@@ -671,15 +742,32 @@ function App() {
                       </Button>
                     )}
 
-                    {/* All Segments Grid */}
+                    {/*
+                      ============================================================
+                      ALL SEGMENTS GRID - id: all-segments-grid
+                      ============================================================
+                      Grid met alle gegenereerde segmenten
+                      - Wordt alleen getoond als er segmenten zijn
+                      - Responsive grid: 1 kolom op mobile, 2 kolommen op desktop (md)
+                      - Elk segment is een klikbare button die het segment downloadt
+                      - Hover effect: highlight het segment op de kaart via selectedSegmentIndex
+                    */}
                     {allSegments.length > 0 && (
-                      <div>
+                      <div id="all-segments-grid">
+                        {/* Header met titel en beschrijving */}
                         <div className="mb-3">
                           <h3 className="font-semibold text-green-900 dark:text-green-100">
                             {t.allSegmentsTitle} ({allSegments.length})
                           </h3>
                           <p className="text-sm text-muted-foreground">{t.allSegmentsDescription}</p>
                         </div>
+
+                        {/*
+                          Grid container
+                          - grid-cols-1: 1 kolom op mobile
+                          - md:grid-cols-2: 2 kolommen vanaf medium screens
+                          - gap-3: 0.75rem ruimte tussen grid items
+                        */}
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                           {allSegments.map((segment, index) => (
                             <button
@@ -692,19 +780,25 @@ function App() {
                                 : 'border-green-200 bg-white dark:bg-green-950/20 hover:border-green-400'
                                 }`}
                             >
+                              {/* Segment header met nummer en download icon */}
                               <div className="flex items-center justify-between mb-2">
                                 <span className="font-semibold text-green-900 dark:text-green-100">
                                   {t.segment} {index + 1}
                                 </span>
                                 <Download className="w-4 h-4 text-green-600" />
                               </div>
+
+                              {/* Segment details: afstand, punten, elevatie */}
                               <div className="text-sm space-y-1">
+                                {/* Start en eind kilometer */}
                                 <p className="text-muted-foreground">
                                   {segment.startKm.toFixed(1)} - {segment.endKm.toFixed(1)} km
                                 </p>
+                                {/* Totale afstand en aantal punten */}
                                 <p className="font-medium">
                                   {segment.distance.toFixed(2)} km · {segment.pointCount} {t.points}
                                 </p>
+                                {/* Hoogtemeters (gain/loss) indien beschikbaar */}
                                 {segment.elevation && (
                                   <p className="text-xs text-muted-foreground">
                                     ↗ {segment.elevation.gain}m · ↘ {segment.elevation.loss}m

@@ -377,35 +377,79 @@ export function MapViewer({
     )
   }
 
+  {/*
+    ============================================================
+    MAP CONTENT - id: map-content-container
+    ============================================================
+    De hoofdcontainer voor de kaart zelf
+    - Bevat de Leaflet MapContainer
+    - Bevat de loading indicator
+    - Krijgt verschillende styling afhankelijk van fullscreen modus
+  */}
   const mapContent = (
     <div
+      id="map-content-container"
       className={`overflow-hidden shadow-lg ${
         isFullscreen
           ? 'relative w-full h-full rounded-lg border-2 border-border'
           : 'relative w-full h-full rounded-lg border-2 border-border'
       }`}
     >
-      {/* Loading indicator */}
+      {/*
+        ============================================================
+        LOADING INDICATOR - id: map-loading-indicator
+        ============================================================
+        Wordt getoond terwijl de kaart aan het laden is
+        - Absolute positioning over de hele kaart
+        - Hoge z-index (1000) om boven de kaart te verschijnen
+        - Spinner animatie met "Kaart laden..." tekst
+      */}
       {isLoading && (
-        <div className="absolute inset-0 bg-gray-100 dark:bg-gray-800 z-[1000] flex items-center justify-center">
+        <div
+          id="map-loading-indicator"
+          className="absolute inset-0 bg-gray-100 dark:bg-gray-800 z-[1000] flex items-center justify-center"
+        >
           <div className="flex flex-col items-center gap-3">
+            {/* Rotating spinner */}
             <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
             <p className="text-sm text-gray-600 dark:text-gray-400">Kaart laden...</p>
           </div>
         </div>
       )}
 
+      {/*
+        ============================================================
+        LEAFLET MAP CONTAINER - id: leaflet-map-container
+        ============================================================
+        De hoofdcontainer voor de Leaflet kaart
+        - center: initieel center punt (eerste punt van de route)
+        - zoom: initiële zoom level (13 = stad niveau)
+        - scrollWheelZoom: sta zoomen met muiswiel toe
+      */}
       <MapContainer
+        id="leaflet-map-container"
         center={[allPoints[0].lat, allPoints[0].lon]}
         zoom={13}
         className="w-full h-full"
         scrollWheelZoom={true}
       >
+        {/*
+          TileLayer: de achtergrond kaart tiles van OpenStreetMap
+          - url: template voor tile URLs
+          - attribution: copyright vermelding
+        */}
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
 
+        {/*
+          Custom components voor kaart functionaliteit:
+          - MapReady: detecteert wanneer kaart geladen is en zet isLoading op false
+          - FitBounds: past kaart zoom/center aan om alle punten te tonen
+          - MapResizer: zorgt voor correcte kaart grootte bij fullscreen toggle
+          - FullscreenControl: de fullscreen knop rechtsboven
+        */}
         <MapReady onReady={() => setIsLoading(false)} />
         <FitBounds bounds={selectedBounds || bounds} />
         <MapResizer isFullscreen={isFullscreen} />
@@ -416,7 +460,16 @@ export function MapViewer({
           closeText={t.closeFullscreen}
         />
 
-          {/* Full route - more visible */}
+          {/*
+            ============================================================
+            VOLLEDIGE ROUTE POLYLINE - id: full-route-polyline
+            ============================================================
+            Toont de VOLLEDIGE route in grijze kleur
+            - color: grijs (#6B7280)
+            - weight: 6px breed
+            - opacity: 0.8 (licht transparant)
+            Dit is de achtergrond route waar het geselecteerde segment overheen komt
+          */}
           <Polyline
             positions={fullRoute}
             pathOptions={{
@@ -426,7 +479,16 @@ export function MapViewer({
             }}
           />
 
-          {/* Selected segment in blue */}
+          {/*
+            ============================================================
+            GESELECTEERD SEGMENT POLYLINE - id: selected-segment-polyline
+            ============================================================
+            Toont het GESELECTEERDE segment in blauwe kleur
+            - color: blauw (#3B82F6)
+            - weight: 8px breed (dikker dan de volledige route)
+            - opacity: 0.95 (bijna niet transparant)
+            Dit segment ligt OVER de grijze route heen voor betere zichtbaarheid
+          */}
           {selectedRoute && selectedRoute.length > 0 && (
             <Polyline
               positions={selectedRoute}
@@ -438,7 +500,16 @@ export function MapViewer({
             />
           )}
 
-          {/* Start marker - using MapPin icon */}
+          {/*
+            ============================================================
+            START MARKER - id: start-marker
+            ============================================================
+            Groene MapPin marker op het startpunt van het segment
+            - Groen: #22C55E
+            - Draggable: kan versleept worden om startpunt aan te passen (indien onStartKmChange callback beschikbaar)
+            - onDragEnd: roept handleStartMarkerDrag aan die startFromKM update
+            - Popup: toont "Start" en kilometer positie
+          */}
           {startPoint && (
             <Marker
               position={[startPoint.lat, startPoint.lon]}
@@ -458,7 +529,16 @@ export function MapViewer({
             </Marker>
           )}
 
-          {/* End marker - using MapPin icon */}
+          {/*
+            ============================================================
+            EIND MARKER - id: end-marker
+            ============================================================
+            Rode MapPin marker op het eindpunt van het segment
+            - Rood: #EF4444
+            - Draggable: kan versleept worden om segment lengte aan te passen (indien onDistanceChange callback beschikbaar)
+            - onDragEnd: roept handleEndMarkerDrag aan die distanceKM update
+            - Popup: toont "Eind" en kilometer positie
+          */}
           {endPoint && selectedPoints && selectedPoints.length > 0 && (
             <Marker
               position={[endPoint.lat, endPoint.lon]}
@@ -478,7 +558,23 @@ export function MapViewer({
             </Marker>
           )}
 
-          {/* Pointer marker - interactive position indicator */}
+          {/*
+            ============================================================
+            POINTER MARKER - id: pointer-marker
+            ============================================================
+            Oranje/Amber MapPin marker die de huidige hover/geselecteerde positie toont
+            - Oranje/Amber: #F59E0B
+            - Gesynchroniseerd met het hoogteprofiel:
+              * Wanneer je over het hoogteprofiel hovert, beweegt deze marker mee
+              * Wanneer je deze marker versleept, update het hoogteprofiel
+            - Permanent Tooltip: altijd zichtbaar (niet alleen op hover)
+              * Toont hoogte (elevation) in meters indien beschikbaar
+              * Toont helling (slope) in procenten:
+                - Rood voor omhoog (positieve helling)
+                - Blauw voor omlaag (negatieve helling)
+
+            Deze marker verbindt de kaart met het hoogteprofiel voor interactieve visualisatie
+          */}
           {pointerPoint && (
             <Marker
               position={[pointerPoint.lat, pointerPoint.lon]}
@@ -488,11 +584,22 @@ export function MapViewer({
                 dragend: handlePointerMarkerDrag,
               }}
             >
+              {/*
+                Permanent tooltip (altijd zichtbaar)
+                - direction="top": verschijnt boven de marker
+                - offset=[0, -10]: 10px naar boven voor betere positionering
+              */}
               <Tooltip permanent direction="top" offset={[0, -10]}>
                 <div className="text-xs text-center">
+                  {/* Hoogte in meters (indien elevation data beschikbaar) */}
                   {pointerPoint.ele !== undefined && (
                     <div className="font-bold text-amber-500">{Math.round(pointerPoint.ele)}m</div>
                   )}
+                  {/*
+                    Helling in procenten (indien berekend)
+                    - Rood (text-red-500): omhoog / positieve helling
+                    - Blauw (text-blue-500): omlaag / negatieve helling
+                  */}
                   {pointerSlope !== null && (
                     <div className={`font-semibold ${pointerSlope >= 0 ? 'text-red-500' : 'text-blue-500'}`}>
                       {(pointerSlope * 100).toFixed(1)}%
@@ -506,15 +613,48 @@ export function MapViewer({
       </div>
   )
 
-  // If fullscreen and elevation profile is provided, wrap both in a flex container
+  {/*
+    ============================================================
+    FULLSCREEN MODE MET ELEVATION PROFILE
+    ============================================================
+    Als de kaart fullscreen is EN er is een elevation profile:
+    - Toon beide in een verticale flex container
+    - Kaart neemt flex-1 (maximale ruimte)
+    - Elevation profile heeft vaste hoogte (h-48 = 12rem = 192px)
+
+    Fixed positioning:
+    - z-[9999]: zeer hoge z-index om boven alles te komen
+    - Mobile: volledig scherm
+    - Desktop (md): kleine marge (4 = 1rem) van de randen
+  */}
   if (isFullscreen && elevationProfile) {
     return (
-      <div className="fixed top-0 left-0 md:top-4 md:left-4 z-[9999] w-screen h-screen md:w-[calc(100vw-2rem)] md:h-[calc(100vh-2rem)] md:rounded-lg overflow-hidden bg-background">
+      <div
+        id="fullscreen-with-elevation"
+        className="fixed top-0 left-0 md:top-4 md:left-4 z-[9999] w-screen h-screen md:w-[calc(100vw-2rem)] md:h-[calc(100vh-2rem)] md:rounded-lg overflow-hidden bg-background"
+      >
+        {/*
+          Flex container met verticale layout (flex-col)
+          - gap-4: 1rem ruimte tussen kaart en elevation profile
+          - p-4: padding rondom
+          - h-full: volledige hoogte van parent
+        */}
         <div className="flex flex-col h-full gap-4 p-4">
-          <div className="flex-1 min-h-0">
+          {/*
+            Map container
+            - flex-1: neemt alle beschikbare ruimte (na aftrek van elevation profile)
+            - min-h-0: voorkom dat flex item te groot wordt
+          */}
+          <div id="fullscreen-map-wrapper" className="flex-1 min-h-0">
             {mapContent}
           </div>
-          <div className="h-48 overflow-y-auto">
+
+          {/*
+            Elevation profile container
+            - h-48: vaste hoogte van 12rem (192px)
+            - overflow-y-auto: scrollbar indien nodig
+          */}
+          <div id="fullscreen-elevation-wrapper" className="h-48 overflow-y-auto">
             {elevationProfile}
           </div>
         </div>
@@ -522,15 +662,30 @@ export function MapViewer({
     )
   }
 
-  // If fullscreen without elevation profile, just use fullscreen styling on the map
+  {/*
+    ============================================================
+    FULLSCREEN MODE ZONDER ELEVATION PROFILE
+    ============================================================
+    Als de kaart fullscreen is ZONDER elevation profile:
+    - Toon alleen de kaart in fullscreen
+    - Zelfde fixed positioning als hierboven
+  */}
   if (isFullscreen) {
     return (
-      <div className="fixed top-0 left-0 md:top-4 md:left-4 z-[9999] w-screen h-screen md:w-[calc(100vw-2rem)] md:h-[calc(100vh-2rem)] md:rounded-lg overflow-hidden">
+      <div
+        id="fullscreen-map-only"
+        className="fixed top-0 left-0 md:top-4 md:left-4 z-[9999] w-screen h-screen md:w-[calc(100vw-2rem)] md:h-[calc(100vh-2rem)] md:rounded-lg overflow-hidden"
+      >
         {mapContent}
       </div>
     )
   }
 
-  // Normal mode
+  {/*
+    ============================================================
+    NORMALE MODE
+    ============================================================
+    Standaard weergave: kaart in normale modus binnen de parent container
+  */}
   return mapContent
 }
