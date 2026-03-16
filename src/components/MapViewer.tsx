@@ -643,7 +643,7 @@ export function MapViewer({
       */}
       <Dialog open={isFullscreen} onOpenChange={setIsFullscreen}>
         <DialogContent
-          className="max-w-none w-screen h-screen md:w-[95vw] md:h-[95vh] p-0 gap-0 border-0 md:border rounded-none md:rounded-lg [&>button]:hidden"
+          className="max-w-none w-screen h-screen md:w-[95vw] md:h-[95vh] p-0 gap-0 border-0 md:border rounded-none md:rounded-lg overflow-hidden [&>button]:hidden"
           id="fullscreen-map-modal"
         >
           {/*
@@ -664,11 +664,12 @@ export function MapViewer({
 
           {elevationProfile ? (
             // Met elevation profile: kaart + elevation in verticale layout
-            <div className="flex flex-col h-full gap-2 p-2 overflow-hidden">
+            <div className="flex flex-col max-h-full gap-2 p-2">
               {/*
                 Map container
                 - flex-1: neemt alle beschikbare ruimte
                 - min-h-0: voorkom flex overflow issues
+                - overflow-hidden: voorkom dat map buiten bounds gaat
               */}
               <div id="fullscreen-map-wrapper" className="flex-1 min-h-0 overflow-hidden rounded-lg">
                 {mapContent}
@@ -676,19 +677,20 @@ export function MapViewer({
 
               {/*
                 Elevation profile container
-                - h-32 md:h-48: responsieve hoogte
+                - h-32 md:h-40: responsieve hoogte (kleiner op desktop om scrollbar te voorkomen)
                   * Mobile: 128px (h-32)
-                  * Desktop: 192px (h-48)
+                  * Desktop: 160px (h-40) - was h-48 (192px) maar dat was te groot
                 - flex-shrink-0: behoud vaste hoogte
+                - overflow-auto: scrollbar indien nodig binnen de elevation zelf
                 - rounded-lg: afgeronde hoeken voor mooiere weergave
               */}
-              <div id="fullscreen-elevation-wrapper" className="h-32 md:h-48 overflow-auto flex-shrink-0 rounded-lg">
+              <div id="fullscreen-elevation-wrapper" className="h-32 md:h-40 overflow-auto flex-shrink-0 rounded-lg">
                 {elevationProfile}
               </div>
             </div>
           ) : (
             // Zonder elevation profile: alleen kaart
-            <div className="h-full p-2">
+            <div className="max-h-full h-full p-2">
               <div className="h-full rounded-lg overflow-hidden">
                 {mapContent}
               </div>
