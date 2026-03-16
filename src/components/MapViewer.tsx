@@ -1,9 +1,11 @@
 import { useEffect, useMemo, useState } from 'react'
 import { MapContainer, TileLayer, Polyline, Marker, Popup, Tooltip, useMap } from 'react-leaflet'
 import { LatLngBounds, LatLngExpression, DivIcon, DragEndEvent } from 'leaflet'
-import { Maximize2, Minimize2, MapPin } from 'lucide-react'
+import { Maximize2, Minimize2, MapPin, X } from 'lucide-react'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { getDistanceFromLatLonInKm } from '@/lib/gpx-utils'
+import { Dialog, DialogContent } from '@/components/ui/dialog'
+import { Button } from '@/components/ui/button'
 import 'leaflet/dist/leaflet.css'
 
 interface RoutePoint {
@@ -615,84 +617,81 @@ export function MapViewer({
 
   {/*
     ============================================================
-    FULLSCREEN MODE MET ELEVATION PROFILE
-    ============================================================
-    Als de kaart fullscreen is EN er is een elevation profile:
-    - Toon beide in een verticale flex container
-    - Kaart neemt flex-1 (maximale ruimte)
-    - Elevation profile heeft responsieve hoogte:
-      * Mobile: h-40 (160px)
-      * Desktop: h-64 (256px)
-
-    Fixed positioning met responsive margins:
-    - z-[9999]: zeer hoge z-index om boven alles te komen
-    - Mobile: volledig scherm (top-0, left-0, w-screen, h-screen)
-    - Desktop (md): kleine marge (1rem) van de randen voor betere UX
-  */}
-  if (isFullscreen && elevationProfile) {
-    return (
-      <div
-        id="fullscreen-with-elevation"
-        className="fixed top-0 left-0 md:top-4 md:left-4 z-[9999] w-screen h-screen md:w-[calc(100vw-2rem)] md:h-[calc(100vh-2rem)] md:rounded-lg bg-background"
-      >
-        {/*
-          Flex container met verticale layout (flex-col)
-          - gap-2: kleine ruimte tussen kaart en elevation profile (0.5rem)
-          - p-0 md:p-4: geen padding op mobile, wel op desktop
-          - h-full: volledige hoogte van parent
-          - overflow-hidden: voorkom scrollbars op container
-        */}
-        <div className="flex flex-col h-full gap-2 p-0 md:p-4 overflow-hidden">
-          {/*
-            Map container
-            - flex-1: neemt alle beschikbare ruimte (na aftrek van elevation profile)
-            - min-h-0: voorkom dat flex item te groot wordt
-            - overflow-hidden: voorkom dat map buiten container komt
-          */}
-          <div id="fullscreen-map-wrapper" className="flex-1 min-h-0 overflow-hidden">
-            {mapContent}
-          </div>
-
-          {/*
-            Elevation profile container
-            - h-40 md:h-64: responsieve hoogte
-              * Mobile: 160px (h-40)
-              * Desktop: 256px (h-64) - meer ruimte voor betere leesbaarheid
-            - overflow-auto: scrollbar indien nodig (zowel x als y)
-            - flex-shrink-0: voorkom dat deze container kleiner wordt dan de ingestelde hoogte
-          */}
-          <div id="fullscreen-elevation-wrapper" className="h-40 md:h-64 overflow-auto flex-shrink-0">
-            {elevationProfile}
-          </div>
-        </div>
-      </div>
-    )
-  }
-
-  {/*
-    ============================================================
-    FULLSCREEN MODE ZONDER ELEVATION PROFILE
-    ============================================================
-    Als de kaart fullscreen is ZONDER elevation profile:
-    - Toon alleen de kaart in fullscreen
-    - Zelfde responsive fixed positioning als hierboven
-  */}
-  if (isFullscreen) {
-    return (
-      <div
-        id="fullscreen-map-only"
-        className="fixed top-0 left-0 md:top-4 md:left-4 z-[9999] w-screen h-screen md:w-[calc(100vw-2rem)] md:h-[calc(100vh-2rem)] md:rounded-lg overflow-hidden"
-      >
-        {mapContent}
-      </div>
-    )
-  }
-
-  {/*
-    ============================================================
     NORMALE MODE
     ============================================================
     Standaard weergave: kaart in normale modus binnen de parent container
+    Fullscreen wordt nu getoond via een Dialog modal (zie hieronder)
   */}
-  return mapContent
+  return (
+    <>
+      {/* Normale kaart weergave */}
+      {mapContent}
+
+      {/*
+        ============================================================
+        FULLSCREEN MODAL - id: fullscreen-map-modal
+        ============================================================
+        Dialog modal voor fullscreen weergave met:
+        - Donkere backdrop overlay
+        - ESC key om te sluiten
+        - Click outside om te sluiten
+        - Proper z-index management
+        - Responsive sizing
+      */}
+      <Dialog open={isFullscreen} onOpenChange={setIsFullscreen}>
+        <DialogContent
+          className="max-w-none w-screen h-screen md:w-[95vw] md:h-[95vh] p-0 gap-0"
+          id="fullscreen-map-modal"
+        >
+          {/*
+            Close button - rechtsboven in de modal
+            - Absolute positioning
+            - Hoge z-index om boven kaart te komen
+            - Hover effect voor betere UX
+          */}
+          <Button
+            variant="ghost"
+            size="icon"
+            className="absolute top-2 right-2 z-[10000] bg-white/90 hover:bg-white dark:bg-gray-800/90 dark:hover:bg-gray-800 shadow-lg rounded-lg"
+            onClick={() => setIsFullscreen(false)}
+          >
+            <X className="h-5 w-5" />
+          </Button>
+
+          {elevationProfile ? (
+            // Met elevation profile: kaart + elevation in verticale layout
+            <div className="flex flex-col h-full gap-2 p-2 overflow-hidden">
+              {/*
+                Map container
+                - flex-1: neemt alle beschikbare ruimte
+                - min-h-0: voorkom flex overflow issues
+              */}
+              <div id="fullscreen-map-wrapper" className="flex-1 min-h-0 overflow-hidden rounded-lg">
+                {mapContent}
+              </div>
+
+              {/*
+                Elevation profile container
+                - h-32 md:h-48: responsieve hoogte
+                  * Mobile: 128px (h-32)
+                  * Desktop: 192px (h-48)
+                - flex-shrink-0: behoud vaste hoogte
+                - rounded-lg: afgeronde hoeken voor mooiere weergave
+              */}
+              <div id="fullscreen-elevation-wrapper" className="h-32 md:h-48 overflow-auto flex-shrink-0 rounded-lg">
+                {elevationProfile}
+              </div>
+            </div>
+          ) : (
+            // Zonder elevation profile: alleen kaart
+            <div className="h-full p-2">
+              <div className="h-full rounded-lg overflow-hidden">
+                {mapContent}
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+    </>
+  )
 }
