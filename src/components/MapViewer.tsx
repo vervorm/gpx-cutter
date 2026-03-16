@@ -620,41 +620,48 @@ export function MapViewer({
     Als de kaart fullscreen is EN er is een elevation profile:
     - Toon beide in een verticale flex container
     - Kaart neemt flex-1 (maximale ruimte)
-    - Elevation profile heeft vaste hoogte (h-48 = 12rem = 192px)
+    - Elevation profile heeft responsieve hoogte:
+      * Mobile: h-40 (160px)
+      * Desktop: h-64 (256px)
 
-    Fixed positioning:
+    Fixed positioning met responsive margins:
     - z-[9999]: zeer hoge z-index om boven alles te komen
-    - Mobile: volledig scherm
-    - Desktop (md): kleine marge (4 = 1rem) van de randen
+    - Mobile: volledig scherm (top-0, left-0, w-screen, h-screen)
+    - Desktop (md): kleine marge (1rem) van de randen voor betere UX
   */}
   if (isFullscreen && elevationProfile) {
     return (
       <div
         id="fullscreen-with-elevation"
-        className="fixed top-0 left-0 md:top-4 md:left-4 z-[9999] w-screen h-screen md:w-[calc(100vw-2rem)] md:h-[calc(100vh-2rem)] md:rounded-lg overflow-hidden bg-background"
+        className="fixed top-0 left-0 md:top-4 md:left-4 z-[9999] w-screen h-screen md:w-[calc(100vw-2rem)] md:h-[calc(100vh-2rem)] md:rounded-lg bg-background"
       >
         {/*
           Flex container met verticale layout (flex-col)
-          - gap-4: 1rem ruimte tussen kaart en elevation profile
-          - p-4: padding rondom
+          - gap-2: kleine ruimte tussen kaart en elevation profile (0.5rem)
+          - p-0 md:p-4: geen padding op mobile, wel op desktop
           - h-full: volledige hoogte van parent
+          - overflow-hidden: voorkom scrollbars op container
         */}
-        <div className="flex flex-col h-full gap-4 p-4">
+        <div className="flex flex-col h-full gap-2 p-0 md:p-4 overflow-hidden">
           {/*
             Map container
             - flex-1: neemt alle beschikbare ruimte (na aftrek van elevation profile)
             - min-h-0: voorkom dat flex item te groot wordt
+            - overflow-hidden: voorkom dat map buiten container komt
           */}
-          <div id="fullscreen-map-wrapper" className="flex-1 min-h-0">
+          <div id="fullscreen-map-wrapper" className="flex-1 min-h-0 overflow-hidden">
             {mapContent}
           </div>
 
           {/*
             Elevation profile container
-            - h-48: vaste hoogte van 12rem (192px)
-            - overflow-y-auto: scrollbar indien nodig
+            - h-40 md:h-64: responsieve hoogte
+              * Mobile: 160px (h-40)
+              * Desktop: 256px (h-64) - meer ruimte voor betere leesbaarheid
+            - overflow-auto: scrollbar indien nodig (zowel x als y)
+            - flex-shrink-0: voorkom dat deze container kleiner wordt dan de ingestelde hoogte
           */}
-          <div id="fullscreen-elevation-wrapper" className="h-48 overflow-y-auto">
+          <div id="fullscreen-elevation-wrapper" className="h-40 md:h-64 overflow-auto flex-shrink-0">
             {elevationProfile}
           </div>
         </div>
@@ -668,7 +675,7 @@ export function MapViewer({
     ============================================================
     Als de kaart fullscreen is ZONDER elevation profile:
     - Toon alleen de kaart in fullscreen
-    - Zelfde fixed positioning als hierboven
+    - Zelfde responsive fixed positioning als hierboven
   */}
   if (isFullscreen) {
     return (
