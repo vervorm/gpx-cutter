@@ -621,11 +621,14 @@ export function MapViewer({
     ============================================================
     Standaard weergave: kaart in normale modus binnen de parent container
     Fullscreen wordt nu getoond via een Dialog modal (zie hieronder)
+
+    BELANGRIJK: Render normale kaart ALLEEN wanneer NIET fullscreen
+    Anders krijgen we 2 overlappende kaarten (normale + modal)
   */}
   return (
     <>
-      {/* Normale kaart weergave */}
-      {mapContent}
+      {/* Normale kaart weergave - alleen tonen wanneer NIET fullscreen */}
+      {!isFullscreen && mapContent}
 
       {/*
         ============================================================
@@ -640,7 +643,7 @@ export function MapViewer({
       */}
       <Dialog open={isFullscreen} onOpenChange={setIsFullscreen}>
         <DialogContent
-          className="max-w-none w-screen h-screen md:w-[95vw] md:h-[95vh] p-0 gap-0"
+          className="max-w-none w-screen h-screen md:w-[95vw] md:h-[95vh] p-0 gap-0 border-0 md:border rounded-none md:rounded-lg [&>button]:hidden"
           id="fullscreen-map-modal"
         >
           {/*
@@ -648,6 +651,7 @@ export function MapViewer({
             - Absolute positioning
             - Hoge z-index om boven kaart te komen
             - Hover effect voor betere UX
+            - Vervangt de default DialogContent close button (die is verborgen via [&>button]:hidden)
           */}
           <Button
             variant="ghost"
