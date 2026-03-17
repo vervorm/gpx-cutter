@@ -663,34 +663,61 @@ export function MapViewer({
           </Button>
 
           {elevationProfile ? (
-            // Met elevation profile: kaart + elevation in verticale layout
-            <div className="flex flex-col max-h-full gap-2 p-2">
-              {/*
-                Map container
-                - flex-1: neemt alle beschikbare ruimte
-                - min-h-0: voorkom flex overflow issues
-                - overflow-hidden: voorkom dat map buiten bounds gaat
-              */}
-              <div id="fullscreen-map-wrapper" className="flex-1 min-h-0 overflow-hidden rounded-lg">
-                {mapContent}
-              </div>
+            /*
+              Met elevation profile: kaart + elevation in verticale layout
 
-              {/*
-                Elevation profile container
-                - h-32 md:h-40: responsieve hoogte (kleiner op desktop om scrollbar te voorkomen)
-                  * Mobile: 128px (h-32)
-                  * Desktop: 160px (h-40) - was h-48 (192px) maar dat was te groot
-                - flex-shrink-0: behoud vaste hoogte
-                - overflow-auto: scrollbar indien nodig binnen de elevation zelf
-                - rounded-lg: afgeronde hoeken voor mooiere weergave
-              */}
-              <div id="fullscreen-elevation-wrapper" className="h-32 md:h-40 overflow-auto flex-shrink-0 rounded-lg">
-                {elevationProfile}
+              LAYOUT STRUCTUUR (3 lagen voor correcte height calculation):
+              1. Padding wrapper (h-full p-2)
+                 - Hoogte: 100% van DialogContent (100vh of 95vh)
+                 - Padding: p-2 (8px top + 8px bottom = 16px)
+                 - Content box: 100vh - 16px
+
+              2. Flex container (h-full gap-2)
+                 - Hoogte: 100% van wrapper's content box
+                 - Gap: 8px tussen map en elevation
+                 - Beschikbaar voor children: 100vh - 16px - 8px = 100vh - 24px
+
+              3. Children (map + elevation)
+                 - Map: flex-1 (vult resterende ruimte)
+                 - Elevation: h-32/h-40 (128px/160px fixed)
+                 - Totaal: (100vh - 24px - 128px) + 128px = 100vh - 24px ✓
+            */
+            <div className="h-full p-2">
+              {/* Flex container voor verticale layout */}
+              <div className="flex flex-col h-full gap-2">
+                {/*
+                  Map container
+                  - flex-1: neemt alle beschikbare ruimte (na aftrek van elevation + gap)
+                  - min-h-0: KRITIEK! Zonder deze property kan flex-1 niet krimpen onder content size
+                  - overflow-hidden: voorkom dat Leaflet kaart buiten bounds gaat
+                  - rounded-lg: afgeronde hoeken
+                */}
+                <div id="fullscreen-map-wrapper" className="flex-1 min-h-0 overflow-hidden rounded-lg">
+                  {mapContent}
+                </div>
+
+                {/*
+                  Elevation profile container
+                  - h-32 md:h-40: responsieve vaste hoogte
+                    * Mobile: 128px (h-32) - klein genoeg voor portrait mode
+                    * Desktop: 160px (h-40) - groter voor betere leesbaarheid
+                  - flex-shrink-0: KRITIEK! Behoud vaste hoogte, laat map krimpen ipv elevation
+                  - overflow-auto: scrollbar binnen elevation zelf indien chart te breed is
+                  - rounded-lg: afgeronde hoeken
+                */}
+                <div id="fullscreen-elevation-wrapper" className="h-32 md:h-40 overflow-auto flex-shrink-0 rounded-lg">
+                  {elevationProfile}
+                </div>
               </div>
             </div>
           ) : (
-            // Zonder elevation profile: alleen kaart
-            <div className="max-h-full h-full p-2">
+            /*
+              Zonder elevation profile: alleen kaart
+              - Padding wrapper: h-full p-2 (zelfde pattern als met elevation)
+              - Inner wrapper: h-full rounded-lg overflow-hidden
+              - Map: neemt volledige hoogte binnen padding
+            */
+            <div className="h-full p-2">
               <div className="h-full rounded-lg overflow-hidden">
                 {mapContent}
               </div>
