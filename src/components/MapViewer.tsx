@@ -698,14 +698,18 @@ export function MapViewer({
 
                 {/*
                   Elevation profile container
-                  - h-32 md:h-40: responsieve vaste hoogte
-                    * Mobile: 128px (h-32) - klein genoeg voor portrait mode
-                    * Desktop: 160px (h-40) - groter voor betere leesbaarheid
+                  - h-40 md:h-56: responsieve vaste hoogte (VERGROOT om SVG van 200px te laten passen)
+                    * Mobile: 160px (h-40) - groot genoeg voor SVG van 200px (met scaling)
+                    * Desktop: 224px (h-56) - nog meer ruimte voor betere zichtbaarheid
                   - flex-shrink-0: KRITIEK! Behoud vaste hoogte, laat map krimpen ipv elevation
-                  - overflow-auto: scrollbar binnen elevation zelf indien chart te breed is
+                  - overflow-hidden: geen scrollbar binnen elevation (SVG schaalt automatisch)
                   - rounded-lg: afgeronde hoeken
+
+                  BELANGRIJK: De ElevationProfile SVG is 200px hoog (hardcoded in component).
+                  Met preserveAspectRatio="xMidYMid meet" schaalt de SVG om in de container te passen.
+                  Container moet groot genoeg zijn om alle SVG details (y-axis labels, chart) te tonen.
                 */}
-                <div id="fullscreen-elevation-wrapper" className="h-32 md:h-40 overflow-auto flex-shrink-0 rounded-lg">
+                <div id="fullscreen-elevation-wrapper" className="h-40 md:h-56 overflow-hidden flex-shrink-0 rounded-lg">
                   {elevationProfile}
                 </div>
               </div>
