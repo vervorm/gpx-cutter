@@ -21,7 +21,8 @@ import { LanguageSelector } from '@/components/LanguageSelector'
 import { saveRoute, loadRoute, clearRoute } from '@/lib/route-cache'
 import { EXAMPLE_GPX } from '@/data/example-route'
 
-const APP_VERSION = '1.1.0'
+const APP_VERSION = '1.2.0'
+const BUILD_DATE = new Date().toISOString().split('T')[0] // YYYY-MM-DD
 
 function App() {
   // Initialize language from localStorage or default to 'nl'
@@ -982,6 +983,34 @@ function App() {
             </a>
           </div>
         </div>
+      </div>
+
+      {/*
+        ============================================================
+        VERSION BADGE - Fixed bottom right
+        ============================================================
+        Altijd zichtbare versie indicator in de rechter benedenhoek
+        - fixed: blijft op dezelfde plek bij scrollen
+        - bottom-2 right-2: 0.5rem van onderkant en rechterkant
+        - z-50: hoog genoeg om boven andere content te komen, maar onder modals (die z-[9999] hebben)
+        - bg-gray-900/80: semi-transparante donkere achtergrond
+        - backdrop-blur-sm: blur effect voor betere leesbaarheid
+        - text-white: witte tekst voor contrast
+        - px-3 py-1.5: padding voor leesbaarheid
+        - rounded-full: volledig afgeronde hoeken (pill shape)
+        - shadow-lg: schaduw voor diepte
+        - text-xs: kleine tekst om niet opdringerig te zijn
+        - font-mono: monospace font voor versie nummer
+        - hover:bg-gray-800: donkerder bij hover voor feedback
+        - transition-colors: smooth overgang bij hover
+        - select-none: voorkom selectie van tekst
+        - cursor-default: normale cursor (geen pointer)
+      */}
+      <div
+        className="fixed bottom-2 right-2 z-50 bg-gray-900/80 dark:bg-gray-800/80 backdrop-blur-sm text-white px-3 py-1.5 rounded-full shadow-lg text-xs font-mono hover:bg-gray-800 dark:hover:bg-gray-700 transition-colors select-none cursor-default"
+        title={`Version ${APP_VERSION} - Built on ${BUILD_DATE}`}
+      >
+        v{APP_VERSION}
       </div>
     </div>
   )
