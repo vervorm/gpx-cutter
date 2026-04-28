@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useMemo } from 'react'
-import { UploadCloud, FileUp, CheckCircle, Settings, Download, Eye, Map, HelpCircle, ExternalLink, Heart, Code2, Github, MoreVertical, Minus, Plus, Trash2 } from 'lucide-react'
+import { UploadCloud, FileUp, CheckCircle, Settings, Download, Eye, Map, HelpCircle, ExternalLink, Heart, Code2, Github, MoreVertical, Trash2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Label } from '@/components/ui/label'
@@ -20,8 +20,10 @@ import { Language, getTranslations } from '@/lib/i18n'
 import { LanguageSelector } from '@/components/LanguageSelector'
 import { saveRoute, loadRoute, clearRoute } from '@/lib/route-cache'
 import { EXAMPLE_GPX } from '@/data/example-route'
+import { SettingsModalContent } from '@/components/SettingsModalContent'
 
-const APP_VERSION = '1.1.0'
+const APP_VERSION = '1.2.0'
+const BUILD_DATE = new Date().toISOString().split('T')[0]
 
 function App() {
   // Initialize language from localStorage or default to 'nl'
@@ -497,59 +499,23 @@ function App() {
                         </DialogTrigger>
                         <DialogContent className="sm:max-w-md">
                           <DialogHeader>
-                            <DialogTitle>Max afstand instellen</DialogTitle>
+                            <DialogTitle>Instellingen</DialogTitle>
                           </DialogHeader>
-                          <div className="space-y-6 py-4">
-                            {/* Plus/Minus Spinner */}
-                            <div className="flex items-center justify-center gap-4 bg-muted/50 rounded-full p-3">
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                className="h-12 w-12 rounded-full hover:bg-background"
-                                onClick={() => {
-                                  const currentValue = parseInt(maxDistanceInput, 10)
-                                  const newValue = Math.max(10, currentValue - 10)
-                                  setMaxDistanceInput(newValue.toString())
-                                }}
-                              >
-                                <Minus className="h-5 w-5" />
-                              </Button>
-
-                              <div className="flex items-center gap-2 min-w-[100px] justify-center">
-                                <span className="text-3xl font-bold">{maxDistanceInput}</span>
-                                <span className="text-lg text-muted-foreground">km</span>
-                              </div>
-
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                className="h-12 w-12 rounded-full hover:bg-background"
-                                onClick={() => {
-                                  const currentValue = parseInt(maxDistanceInput, 10)
-                                  const newValue = Math.min(1000, currentValue + 10)
-                                  setMaxDistanceInput(newValue.toString())
-                                }}
-                              >
-                                <Plus className="h-5 w-5" />
-                              </Button>
-                            </div>
-
-                            <Button
-                              onClick={() => {
-                                const value = parseInt(maxDistanceInput, 10)
-                                if (!isNaN(value) && value >= 10 && value <= 1000) {
-                                  setMaxDistanceSetting(value)
-                                  setMaxDistanceInput(value.toString())
-                                } else {
-                                  setMaxDistanceInput(maxDistanceSetting.toString())
-                                }
-                                setSettingsOpen(false)
-                              }}
-                              className="w-full"
-                            >
-                              Pas aan
-                            </Button>
-                          </div>
+                          <SettingsModalContent
+                            startFromKM={startFromKM}
+                            distanceKM={distanceKM}
+                            maxDistanceInput={maxDistanceInput}
+                            maxDistanceSetting={maxDistanceSetting}
+                            roundedMaxDistance={roundedMaxDistance}
+                            maxDistanceKM={maxDistanceKM}
+                            setStartFromKM={setStartFromKM}
+                            setDistanceKM={setDistanceKM}
+                            setMaxDistanceInput={setMaxDistanceInput}
+                            setMaxDistanceSetting={setMaxDistanceSetting}
+                            onClose={() => setSettingsOpen(false)}
+                            startFromLabel={t.startFromLabel}
+                            distanceLabel={t.distanceLabel}
+                          />
                         </DialogContent>
                       </Dialog>
                     </div>
@@ -981,6 +947,22 @@ function App() {
           </div>
         </div>
       </div>
+
+      {/*
+        ============================================================
+        VERSION FOOTER
+        ============================================================
+        Versienummer onderaan de pagina (niet fixed).
+        Tooltip toont build datum bij hover.
+      */}
+      <footer className="text-center py-6 mt-8 border-t border-border">
+        <p
+          className="text-xs text-muted-foreground font-mono"
+          title={`Built on ${BUILD_DATE}`}
+        >
+          v{APP_VERSION}
+        </p>
+      </footer>
     </div>
   )
 }
